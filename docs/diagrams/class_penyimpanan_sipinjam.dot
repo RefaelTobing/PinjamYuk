@@ -1,0 +1,42 @@
+digraph G {
+  graph [fontname="DejaVu Sans", rankdir=LR, nodesep=0.25, ranksep=0.45,
+         splines=true, pad=0.2, bgcolor="white"];
+  node  [fontname="DejaVu Sans", fontsize=13];
+  edge  [fontname="DejaVu Sans", fontsize=12, color="#3a3a3a"];
+  subgraph cluster_0 {
+    label=<<B>Paket Penyimpanan</B>>; fontsize=14; fontcolor="#3d3d3d";
+    style="rounded,dashed"; color="#9a9a9a"; margin=8;
+      RepositoriBarang [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#f6e6c8" align="center"><b>RepositoriBarang</b></td></tr><tr><td align="left">- daftarBarang</td></tr><tr><td align="left">+ tambah(b), cari(kode)</td></tr></table>>];
+      RepositoriPeminjaman [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#f6e6c8" align="center"><b>RepositoriPeminjaman</b></td></tr><tr><td align="left">- daftarPeminjaman</td></tr><tr><td align="left">+ tambah(p), cariAktif()</td></tr></table>>];
+      RepositoriPengguna [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#f6e6c8" align="center"><b>RepositoriPengguna</b></td></tr><tr><td align="left">- daftarPengguna</td></tr><tr><td align="left">+ login(u, s): Pengguna</td></tr></table>>];
+      PenyimpananData [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#f6e6c8" align="center"><b>PenyimpananData</b></td></tr><tr><td align="left">- folderData</td></tr><tr><td align="left">+ simpanSemua(), muatSemua()</td></tr></table>>];
+  }
+  subgraph cluster_1 {
+    label=<<B>Paket Layanan</B>>; fontsize=14; fontcolor="#3d3d3d";
+    style="rounded,dashed"; color="#9a9a9a"; margin=8;
+      LayananPeminjaman [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#d7ecdd" align="center"><b>LayananPeminjaman</b></td></tr><tr><td align="left">+ ajukanPeminjaman(...)<br/>+ verifikasi(...)<br/>+ daftarJatuhTempo()</td></tr></table>>];
+  }
+  subgraph cluster_2 {
+    label=<<B>Paket Pelaporan dan Antarmuka</B>>; fontsize=14; fontcolor="#3d3d3d";
+    style="rounded,dashed"; color="#9a9a9a"; margin=8;
+      RekapPeminjaman [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#f7d9d9" align="center"><b>RekapPeminjaman</b></td></tr><tr><td align="left">+ jumlahPerKategori()<br/>+ tingkatKeterlambatan()</td></tr></table>>];
+      AplikasiSipinjam [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#f7d9d9" align="center"><b>AplikasiSipinjam</b></td></tr><tr><td align="left">+ main(args)<br/>+ tampilkanMenu(peran)</td></tr></table>>];
+  }
+  subgraph cluster_3 {
+    label=<<B>Kelas rujukan</B>>; fontsize=14; fontcolor="#3d3d3d";
+    style="rounded,dashed"; color="#9a9a9a"; margin=8;
+      Barang [shape=box, style="dashed", fontsize=12, color="#8a8a8a", label="Barang\n(di gambar lain)"];
+      Peminjaman [shape=box, style="dashed", fontsize=12, color="#8a8a8a", label="Peminjaman\n(di gambar lain)"];
+      Pengguna [shape=box, style="dashed", fontsize=12, color="#8a8a8a", label="Pengguna\n(di gambar lain)"];
+  }
+  Legenda [shape=plaintext, label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="5" bgcolor="#ffffff"><tr><td align="left"><b>Legenda</b></td></tr><tr><td align="left">&#9651; garis penuh = generalisasi</td></tr><tr><td align="left">&#9651; garis putus = realisasi interface</td></tr><tr><td align="left">&#9671; belah ketupat = agregasi</td></tr><tr><td align="left">garis tanpa panah = asosiasi</td></tr></table>>];
+  LayananPeminjaman -> RepositoriBarang [arrowhead=none, style=solid];
+  LayananPeminjaman -> RepositoriPeminjaman [arrowhead=none, style=solid];
+  LayananPeminjaman -> PenyimpananData [arrowhead=none, style=solid];
+  RekapPeminjaman -> RepositoriPeminjaman [arrowhead=none, style=solid];
+  AplikasiSipinjam -> LayananPeminjaman [arrowhead=none, style=solid];
+  AplikasiSipinjam -> RekapPeminjaman [arrowhead=none, style=solid];
+  RepositoriBarang -> Barang [arrowhead=odiamond, style=solid, headlabel=" 0..*", taillabel="1 "];
+  RepositoriPeminjaman -> Peminjaman [arrowhead=odiamond, style=solid, headlabel=" 0..*", taillabel="1 "];
+  RepositoriPengguna -> Pengguna [arrowhead=odiamond, style=solid, headlabel=" 0..*", taillabel="1 "];
+}

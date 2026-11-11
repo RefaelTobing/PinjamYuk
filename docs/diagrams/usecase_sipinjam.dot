@@ -1,0 +1,54 @@
+digraph UseCase {
+  graph [fontname="DejaVu Sans", rankdir=LR, nodesep=0.30, ranksep=0.55,
+         splines=true, pad=0.3, bgcolor="white"];
+  node  [fontname="DejaVu Sans", fontsize=11];
+  edge  [fontname="DejaVu Sans", fontsize=9, color="#333333", arrowsize=0.7];
+  subgraph cluster_sistem {
+    label=<<B>Sistem SIPINJAM</B>>; labeljust="c"; fontsize=13;
+    style="rounded,dashed"; color="#7a7a7a"; margin=16;
+    UC01 [shape=ellipse, style="filled", fillcolor="#eef4fb", color="#4a72a8", width=2.0, label="Login\n<FONT POINT-SIZE='9' COLOR='#666666'>UC01</FONT>"];
+    UC02 [shape=ellipse, style="filled", fillcolor="#eef4fb", color="#4a72a8", width=2.0, label="Registrasi akun\nmahasiswa\n<FONT POINT-SIZE='9' COLOR='#666666'>UC02</FONT>"];
+    UC03 [shape=ellipse, style="filled", fillcolor="#eef4fb", color="#4a72a8", width=2.0, label="Kelola data\ninventaris\n<FONT POINT-SIZE='9' COLOR='#666666'>UC03</FONT>"];
+    UC04 [shape=ellipse, style="filled", fillcolor="#eef4fb", color="#4a72a8", width=2.0, label="Kelola kategori\nbarang\n<FONT POINT-SIZE='9' COLOR='#666666'>UC04</FONT>"];
+    UC05 [shape=ellipse, style="filled", fillcolor="#eef4fb", color="#4a72a8", width=2.0, label="Kelola data\nmahasiswa\n<FONT POINT-SIZE='9' COLOR='#666666'>UC05</FONT>"];
+    UC06 [shape=ellipse, style="filled", fillcolor="#eef4fb", color="#4a72a8", width=2.0, label="Cek ketersediaan\ndan jadwal barang\n<FONT POINT-SIZE='9' COLOR='#666666'>UC06</FONT>"];
+    UC07 [shape=ellipse, style="filled", fillcolor="#eef4fb", color="#4a72a8", width=2.0, label="Ajukan\npeminjaman\n<FONT POINT-SIZE='9' COLOR='#666666'>UC07</FONT>"];
+    UC08 [shape=ellipse, style="filled", fillcolor="#eef4fb", color="#4a72a8", width=2.0, label="Batalkan\npengajuan\n<FONT POINT-SIZE='9' COLOR='#666666'>UC08</FONT>"];
+    UC09 [shape=ellipse, style="filled", fillcolor="#eef4fb", color="#4a72a8", width=2.0, label="Verifikasi dan\nsetujui pengajuan\n<FONT POINT-SIZE='9' COLOR='#666666'>UC09</FONT>"];
+    UC10 [shape=ellipse, style="filled", fillcolor="#eef4fb", color="#4a72a8", width=2.0, label="Persetujuan\npembina\n<FONT POINT-SIZE='9' COLOR='#666666'>UC10</FONT>"];
+    UC11 [shape=ellipse, style="filled", fillcolor="#eef4fb", color="#4a72a8", width=2.0, label="Catat serah\nterima barang\n<FONT POINT-SIZE='9' COLOR='#666666'>UC11</FONT>"];
+    UC12 [shape=ellipse, style="filled", fillcolor="#eef4fb", color="#4a72a8", width=2.0, label="Catat pengembalian\ndan kondisi barang\n<FONT POINT-SIZE='9' COLOR='#666666'>UC12</FONT>"];
+    UC13 [shape=ellipse, style="filled", fillcolor="#eef4fb", color="#4a72a8", width=2.0, label="Lihat riwayat dan\ndenda\n<FONT POINT-SIZE='9' COLOR='#666666'>UC13</FONT>"];
+    UC14 [shape=ellipse, style="filled", fillcolor="#eef4fb", color="#4a72a8", width=2.0, label="Pantau jatuh\ntempo\n<FONT POINT-SIZE='9' COLOR='#666666'>UC14</FONT>"];
+    UC15 [shape=ellipse, style="filled", fillcolor="#eef4fb", color="#4a72a8", width=2.0, label="Rekap dan laporan\nbulanan\n<FONT POINT-SIZE='9' COLOR='#666666'>UC15</FONT>"];
+    UC16 [shape=ellipse, style="filled", fillcolor="#eef4fb", color="#4a72a8", width=2.0, label="Hitung denda\notomatis\n<FONT POINT-SIZE='9' COLOR='#666666'>UC16</FONT>"];
+  }
+  Mahasiswa [shape=box, style="rounded,filled", fillcolor="#fdf3e3", color="#b98a3c", width=1.5, height=0.7, label=<<B>Mahasiswa</B><BR/><FONT POINT-SIZE='9'>«actor»</FONT>>];
+  PetugasSarpras [shape=box, style="rounded,filled", fillcolor="#fdf3e3", color="#b98a3c", width=1.5, height=0.7, label=<<B>PetugasSarpras</B><BR/><FONT POINT-SIZE='9'>«actor»</FONT>>];
+  DosenPembina [shape=box, style="rounded,filled", fillcolor="#fdf3e3", color="#b98a3c", width=1.5, height=0.7, label=<<B>DosenPembina</B><BR/><FONT POINT-SIZE='9'>«actor»</FONT>>];
+  Mahasiswa -> UC01 [style=solid];
+  Mahasiswa -> UC02 [style=solid];
+  Mahasiswa -> UC06 [style=solid];
+  Mahasiswa -> UC07 [style=solid];
+  Mahasiswa -> UC08 [style=solid];
+  Mahasiswa -> UC13 [style=solid];
+  PetugasSarpras -> UC01 [style=solid];
+  PetugasSarpras -> UC03 [style=solid];
+  PetugasSarpras -> UC04 [style=solid];
+  PetugasSarpras -> UC05 [style=solid];
+  PetugasSarpras -> UC06 [style=solid];
+  PetugasSarpras -> UC09 [style=solid];
+  PetugasSarpras -> UC11 [style=solid];
+  PetugasSarpras -> UC12 [style=solid];
+  PetugasSarpras -> UC14 [style=solid];
+  PetugasSarpras -> UC15 [style=solid];
+  DosenPembina -> UC01 [style=solid];
+  DosenPembina -> UC10 [style=solid];
+  DosenPembina -> UC14 [style=solid];
+  UC09 -> UC06 [style=dashed, label="«include»", fontsize=9];
+  UC07 -> UC06 [style=dashed, label="«include»", fontsize=9];
+  UC10 -> UC06 [style=dashed, label="«include»", fontsize=9];
+  UC12 -> UC16 [style=dashed, label="«include»", fontsize=9];
+  UC13 -> UC16 [style=dashed, label="«include»", fontsize=9];
+  UC07 -> UC08 [style=dashed, label="«extend»", fontsize=9];
+}

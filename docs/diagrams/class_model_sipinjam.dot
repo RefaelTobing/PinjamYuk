@@ -1,0 +1,44 @@
+digraph G {
+  graph [fontname="DejaVu Sans", rankdir=LR, nodesep=0.25, ranksep=0.45,
+         splines=true, pad=0.2, bgcolor="white"];
+  node  [fontname="DejaVu Sans", fontsize=13];
+  edge  [fontname="DejaVu Sans", fontsize=12, color="#3a3a3a"];
+  subgraph cluster_0 {
+    label=<<B>Paket Pengguna</B>>; fontsize=14; fontcolor="#3d3d3d";
+    style="rounded,dashed"; color="#9a9a9a"; margin=8;
+      Pengguna [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#c9dcf2" align="center"><b>Pengguna</b><br/><i>«abstract»</i></td></tr><tr><td align="left">- id, username</td></tr><tr><td align="left">+ getPeran(): String<br/>+ tampilkanProfil()</td></tr></table>>];
+      Mahasiswa [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#e8f1fb" align="center"><b>Mahasiswa</b></td></tr><tr><td align="left">- nim, prodi</td></tr><tr><td align="left">+ getPeran(): String<br/>+ peminjamanAktif(): int</td></tr></table>>];
+      PetugasSarpras [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#e8f1fb" align="center"><b>PetugasSarpras</b></td></tr><tr><td align="left">- nip, unit</td></tr><tr><td align="left">+ getPeran(): String</td></tr></table>>];
+      DosenPembina [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#e8f1fb" align="center"><b>DosenPembina</b></td></tr><tr><td align="left">- nidn, jabatan</td></tr><tr><td align="left">+ getPeran(): String</td></tr></table>>];
+  }
+  subgraph cluster_1 {
+    label=<<B>Paket Inventaris</B>>; fontsize=14; fontcolor="#3d3d3d";
+    style="rounded,dashed"; color="#9a9a9a"; margin=8;
+      KategoriBarang [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#f2f2f2" align="center"><b>KategoriBarang</b></td></tr><tr><td align="left">- kode, nama</td></tr><tr><td align="left">+ getNama(): String</td></tr></table>>];
+      Barang [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#c9dcf2" align="center"><b>Barang</b><br/><i>«abstract»</i></td></tr><tr><td align="left">- kode, nama, stok</td></tr><tr><td align="left">+ getJenisBarang(): String<br/>+ hitungDenda(): double<br/>+ perluPersetujuan()</td></tr></table>>];
+      BarangElektronik [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#e8f1fb" align="center"><b>BarangElektronik</b></td></tr><tr><td align="left">- masaGaransi</td></tr><tr><td align="left">+ hitungDenda(): double</td></tr></table>>];
+      AlatLaboratorium [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#e8f1fb" align="center"><b>AlatLaboratorium</b></td></tr><tr><td align="left">- laboratorium</td></tr><tr><td align="left">+ hitungDenda(): double</td></tr></table>>];
+      BarangFurnitur [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#e8f1fb" align="center"><b>BarangFurnitur</b></td></tr><tr><td align="left">- bahan</td></tr><tr><td align="left">+ hitungDenda(): double</td></tr></table>>];
+      Ruangan [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#e8f1fb" align="center"><b>Ruangan</b></td></tr><tr><td align="left">- kapasitas</td></tr><tr><td align="left">+ hitungDenda(): double</td></tr></table>>];
+  }
+  subgraph cluster_2 {
+    label=<<B>Paket Transaksi</B>>; fontsize=14; fontcolor="#3d3d3d";
+    style="rounded,dashed"; color="#9a9a9a"; margin=8;
+      DetailPeminjaman [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#f2f2f2" align="center"><b>DetailPeminjaman</b></td></tr><tr><td align="left">- jumlah, kondisiAwal</td></tr><tr><td align="left">+ subtotalDenda(): double</td></tr></table>>];
+      Peminjaman [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#f2f2f2" align="center"><b>Peminjaman</b></td></tr><tr><td align="left">- id, tanggalMulai<br/>- tanggalSelesai, status</td></tr><tr><td align="left">+ ajukan(), setujui()<br/>+ serahkanBarang()<br/>+ isTerlambat(): boolean</td></tr></table>>];
+      Pengembalian [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#f2f2f2" align="center"><b>Pengembalian</b></td></tr><tr><td align="left">- tanggalKembali, denda</td></tr><tr><td align="left">+ hitungDenda(): double</td></tr></table>>];
+  }
+  Legenda [shape=plaintext, label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="5" bgcolor="#ffffff"><tr><td align="left"><b>Legenda</b></td></tr><tr><td align="left">&#9651; garis penuh = generalisasi</td></tr><tr><td align="left">&#9651; garis putus = realisasi interface</td></tr><tr><td align="left">&#9671; belah ketupat = agregasi</td></tr><tr><td align="left">garis tanpa panah = asosiasi</td></tr></table>>];
+  Pengguna -> Mahasiswa [arrowhead=onormal, style=solid];
+  Pengguna -> PetugasSarpras [arrowhead=onormal, style=solid];
+  Pengguna -> DosenPembina [arrowhead=onormal, style=solid];
+  Barang -> BarangElektronik [arrowhead=onormal, style=solid];
+  Barang -> AlatLaboratorium [arrowhead=onormal, style=solid];
+  Barang -> BarangFurnitur [arrowhead=onormal, style=solid];
+  Barang -> Ruangan [arrowhead=onormal, style=solid];
+  Barang -> KategoriBarang [arrowhead=none, style=solid, headlabel=" 1", taillabel="1 "];
+  DetailPeminjaman -> Barang [arrowhead=none, style=solid, headlabel=" 1", taillabel="0..* "];
+  Peminjaman -> Mahasiswa [arrowhead=none, style=solid, headlabel=" 1", taillabel="0..* "];
+  Peminjaman -> Pengembalian [arrowhead=none, style=solid, headlabel=" 0..1", taillabel="1 "];
+  Peminjaman -> DetailPeminjaman [arrowhead=odiamond, style=solid, headlabel=" 1..*", taillabel="1 "];
+}

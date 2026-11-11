@@ -1,0 +1,41 @@
+digraph G {
+  graph [fontname="DejaVu Sans", rankdir=LR, nodesep=0.25, ranksep=0.45,
+         splines=true, pad=0.2, bgcolor="white"];
+  node  [fontname="DejaVu Sans", fontsize=13];
+  edge  [fontname="DejaVu Sans", fontsize=12, color="#3a3a3a"];
+  subgraph cluster_0 {
+    label=<<B>Paket Aturan Validasi</B>>; fontsize=14; fontcolor="#3d3d3d";
+    style="rounded,dashed"; color="#9a9a9a"; margin=8;
+      AturanPeminjaman [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#e0d3ef" align="center"><b>AturanPeminjaman</b><br/><i>«interface»</i></td></tr><tr><td align="left">+ getNamaAturan(): String<br/>+ periksa(m, p): void</td></tr></table>>];
+      AturanStatusMahasiswa [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#e0d3ef" align="center"><b>AturanStatusMahasiswa</b></td></tr><tr><td align="left">+ periksa(m, p): void</td></tr></table>>];
+      AturanMaksimalAktif [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#e0d3ef" align="center"><b>AturanMaksimalAktif</b></td></tr><tr><td align="left">+ periksa(m, p): void</td></tr></table>>];
+      AturanTunggakanDenda [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#e0d3ef" align="center"><b>AturanTunggakanDenda</b></td></tr><tr><td align="left">+ periksa(m, p): void</td></tr></table>>];
+      AturanBatasWaktu [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#e0d3ef" align="center"><b>AturanBatasWaktu</b></td></tr><tr><td align="left">+ periksa(m, p): void</td></tr></table>>];
+      AturanDurasiMaksimal [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#e0d3ef" align="center"><b>AturanDurasiMaksimal</b></td></tr><tr><td align="left">+ periksa(m, p): void</td></tr></table>>];
+      ValidatorPeminjaman [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#d7ecdd" align="center"><b>ValidatorPeminjaman</b></td></tr><tr><td align="left">- daftarAturan</td></tr><tr><td align="left">+ validasi(m, p): void</td></tr></table>>];
+  }
+  subgraph cluster_1 {
+    label=<<B>Paket Layanan</B>>; fontsize=14; fontcolor="#3d3d3d";
+    style="rounded,dashed"; color="#9a9a9a"; margin=8;
+      LayananKetersediaan [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#d7ecdd" align="center"><b>LayananKetersediaan</b></td></tr><tr><td align="left">+ cekKetersediaan(b, jml,<br/>  mulai, selesai): boolean</td></tr></table>>];
+      KalkulatorDenda [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#d7ecdd" align="center"><b>KalkulatorDenda</b></td></tr><tr><td align="left">+ hitung(p): double<br/>+ rincian(p): String</td></tr></table>>];
+      LayananPeminjaman [shape=plaintext, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="5"><tr><td bgcolor="#d7ecdd" align="center"><b>LayananPeminjaman</b></td></tr><tr><td align="left">+ ajukanPeminjaman(...)<br/>+ verifikasi(id, setuju)<br/>+ serahTerima(id)<br/>+ catatPengembalian(...)<br/>+ daftarJatuhTempo()</td></tr></table>>];
+  }
+  subgraph cluster_2 {
+    label=<<B>Kelas rujukan</B>>; fontsize=14; fontcolor="#3d3d3d";
+    style="rounded,dashed"; color="#9a9a9a"; margin=8;
+      Peminjaman [shape=box, style="dashed", fontsize=12, color="#8a8a8a", label="Peminjaman\n(di gambar lain)"];
+  }
+  Legenda [shape=plaintext, label=<<table border="1" cellborder="0" cellspacing="0" cellpadding="5" bgcolor="#ffffff"><tr><td align="left"><b>Legenda</b></td></tr><tr><td align="left">&#9651; garis penuh = generalisasi</td></tr><tr><td align="left">&#9651; garis putus = realisasi interface</td></tr><tr><td align="left">&#9671; belah ketupat = agregasi</td></tr><tr><td align="left">garis tanpa panah = asosiasi</td></tr></table>>];
+  AturanPeminjaman -> AturanStatusMahasiswa [arrowhead=onormal, style=dashed];
+  AturanPeminjaman -> AturanMaksimalAktif [arrowhead=onormal, style=dashed];
+  AturanPeminjaman -> AturanTunggakanDenda [arrowhead=onormal, style=dashed];
+  AturanPeminjaman -> AturanBatasWaktu [arrowhead=onormal, style=dashed];
+  AturanPeminjaman -> AturanDurasiMaksimal [arrowhead=onormal, style=dashed];
+  ValidatorPeminjaman -> Peminjaman [arrowhead=none, style=solid];
+  KalkulatorDenda -> Peminjaman [arrowhead=none, style=solid];
+  LayananPeminjaman -> ValidatorPeminjaman [arrowhead=none, style=solid];
+  LayananPeminjaman -> LayananKetersediaan [arrowhead=none, style=solid];
+  LayananPeminjaman -> KalkulatorDenda [arrowhead=none, style=solid];
+  ValidatorPeminjaman -> AturanPeminjaman [arrowhead=odiamond, style=solid, headlabel=" 1..*", taillabel="1 "];
+}
