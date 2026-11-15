@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Design System SIPINJAM (PinjamYuk)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+    .poster-canvas {
+      width: 1102px;
+      background-color: #f8fafc;
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+    }
+
+    /* TOP BANNER */
+    .banner {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%);
+      color: #ffffff;
+      padding: 22px 28px;
+      border-radius: 14px;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.15);
+    }
+    .banner-logo {
+      width: 48px;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .banner h1 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 3px;
+    }
+    .banner p {
+      font-size: 13px;
+      color: #bfdbfe;
+      font-weight: 500;
+    }
+
+    /* 3-COLUMN GRID */
+    .grid-container {
+      display: grid;
+      grid-template-columns: 330px 350px 340px;
+      gap: 18px;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+    .card-header {
+      margin-bottom: 12px;
+    }
+    .card-num {
+      color: #0284c7;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin-right: 4px;
+    }
+    .card-title {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #0f172a;
+    }
+    .card-desc {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 2px;
+      line-height: 1.35;
+    }
+
+    /* 01 SISTEM WARNA */
+    .color-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .color-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .color-swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      flex-shrink: 0;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    .color-info {
+      flex: 1;
+    }
+    .color-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .color-role {
+      font-size: 9.5px;
+      color: #64748b;
+    }
+    .color-hex {
+      font-size: 10px;
+      font-family: monospace;
+      color: #475569;
+      font-weight: 600;
+    }
+
+    /* 03 SISTEM JARAK */
+    .spacing-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 10.5px;
+    }
+    .spacing-label {
+      width: 80px;
+      color: #475569;
+      font-weight: 600;
+    }
+    .spacing-bar-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    .spacing-bar {
+      height: 8px;
+      background: #1e40af;
+      border-radius: 4px;
+    }
+    .spacing-val {
+      width: 32px;
+      text-align: right;
+      color: #64748b;
+      font-size: 10px;
+    }
+
+    /* 04 BORDER RADIUS */
+    .radius-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 7px 10px;
+      margin-bottom: 6px;
+    }
+    .radius-preview {
+      width: 26px;
+      height: 26px;
+      background: #bfdbfe;
+      border: 1.5px solid #3b82f6;
+      flex-shrink: 0;
+    }
+    .radius-info h5 {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .radius-info p {
+      font-size: 9px;
+      color: #64748b;
+    }
+
+    /* 02 TIPOGRAFI */
+    .type-block {
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .type-tag {
+      font-size: 9px;
+      font-weight: 800;
+      color: #2563eb;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .type-h1 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.25;
+    }
+    .type-h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1.3;
+    }
+    .type-h3 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #334155;
+    }
+    .type-body {
+      font-size: 11.5px;
+      color: #475569;
+      line-height: 1.4;
+    }
+    .type-small {
+      font-size: 10.5px;
+      color: #64748b;
+      line-height: 1.35;
+    }
+    .type-caption {
+      font-size: 9.5px;
+      color: #94a3b8;
+    }
+
+    /* 05 BUTTONS */
+    .btn-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 11px;
+    }
+    .btn-label {
+      color: #64748b;
+      font-size: 10px;
+      font-weight: 600;
+      width: 70px;
+    }
+    .btn {
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .btn-primary {
+      background: #1e40af;
+      color: #ffffff;
+    }
+    .btn-secondary {
+      background: #047857;
+      color: #ffffff;
+    }
+    .btn-outline {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      color: #334155;
+    }
+    .btn-ghost {
+      background: transparent;
+      color: #2563eb;
+    }
+    .btn-danger {
+      background: #dc2626;
+      color: #ffffff;
+    }
+
+    /* 06 ELEMEN FORMULIR */
+    .form-group {
+      margin-bottom: 9px;
+    }
+    .form-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 3px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      font-size: 11px;
+      background: #ffffff;
+      color: #1e293b;
+    }
+    .form-input-search {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      background: #ffffff;
+    }
+    .form-input-search input {
+      border: none;
+      outline: none;
+      font-size: 11px;
+      width: 100%;
+      color: #1e293b;
+    }
+    .upload-box {
+      border: 1.5px dashed #93c5fd;
+      background: #eff6ff;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+    }
+    .upload-box p {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #1d4ed8;
+    }
+    .upload-box span {
+      font-size: 9px;
+      color: #64748b;
+    }
+
+    /* 07 & 08 NAVIGASI & STATUS BADGES */
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      background: #f1f5f9;
+      padding: 3px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .nav-tab {
+      padding: 5px 10px;
+      font-size: 10px;
+      font-weight: 600;
+      border-radius: 6px;
+      color: #64748b;
+    }
+    .nav-tab.active {
+      background: #ffffff;
+      color: #1e40af;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .badge-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: #475569;
+      margin: 8px 0 5px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .badge-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      font-size: 9.5px;
+      font-weight: 700;
+    }
+    .badge-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+    }
+    .badge-amber { background: #fef3c7; color: #92400e; }
+    .badge-amber .badge-dot { background: #d97706; }
+    .badge-sky { background: #e0f2fe; color: #0369a1; }
+    .badge-sky .badge-dot { background: #0284c7; }
+    .badge-indigo { background: #e0e7ff; color: #3730a3; }
+    .badge-indigo .badge-dot { background: #4f46e5; }
+    .badge-purple { background: #f3e8ff; color: #6b21a8; }
+    .badge-purple .badge-dot { background: #9333ea; }
+    .badge-green { background: #dcfce7; color: #15803d; }
+    .badge-green .badge-dot { background: #16a34a; }
+    .badge-red { background: #fee2e2; color: #991b1b; }
+    .badge-red .badge-dot { background: #dc2626; }
+
+    /* 09 CARDS */
+    .item-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      background: #ffffff;
+    }
+    .item-card-header {
+      background: linear-gradient(135deg, #1e293b, #334155);
+      color: #ffffff;
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .item-card-body {
+      padding: 10px 12px;
+    }
+    .item-card-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .item-card-sub {
+      font-size: 10px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+    .slot-row {
+      display: flex;
+      gap: 3px;
+      margin: 8px 0;
+    }
+    .slot-pill {
+      font-size: 8px;
+      font-weight: 700;
+      padding: 3px 5px;
+      border-radius: 4px;
+      text-align: center;
+      flex: 1;
+    }
+    .slot-avail { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+    .slot-busy { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    .slot-sel { background: #fef08a; color: #854d0e; border: 1px solid #fde047; }
+
+    .stat-card {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .stat-card h6 {
+      font-size: 10px;
+      color: #1e40af;
+      font-weight: 700;
+    }
+    .stat-card h3 {
+      font-size: 20px;
+      color: #1e3a8a;
+      font-weight: 800;
+    }
+
+    /* 10 IKONOGRAFI */
+    .icon-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 7px;
+      text-align: center;
+    }
+    .icon-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .icon-box svg {
+      width: 17px;
+      height: 17px;
+      color: #334155;
+    }
+    .icon-box span {
+      font-size: 8.5px;
+      color: #64748b;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+<div class="poster-canvas">
+
+  <!-- TOP BANNER -->
+  <div class="banner">
+    <div class="banner-logo">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+      </svg>
+    </div>
+    <div>
+      <h1>SIPINJAM (PinjamYuk)</h1>
+      <p>Sistem Desain & Panduan UI — Platform Peminjaman Inventaris & Booking Ruangan Kampus</p>
+    </div>
+  </div>
+
+  <!-- 3 COLUMNS -->
+  <div class="grid-container">
+
+    <!-- COLUMN 1 -->
+    <div>
+      <!-- 01 SISTEM WARNA -->
+      <div class="card">
+        <div class="card-header">
+          <div><span class="card-num">01</span><span class="card-title">Sistem Warna</span></div>
+          <div class="card-desc">Palet warna terstandarisasi untuk peran pengguna & konsistensi sistem.</div>
+        </div>
+        <div class="color-list">
+          <div class="color-item">
+            <div class="color-swatch" style="background: #1e40af;"></div>
+            <div class="color-info">
+              <div class="color-name">Blue (Mahasiswa)</div>
+              <div class="color-role">Aksi Utama, Navigasi Mahasiswa</div>
+            </div>
+            <div class="color-hex">#1E40AF</div>
+          </div>
+          <div class="color-item">
+            <div class="color-swatch" style="background: #047857;"></div>
+            <div class="color-info">
+              <div class="color-name">Emerald (Petugas)</div>
+              <div class="color-role">Verifikasi, Manajemen Sarpras</div>
+            </div>
+            <div class="color-hex">#047857</div>
+          </div>
+          <div class="color-item">
+            <div class="color-swatch" style="background: #d97706;"></div>
+            <div class="color-info">
+              <div class="color-name">Amber (Dosen Pembina)</div>
+              <div class="color-role">Persetujuan Otoritas Barang Lab</div>
+            </div>
+            <div class="color-hex">#D97706</div>
+          </div>
+          <div class="color-item">
+            <div class="color-swatch" style="background: #0284c7;"></div>
+            <div class="color-info">
+              <div class="color-name">Sky (Info/Aktif)</div>
+              <div class="color-role">Status Diajukan, Slot Dipilih</div>
+            </div>
+            <div class="color-hex">#0284C7</div>
+          </div>
+          <div class="color-item">
+            <div class="color-swatch" style="background: #16a34a;"></div>
+            <div class="color-info">
+              <div class="color-name">Green (Success)</div>
+              <div class="color-role">Dikembalikan, Slot Tersedia</div>
+            </div>
+            <div class="color-hex">#16A34A</div>
+          </div>
+          <div class="color-item">
+            <div class="color-swatch" style="background: #eab308;"></div>
+            <div class="color-info">
+              <div class="color-name">Yellow (Warning)</div>
+              <div class="color-role">Menunggu Pembina, Jatuh Tempo</div>
+            </div>
+            <div class="color-hex">#EAB308</div>
+          </div>
+          <div class="color-item">
+            <div class="color-swatch" style="background: #dc2626;"></div>
+            <div class="color-info">
+              <div class="color-name">Red (Danger/Denda)</div>
+              <div class="color-role">Ditolak, Terlambat, Kerusakan</div>
+            </div>
+            <div class="color-hex">#DC2626</div>
+          </div>
+          <div class="color-item">
+            <div class="color-swatch" style="background: #0f172a;"></div>
+            <div class="color-info">
+              <div class="color-name">Slate (Text/Neutral)</div>
+              <div class="color-role">Teks Utama, Judul, Batas Gelap</div>
+            </div>
+            <div class="color-hex">#0F172A</div>
+          </div>
+          <div class="color-item">
+            <div class="color-swatch" style="background: #f8fafc; border: 1px solid #cbd5e1;"></div>
+            <div class="color-info">
+              <div class="color-name">Light Slate (Background)</div>
+              <div class="color-role">Latar Belakang Dashboard</div>
+            </div>
+            <div class="color-hex">#F8FAFC</div>
+          </div>
+          <div class="color-item">
+            <div class="color-swatch" style="background: #ffffff; border: 1px solid #cbd5e1;"></div>
+            <div class="color-info">
+              <div class="color-name">White (Surface)</div>
+              <div class="color-role">Latar Kartu, Modal & Kontainer</div>
+            </div>
+            <div class="color-hex">#FFFFFF</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 03 SISTEM JARAK -->
+      <div class="card">
+        <div class="card-header">
+          <div><span class="card-num">03</span><span class="card-title">Sistem Jarak (Spacing)</span></div>
+          <div class="card-desc">Sistem kelipatan 4px untuk konsistensi layout mikro & makro.</div>
+        </div>
+        <div class="spacing-item"><span class="spacing-label">4px (xs)</span><div class="spacing-bar-container"><div class="spacing-bar" style="width: 8px;"></div></div><span class="spacing-val">4px</span></div>
+        <div class="spacing-item"><span class="spacing-label">8px (sm)</span><div class="spacing-bar-container"><div class="spacing-bar" style="width: 18px;"></div></div><span class="spacing-val">8px</span></div>
+        <div class="spacing-item"><span class="spacing-label">12px (md)</span><div class="spacing-bar-container"><div class="spacing-bar" style="width: 28px;"></div></div><span class="spacing-val">12px</span></div>
+        <div class="spacing-item"><span class="spacing-label">16px (lg)</span><div class="spacing-bar-container"><div class="spacing-bar" style="width: 40px;"></div></div><span class="spacing-val">16px</span></div>
+        <div class="spacing-item"><span class="spacing-label">24px (xl)</span><div class="spacing-bar-container"><div class="spacing-bar" style="width: 58px;"></div></div><span class="spacing-val">24px</span></div>
+        <div class="spacing-item"><span class="spacing-label">32px (xxl)</span><div class="spacing-bar-container"><div class="spacing-bar" style="width: 78px;"></div></div><span class="spacing-val">32px</span></div>
+        <div class="spacing-item"><span class="spacing-label">48px (3xl)</span><div class="spacing-bar-container"><div class="spacing-bar" style="width: 105px;"></div></div><span class="spacing-val">48px</span></div>
+        <div class="spacing-item"><span class="spacing-label">64px (4xl)</span><div class="spacing-bar-container"><div class="spacing-bar" style="width: 135px;"></div></div><span class="spacing-val">64px</span></div>
+      </div>
+
+      <!-- 04 SUDUT KELENGKUNGAN -->
+      <div class="card">
+        <div class="card-header">
+          <div><span class="card-num">04</span><span class="card-title">Sudut Kelengkungan</span></div>
+          <div class="card-desc">Konsistensi pembulatan sudut pada setiap elemen antarmuka.</div>
+        </div>
+        <div class="radius-item" style="border-radius: 4px;">
+          <div class="radius-preview" style="border-radius: 4px;"></div>
+          <div class="radius-info"><h5>Small (4px)</h5><p>Digunakan pada Badge, Slot Jam, Checkbox</p></div>
+        </div>
+        <div class="radius-item" style="border-radius: 8px;">
+          <div class="radius-preview" style="border-radius: 8px;"></div>
+          <div class="radius-info"><h5>Medium (8px)</h5><p>Digunakan pada Tombol, Input Form, Popover</p></div>
+        </div>
+        <div class="radius-item" style="border-radius: 12px;">
+          <div class="radius-preview" style="border-radius: 12px;"></div>
+          <div class="radius-info"><h5>Large (12px)</h5><p>Digunakan pada Kartu Barang & Ruangan</p></div>
+        </div>
+        <div class="radius-item" style="border-radius: 16px;">
+          <div class="radius-preview" style="border-radius: 16px;"></div>
+          <div class="radius-info"><h5>Extra Large (16px)</h5><p>Digunakan pada Modal Dialog, Banner</p></div>
+        </div>
+        <div class="radius-item" style="border-radius: 9999px;">
+          <div class="radius-preview" style="border-radius: 9999px;"></div>
+          <div class="radius-info"><h5>Full / Pill (9999px)</h5><p>Digunakan pada Status Tag & Avatar</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUMN 2 -->
+    <div>
+      <!-- 02 TIPOGRAFI -->
+      <div class="card">
+        <div class="card-header">
+          <div><span class="card-num">02</span><span class="card-title">Tipografi</span></div>
+          <div class="card-desc">Hirarki tipografi Plus Jakarta Sans untuk kejelasan operasional sarpras.</div>
+        </div>
+        <div class="type-block">
+          <div class="type-tag">Heading 1 (24px / Bold)</div>
+          <div class="type-h1">Peminjaman Inventaris Kampus</div>
+        </div>
+        <div class="type-block">
+          <div class="type-tag">Heading 2 (18px / Bold)</div>
+          <div class="type-h2">Jadwal Penggunaan Ruang Rapat</div>
+        </div>
+        <div class="type-block">
+          <div class="type-tag">Heading 3 (14px / SemiBold)</div>
+          <div class="type-h3">Formulir Pengajuan Multi-Item</div>
+        </div>
+        <div class="type-block">
+          <div class="type-tag">Body Regular (12px / Regular)</div>
+          <div class="type-body">Peminjaman inventaris proyektor dan audio memerlukan verifikasi petugas minimal H-1 sebelum tanggal mulai.</div>
+        </div>
+        <div class="type-block">
+          <div class="type-tag">Body Small (11px / Regular)</div>
+          <div class="type-small">Sisa stok dihitung otomatis berdasarkan tumpang tindih tanggal peminjaman aktif.</div>
+        </div>
+        <div>
+          <div class="type-tag">Caption (10px / Regular)</div>
+          <div class="type-caption">*Denda pembatalan booking ruangan &lt; H-1 dikenakan tarif tetap Rp50.000.</div>
+        </div>
+      </div>
+
+      <!-- 05 TOMBOL -->
+      <div class="card">
+        <div class="card-header">
+          <div><span class="card-num">05</span><span class="card-title">Tombol (Buttons)</span></div>
+          <div class="card-desc">Varian aksi interaktif peminjam dan verifikator.</div>
+        </div>
+        <div class="btn-row">
+          <span class="btn-label">Primary</span>
+          <button class="btn btn-primary">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Ajukan Peminjaman
+          </button>
+        </div>
+        <div class="btn-row">
+          <span class="btn-label">Secondary</span>
+          <button class="btn btn-secondary">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            Verifikasi Petugas
+          </button>
+        </div>
+        <div class="btn-row">
+          <span class="btn-label">Outline</span>
+          <button class="btn btn-outline">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+            Kembali ke Beranda
+          </button>
+        </div>
+        <div class="btn-row">
+          <span class="btn-label">Ghost</span>
+          <button class="btn btn-ghost">Rincian Denda &rarr;</button>
+        </div>
+        <div class="btn-row">
+          <span class="btn-label">Danger</span>
+          <button class="btn btn-danger">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            Batalkan Booking
+          </button>
+        </div>
+      </div>
+
+      <!-- 06 ELEMEN FORMULIR -->
+      <div class="card">
+        <div class="card-header">
+          <div><span class="card-num">06</span><span class="card-title">Elemen Formulir</span></div>
+          <div class="card-desc">Komponen masukan data transaksi dan filter inventaris.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cari Inventaris / Ruangan</label>
+          <div class="form-input-search">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" placeholder="Ketik nama proyektor, aula, atau audio...">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Rentang Tanggal Kegiatan</label>
+          <input type="text" class="form-input" value="20 Nov 2026  &rarr;  22 Nov 2026">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Keperluan Peminjaman (Textarea)</label>
+          <input type="text" class="form-input" value="Workshop Pemrograman Web Himpunan Mahasiswa TI">
+        </div>
+        <div class="upload-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" style="margin-bottom: 2px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          <p>Lampirkan Surat Izin Kegiatan</p>
+          <span>PDF atau PNG, Maksimal 5MB</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUMN 3 -->
+    <div>
+      <!-- 07 & 08 NAVIGASI & STATUS BADGES -->
+      <div class="card">
+        <div class="card-header">
+          <div><span class="card-num">07 & 08</span><span class="card-title">Navigasi & Status Badges</span></div>
+          <div class="card-desc">Status siklus peminjaman, kondisi barang & slot ruangan.</div>
+        </div>
+
+        <div class="nav-tabs">
+          <div class="nav-tab active">Katalog</div>
+          <div class="nav-tab">Jadwal Ruang</div>
+          <div class="nav-tab">Riwayat</div>
+          <div class="nav-tab">Denda</div>
+        </div>
+
+        <div class="badge-section-title">Status Transaksi Peminjaman</div>
+        <div class="badge-cloud">
+          <span class="badge badge-amber"><span class="badge-dot"></span>Menunggu Pembina</span>
+          <span class="badge badge-sky"><span class="badge-dot"></span>Diajukan</span>
+          <span class="badge badge-indigo"><span class="badge-dot"></span>Disetujui</span>
+          <span class="badge badge-purple"><span class="badge-dot"></span>Dipinjam</span>
+          <span class="badge badge-green"><span class="badge-dot"></span>Dikembalikan</span>
+          <span class="badge badge-red"><span class="badge-dot"></span>Ditolak</span>
+        </div>
+
+        <div class="badge-section-title">Kondisi Fisik Barang</div>
+        <div class="badge-cloud">
+          <span class="badge badge-green"><span class="badge-dot"></span>Baik</span>
+          <span class="badge badge-amber"><span class="badge-dot"></span>Rusak Ringan</span>
+          <span class="badge badge-red"><span class="badge-dot"></span>Rusak Berat</span>
+          <span class="badge badge-red"><span class="badge-dot"></span>Hilang</span>
+        </div>
+
+        <div class="badge-section-title">Status Slot Waktu (07.00 - 21.00)</div>
+        <div class="slot-row">
+          <div class="slot-pill slot-avail">07:00 Kosong</div>
+          <div class="slot-pill slot-busy">08:00 Terisi</div>
+          <div class="slot-pill slot-sel">09:00 Dipilih</div>
+          <div class="slot-pill slot-avail">10:00 Kosong</div>
+        </div>
+      </div>
+
+      <!-- 09 KARTU KOMPONEN (CARDS) -->
+      <div class="card">
+        <div class="card-header">
+          <div><span class="card-num">09</span><span class="card-title">Kartu Komponen (Cards)</span></div>
+          <div class="card-desc">Penyajian informasi terstruktur untuk inventaris & statistik.</div>
+        </div>
+
+        <!-- BARANG CARD -->
+        <div class="item-card">
+          <div class="item-card-header">
+            <span style="font-size: 11px; font-weight: 700;">PROY-01 &bull; Elektronik</span>
+            <span class="badge badge-amber" style="padding: 2px 6px; font-size: 8px;">Perlu Pembina</span>
+          </div>
+          <div class="item-card-body">
+            <div class="item-card-title">Proyektor Epson EB-X400</div>
+            <div class="item-card-sub">Stok Fisik: 5 | Sisa Tersedia: <b>3 Unit</b></div>
+            <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 10px; color: #16a34a; font-weight: 700;">Denda Rp10rb/hari</span>
+              <button class="btn btn-primary" style="padding: 4px 8px; font-size: 10px;">+ Pinjam</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STAT METRIC CARD -->
+        <div class="stat-card">
+          <div>
+            <h6>TOTAL PEMINJAMAN AKTIF</h6>
+            <h3>8 Transaksi</h3>
+            <span style="font-size: 9px; color: #15803d; font-weight: 600;">&bull; 100% Data Tersinkronisasi</span>
+          </div>
+          <div style="background: #ffffff; padding: 7px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10 IKONOGRAFI -->
+      <div class="card">
+        <div class="card-header">
+          <div><span class="card-num">10</span><span class="card-title">Ikonografi</span></div>
+          <div class="card-desc">Koleksi ikon outline minimalis terstandarisasi untuk akses cepat.</div>
+        </div>
+        <div class="icon-grid">
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+            <span>Barang</span>
+          </div>
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <span>Jadwal</span>
+          </div>
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span>Slot Jam</span>
+          </div>
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>Profil</span>
+          </div>
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>Approval</span>
+          </div>
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <span>Denda</span>
+          </div>
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Selesai</span>
+          </div>
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            <span>Filter</span>
+          </div>
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <span>Batal</span>
+          </div>
+          <div class="icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <span>Bantuan</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+</html>
