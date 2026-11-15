@@ -86,9 +86,9 @@ Mengimplementasikan modul pemesanan (booking) ruangan kampus per slot waktu jam.
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] Jadwal slot jam 07.00 s.d 21.00 tergenerate dengan benar dan menampilkan status KOSONG vs TERISI.
-- [ ] Pengajuan booking yang saling tumpang tindih waktu pada ruangan yang sama ditolak secara otomatis (*fail fast*).
-- [ ] Booking dengan jumlah peserta melebihi kapasitas ruangan ditolak dengan pesan kesalahan yang jelas.
-- [ ] Pembatalan mendadak ($< \text{H}-1$) menghasilkan denda Rp50.000 pada respon dan tercatat di profil mahasiswa.
-- [ ] Perubahan data tersimpan permanen di `data/booking.txt`.
+- [x] Jadwal slot jam 07.00 s.d 21.00 tergenerate dengan benar dan menampilkan status KOSONG vs TERISI.
+- [x] Pengajuan booking yang saling tumpang tindih waktu pada ruangan yang sama ditolak secara otomatis (*fail fast*).
+- [x] Booking dengan jumlah peserta melebihi kapasitas ruangan ditolak dengan pesan kesalahan yang jelas.
+- [x] Pembatalan mendadak ($< \text{H}-1$) menghasilkan denda Rp50.000 pada respon dan tercatat di profil mahasiswa.
+- [x] Perubahan data tersimpan permanen di `data/booking.txt`.
 

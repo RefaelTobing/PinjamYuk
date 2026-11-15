@@ -66,17 +66,17 @@ Untuk mengekspos endpoint REST API dari Java, terdapat 2 pendekatan yang dapat d
 
 ## 4. Daftar Modul Tugas Backend (`docs/TaskBE/`)
 
-| File Task | Nama Tugas | Fokus Utama |
-| --- | --- | --- |
-| [TASK-BE-01](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskBE/TASK-BE-01_REFACTORING_CORE_DAN_PBO_AUDIT.md) | Refactoring Core & Audit Kepatuhan OOP | Memisahkan Swing GUI tanpa merusak model, aturan, repositori, layanan |
-| [TASK-BE-02](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskBE/TASK-BE-02_HTTP_SERVER_ROUTER_DAN_CORS.md) | HTTP Server, Router & CORS | Inisialisasi HTTP Server Java, router modular, support OPTIONS/CORS untuk FE |
-| [TASK-BE-03](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskBE/TASK-BE-03_DTO_DAN_JSON_SERIALIZER.md) | DTO Layer & JSON Parser | Parsing body request JSON & format respons JSON standar |
-| [TASK-BE-04](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskBE/TASK-BE-04_AUTH_DAN_RBAC_HANDLER.md) | Autentikasi & RBAC (3 Peran) | Login, register mahasiswa, validasi wewenang (Mahasiswa, Petugas, Pembina) |
-| [TASK-BE-05](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskBE/TASK-BE-05_INVENTARIS_DAN_STOK_API.md) | Master Data & Cek Stok Dinamis | Katalog barang, ruangan, kategori, cek ketersediaan stok per tanggal |
-| [TASK-BE-06](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskBE/TASK-BE-06_TRANSAKSI_PEMINJAMAN_API.md) | Peminjaman Barang & Rule Engine R1-R5 | Pengajuan multi-item, approval pembina, verifikasi petugas, denda |
-| [TASK-BE-07](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskBE/TASK-BE-07_BOOKING_RUANGAN_API.md) | Booking Ruangan & Rule Engine S1-S7 | Slot jam 07.00-21.00, deteksi bentrok jadwal, pembatalan & denda |
-| [TASK-BE-08](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskBE/TASK-BE-08_LAPORAN_DAN_STATISTIK_API.md) | Pelaporan & Statistik | Rekapitulasi kategori, utilisasi ruangan per jam, jatuh tempo |
-| [TASK-BE-09](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskBE/TASK-BE-09_PENGUJIAN_API_DAN_DOKUMENTASI.md) | Pengujian API & Persistensi File | Uji otomatis endpoint HTTP, integritas file handling `data/`, Postman/OpenAPI |
+| File Task | Nama Tugas | Fokus Utama | Status |
+| --- | --- | --- | :---: |
+| [TASK-BE-01](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskBE/TASK-BE-01_REFACTORING_CORE_DAN_PBO_AUDIT.md) | Refactoring Core & Audit Kepatuhan OOP | Memisahkan Swing GUI tanpa merusak model, aturan, repositori, layanan | **[x] SELESAI** |
+| [TASK-BE-02](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskBE/TASK-BE-02_HTTP_SERVER_ROUTER_DAN_CORS.md) | HTTP Server, Router & CORS | Inisialisasi HTTP Server Java, router modular, support OPTIONS/CORS untuk FE | **[x] SELESAI** |
+| [TASK-BE-03](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskBE/TASK-BE-03_DTO_DAN_JSON_SERIALIZER.md) | DTO Layer & JSON Parser | Parsing body request JSON & format respons JSON standar | **[x] SELESAI** |
+| [TASK-BE-04](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskBE/TASK-BE-04_AUTH_DAN_RBAC_HANDLER.md) | Autentikasi & RBAC (3 Peran) | Login, register mahasiswa, validasi wewenang (Mahasiswa, Petugas, Pembina) | **[x] SELESAI** |
+| [TASK-BE-05](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskBE/TASK-BE-05_INVENTARIS_DAN_STOK_API.md) | Master Data & Cek Stok Dinamis | Katalog barang, ruangan, kategori, cek ketersediaan stok per tanggal | **[x] SELESAI** |
+| [TASK-BE-06](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskBE/TASK-BE-06_TRANSAKSI_PEMINJAMAN_API.md) | Peminjaman Barang & Rule Engine R1-R5 | Pengajuan multi-item, approval pembina, verifikasi petugas, denda | **[x] SELESAI** |
+| [TASK-BE-07](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskBE/TASK-BE-07_BOOKING_RUANGAN_API.md) | Booking Ruangan & Rule Engine S1-S7 | Slot jam 07.00-21.00, deteksi bentrok jadwal, pembatalan & denda | **[x] SELESAI** |
+| [TASK-BE-08](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskBE/TASK-BE-08_LAPORAN_DAN_STATISTIK_API.md) | Pelaporan & Statistik | Rekapitulasi kategori, utilisasi ruangan per jam, jatuh tempo | **[x] SELESAI** |
+| [TASK-BE-09](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskBE/TASK-BE-09_PENGUJIAN_API_DAN_DOKUMENTASI.md) | Pengujian API & Persistensi File | Uji otomatis endpoint HTTP, integritas file handling `data/`, Postman/OpenAPI | **[x] SELESAI** |
 
 ---
 

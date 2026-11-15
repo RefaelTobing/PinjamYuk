@@ -77,8 +77,8 @@ tersedia(barang, mulai, selesai) = totalStok - terpakai
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] Endpoint `GET /api/inventaris/barang` mengembalikan daftar barang lengkap dengan detail jenis spesifiknya.
-- [ ] Cek stok dinamis berfungsi akurat: bila barang A sedang dipinjam 2 unit pada rentang tanggal X s.d Y, maka request dengan tanggal yang tumpang tindih mengembalikan `stokTersedia` yang sudah berkurang 2.
-- [ ] Petugas dapat menambah dan mengedit barang/ruangan melalui method `POST` dan `PUT`.
-- [ ] Akses modifikasi master data ditolak dengan HTTP 403 jika dilakukan oleh pengguna non-petugas.
+- [x] Endpoint `GET /api/inventaris/barang` mengembalikan daftar barang lengkap dengan detail jenis spesifiknya.
+- [x] Cek stok dinamis berfungsi akurat: bila barang A sedang dipinjam 2 unit pada rentang tanggal X s.d Y, maka request dengan tanggal yang tumpang tindih mengembalikan `stokTersedia` yang sudah berkurang 2.
+- [x] Petugas dapat menambah dan mengedit barang/ruangan melalui method `POST` dan `PUT`.
+- [x] Akses modifikasi master data ditolak dengan HTTP 403 jika dilakukan oleh pengguna non-petugas.
 

@@ -58,9 +58,9 @@ Membangun antarmuka katalog peminjaman barang inventaris kampus untuk mahasiswa.
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] Pengguna dapat memfilter barang berdasarkan rentang tanggal dan melihat sisa stok yang berubah secara dinamis.
-- [ ] Validasi tanggal berjalan di sisi klien (minimal H-1 dan maksimal 7 hari).
-- [ ] Mahasiswa dapat memilih beberapa jenis barang sekaligus (multi-item) dan mengatur jumlahnya.
-- [ ] Pengajuan berhasil terkirim ke `POST /api/peminjaman` dan menghasilkan nomor registrasi peminjaman.
-- [ ] Jika mahasiswa melanggar aturan kelayakan (misal melebihi batas 2 pengajuan aktif), pesan error dari server tertampil jelas.
+- [x] Pengguna dapat memfilter barang berdasarkan rentang tanggal dan melihat sisa stok yang berubah secara dinamis.
+- [x] Validasi tanggal berjalan di sisi klien (minimal H-1 dan maksimal 7 hari).
+- [x] Mahasiswa dapat memilih beberapa jenis barang sekaligus (multi-item) dan mengatur jumlahnya.
+- [x] Pengajuan berhasil terkirim ke `POST /api/peminjaman` dan menghasilkan nomor registrasi peminjaman.
+- [x] Jika mahasiswa melanggar aturan kelayakan (misal melebihi batas 2 pengajuan aktif), pesan error dari server tertampil jelas.
 

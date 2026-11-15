@@ -51,9 +51,9 @@ Membangun antarmuka visualisasi ketersediaan ruangan kampus per slot waktu jam (
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] Grid slot jam 07.00 s.d 21.00 tampil rapi dan responsif di layar desktop maupun mobile.
-- [ ] Slot yang sudah terisi tampil terkunci (disabled) dan tidak dapat dipilih.
-- [ ] Pengguna tidak dapat memilih durasi melebihi batas 4 jam dalam 1 pengajuan.
-- [ ] Validasi input peserta mendeteksi jika melebihi kapasitas ruangan dan mencegah pengiriman formulir.
-- [ ] Pengajuan booking berhasil tersimpan ke backend dan slot tersebut seketika berubah warna menjadi terisi/terkunci pada grid jadwal.
+- [x] Grid slot jam 07.00 s.d 21.00 tampil rapi dan responsif di layar desktop maupun mobile.
+- [x] Slot yang sudah terisi tampil terkunci (disabled) dan tidak dapat dipilih.
+- [x] Pengguna tidak dapat memilih durasi melebihi batas 4 jam dalam 1 pengajuan.
+- [x] Validasi input peserta mendeteksi jika melebihi kapasitas ruangan dan mencegah pengiriman formulir.
+- [x] Pengajuan booking berhasil tersimpan ke backend dan slot tersebut seketika berubah warna menjadi terisi/terkunci pada grid jadwal.
 

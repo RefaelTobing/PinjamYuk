@@ -53,8 +53,8 @@ $$\text{Diajukan / Menunggu Pembina} \longrightarrow \text{Disetujui} \longright
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] Seluruh riwayat transaksi milik mahasiswa yang login tertampil dengan data akurat (nomor registrasi, tanggal, item barang/ruangan, status).
-- [ ] Stepper status memperlihatkan tahapan proses peminjaman secara jelas.
-- [ ] Pembatalan booking kurang dari H-1 menampilkan peringatan denda Rp50.000 dan setelah dikonfirmasi, denda tercatat pada profil mahasiswa.
-- [ ] Transaksi yang sudah masuk tahap `DIPINJAM` atau `SELESAI` tidak memiliki tombol pembatalan.
+- [x] Seluruh riwayat transaksi milik mahasiswa yang login tertampil dengan data akurat (nomor registrasi, tanggal, item barang/ruangan, status).
+- [x] Stepper status memperlihatkan tahapan proses peminjaman secara jelas.
+- [x] Pembatalan booking kurang dari H-1 menampilkan peringatan denda Rp50.000 dan setelah dikonfirmasi, denda tercatat pada profil mahasiswa.
+- [x] Transaksi yang sudah masuk tahap `DIPINJAM` atau `SELESAI` tidak memiliki tombol pembatalan.
 

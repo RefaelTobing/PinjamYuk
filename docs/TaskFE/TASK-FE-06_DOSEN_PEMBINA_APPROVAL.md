@@ -51,8 +51,8 @@ Membangun antarmuka khusus untuk Dosen Pembina. Dosen Pembina bertanggung jawab 
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] Pengajuan yang mengandung barang khusus otomatis muncul pada antrean Dosen Pembina.
-- [ ] Dosen Pembina dapat menyetujui pengajuan, yang secara otomatis mengubah status transaksi menjadi `DIAJUKAN` (siap diproses Petugas Sarpras).
-- [ ] Dosen Pembina dapat menolak pengajuan dengan alasan wajib, yang langsung mengubah status transaksi menjadi `DITOLAK`.
-- [ ] Tampilan responsif dan mudah digunakan oleh dosen di berbagai perangkat (tablet/laptop).
+- [x] Pengajuan yang mengandung barang khusus otomatis muncul pada antrean Dosen Pembina.
+- [x] Dosen Pembina dapat menyetujui pengajuan, yang secara otomatis mengubah status transaksi menjadi `DIAJUKAN` (siap diproses Petugas Sarpras).
+- [x] Dosen Pembina dapat menolak pengajuan dengan alasan wajib, yang langsung mengubah status transaksi menjadi `DITOLAK`.
+- [x] Tampilan responsif dan mudah digunakan oleh dosen di berbagai perangkat (tablet/laptop).
 

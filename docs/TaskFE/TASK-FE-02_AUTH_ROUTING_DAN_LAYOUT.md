@@ -76,8 +76,8 @@ Membangun antarmuka masuk (*Login*), pendaftaran mahasiswa baru (*Register*), ma
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] Pengguna dapat login sebagai Mahasiswa, Petugas Sarpras, dan Dosen Pembina, lalu diarahkan ke halaman utama masing-masing peran secara otomatis.
-- [ ] Mahasiswa tidak dapat membuka URL rute milik Petugas (di-redirect atau diblokir).
-- [ ] Tombol Logout menghapus sesi di `localStorage` dan mengembalikan pengguna ke halaman `/login`.
-- [ ] Registrasi mahasiswa baru berhasil mengirim data ke endpoint BE dan akun baru langsung dapat digunakan login.
+- [x] Pengguna dapat login sebagai Mahasiswa, Petugas Sarpras, dan Dosen Pembina, lalu diarahkan ke halaman utama masing-masing peran secara otomatis.
+- [x] Mahasiswa tidak dapat membuka URL rute milik Petugas (di-redirect atau diblokir).
+- [x] Tombol Logout menghapus sesi di `localStorage` dan mengembalikan pengguna ke halaman `/login`.
+- [x] Registrasi mahasiswa baru berhasil mengirim data ke endpoint BE dan akun baru langsung dapat digunakan login.
 

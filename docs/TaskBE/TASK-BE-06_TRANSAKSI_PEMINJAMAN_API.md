@@ -104,9 +104,9 @@ Sebelum pengajuan disimpan, `ValidatorPeminjaman` mengeksekusi kumpulan objek `A
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] Pengajuan yang melanggar aturan R1-R5 berhasil digagalkan dengan pesan spesifik (misal: "Durasi peminjaman melebihi 7 hari").
-- [ ] Pengajuan yang berisi barang bertanda perlu persetujuan pembina otomatis masuk antrean pembina terlebih dahulu.
-- [ ] Transisi status mengikuti siklus resmi: `MENUNGGU_PEMBINA` $\to$ `DIAJUKAN` $\to$ `DISETUJUI` $\to$ `DIPINJAM` $\to$ `DIKEMBALIKAN`.
-- [ ] Denda keterlambatan dan denda kerusakan dihitung otomatis dan akurat sesuai jenis kelas polimorfik barang (`BarangElektronik`, `AlatLaboratorium`, `BarangFurnitur`).
-- [ ] Data perubahan tersimpan permanen ke file `data/peminjaman.txt`.
+- [x] Pengajuan yang melanggar aturan R1-R5 berhasil digagalkan dengan pesan spesifik (misal: "Durasi peminjaman melebihi 7 hari").
+- [x] Pengajuan yang berisi barang bertanda perlu persetujuan pembina otomatis masuk antrean pembina terlebih dahulu.
+- [x] Transisi status mengikuti siklus resmi: `MENUNGGU_PEMBINA` $\to$ `DIAJUKAN` $\to$ `DISETUJUI` $\to$ `DIPINJAM` $\to$ `DIKEMBALIKAN`.
+- [x] Denda keterlambatan dan denda kerusakan dihitung otomatis dan akurat sesuai jenis kelas polimorfik barang (`BarangElektronik`, `AlatLaboratorium`, `BarangFurnitur`).
+- [x] Data perubahan tersimpan permanen ke file `data/peminjaman.txt`.
 

@@ -66,8 +66,8 @@ Membangun pusat sirkulasi operasional bagi Petugas Sarpras untuk memproses trans
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] Petugas dapat menyetujui atau menolak pengajuan baru.
-- [ ] Serah terima barang berhasil mengubah status menjadi `DIPINJAM` dan merekam kondisi awal barang.
-- [ ] Formulir pengembalian memungkinkan pemilihan kondisi akhir yang berbeda untuk setiap item barang dalam peminjaman multi-item.
-- [ ] Sistem menghitung denda secara presisi (keterlambatan + kondisi) dan menampilkan rincian jelas ke petugas sebelum transaksi ditutup.
+- [x] Petugas dapat menyetujui atau menolak pengajuan baru.
+- [x] Serah terima barang berhasil mengubah status menjadi `DIPINJAM` dan merekam kondisi awal barang.
+- [x] Formulir pengembalian memungkinkan pemilihan kondisi akhir yang berbeda untuk setiap item barang dalam peminjaman multi-item.
+- [x] Sistem menghitung denda secara presisi (keterlambatan + kondisi) dan menampilkan rincian jelas ke petugas sebelum transaksi ditutup.
 

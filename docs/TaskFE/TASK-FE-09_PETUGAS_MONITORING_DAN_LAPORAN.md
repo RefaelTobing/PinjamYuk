@@ -57,7 +57,7 @@ Membangun pusat kendali monitoring dan analitik visual untuk Petugas Sarpras dan
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] Daftar barang yang lewat tenggat tertampil dengan indikator warna merah yang kontras beserta hitungan estimasi denda harian.
-- [ ] Diagram grafik statistik kategori barang dan utilisasi ruangan ter-render dengan rapi dan data sinkron dengan database file backend.
-- [ ] Halaman dapat diakses oleh Petugas Sarpras dan Dosen Pembina.
+- [x] Daftar barang yang lewat tenggat tertampil dengan indikator warna merah yang kontras beserta hitungan estimasi denda harian.
+- [x] Diagram grafik statistik kategori barang dan utilisasi ruangan ter-render dengan rapi dan data sinkron dengan database file backend.
+- [x] Halaman dapat diakses oleh Petugas Sarpras dan Dosen Pembina.
 

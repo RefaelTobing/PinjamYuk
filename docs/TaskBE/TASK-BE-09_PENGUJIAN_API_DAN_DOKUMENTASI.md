@@ -46,7 +46,7 @@ Pastikan bahwa setelah server dimatikan (`kill`/`Ctrl+C`) dan dihidupkan kembali
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] Skrip `test_api.sh` berjalan sukses dari awal sampai akhir (status code 200/201 pada skenario sukses, dan 400/401/409 pada skenario gagal).
-- [ ] Berkas teks di `data/` tetap valid dan tidak mengalami korupsi format pemisah pipa (`|`).
-- [ ] Dokumentasi endpoint API siap dibagikan kepada pengembang Frontend (FE Bebas).
+- [x] Skrip `test_api.sh` berjalan sukses dari awal sampai akhir (status code 200/201 pada skenario sukses, dan 400/401/409 pada skenario gagal).
+- [x] Berkas teks di `data/` tetap valid dan tidak mengalami korupsi format pemisah pipa (`|`).
+- [x] Dokumentasi endpoint API siap dibagikan kepada pengembang Frontend (FE Bebas).
 

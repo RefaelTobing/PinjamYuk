@@ -73,18 +73,18 @@ frontend/
 
 ## 4. Daftar Modul Tugas Frontend (`docs/TaskFE/`)
 
-| File Task | Nama Tugas | Aktor / Fokus |
-| --- | --- | --- |
-| [TASK-FE-01](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-01_SETUP_PROJECT_DAN_ENV.md) | Setup Project, Styling & API Client | Inisialisasi Vite/React, Tailwind, Axios client & konfigurasi port |
-| [TASK-FE-02](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-02_AUTH_ROUTING_DAN_LAYOUT.md) | Autentikasi, Routing & App Shell | Login 3 peran, registrasi mahasiswa, layout sidebar & navbar responsif |
-| [TASK-FE-03](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-03_MAHASISWA_KATALOG_DAN_PENGAJUAN.md) | Katalog Barang & Pengajuan Multi-Item | Mahasiswa: filter tanggal, kalkulasi sisa stok real-time, keranjang barang |
-| [TASK-FE-04](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-04_MAHASISWA_BOOKING_RUANGAN.md) | Visualisasi Slot & Booking Ruangan | Mahasiswa: peta slot 07.00-21.00, deteksi slot terisi, booking form |
-| [TASK-FE-05](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-05_MAHASISWA_RIWAYAT_DAN_DENDA.md) | Riwayat Peminjaman & Tagihan Denda | Mahasiswa: pelacakan status, info denda, pembatalan pengajuan/booking |
-| [TASK-FE-06](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-06_DOSEN_PEMBINA_APPROVAL.md) | Dashboard Antrean Persetujuan Pembina | Dosen Pembina: persetujuan barang lab & elektronik bernilai tinggi |
-| [TASK-FE-07](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-07_PETUGAS_MASTER_DATA.md) | Pengelolaan Master Data Inventaris & Ruang | Petugas: CRUD Barang, Ruangan, Kategori, dan pengaturan tarif denda |
-| [TASK-FE-08](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-08_PETUGAS_VERIFIKASI_DAN_OPERASIONAL.md) | Verifikasi, Serah Terima & Pengembalian | Petugas: approval, serah terima kondisi awal, input pengembalian & denda |
-| [TASK-FE-09](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-09_PETUGAS_MONITORING_DAN_LAPORAN.md) | Monitoring Overdue & Visualisasi Grafik | Petugas/Pembina: peringatan jatuh tempo & grafik statistik peminjaman |
-| [TASK-FE-10](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-10_INTEGRASI_E2E_DAN_DEMO_READINESS.md) | Integrasi End-to-End, Testing & Demo | Verifikasi integrasi full flow, polish UI/UX, skenario presentasi live |
+| File Task | Nama Tugas | Aktor / Fokus | Status |
+| --- | --- | --- | :---: |
+| [TASK-FE-01](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-01_SETUP_PROJECT_DAN_ENV.md) | Setup Project, Styling & API Client | Inisialisasi Vite/React, Tailwind, Axios client & konfigurasi port | **[x] SELESAI** |
+| [TASK-FE-02](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-02_AUTH_ROUTING_DAN_LAYOUT.md) | Autentikasi, Routing & App Shell | Login 3 peran, registrasi mahasiswa, layout sidebar & navbar responsif | **[x] SELESAI** |
+| [TASK-FE-03](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-03_MAHASISWA_KATALOG_DAN_PENGAJUAN.md) | Katalog Barang & Pengajuan Multi-Item | Mahasiswa: filter tanggal, kalkulasi sisa stok real-time, keranjang barang | **[x] SELESAI** |
+| [TASK-FE-04](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-04_MAHASISWA_BOOKING_RUANGAN.md) | Visualisasi Slot & Booking Ruangan | Mahasiswa: peta slot 07.00-21.00, deteksi slot terisi, booking form | **[x] SELESAI** |
+| [TASK-FE-05](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-05_MAHASISWA_RIWAYAT_DAN_DENDA.md) | Riwayat Peminjaman & Tagihan Denda | Mahasiswa: pelacakan status, info denda, pembatalan pengajuan/booking | **[x] SELESAI** |
+| [TASK-FE-06](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-06_DOSEN_PEMBINA_APPROVAL.md) | Dashboard Antrean Persetujuan Pembina | Dosen Pembina: persetujuan barang lab & elektronik bernilai tinggi | **[x] SELESAI** |
+| [TASK-FE-07](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-07_PETUGAS_MASTER_DATA.md) | Pengelolaan Master Data Inventaris & Ruang | Petugas: CRUD Barang, Ruangan, Kategori, dan pengaturan tarif denda | **[x] SELESAI** |
+| [TASK-FE-08](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-08_PETUGAS_VERIFIKASI_DAN_OPERASIONAL.md) | Verifikasi, Serah Terima & Pengembalian | Petugas: approval, serah terima kondisi awal, input pengembalian & denda | **[x] SELESAI** |
+| [TASK-FE-09](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-09_PETUGAS_MONITORING_DAN_LAPORAN.md) | Monitoring Overdue & Visualisasi Grafik | Petugas/Pembina: peringatan jatuh tempo & grafik statistik peminjaman | **[x] SELESAI** |
+| [TASK-FE-10](file:///home/refael_tobing/Kuliah/Semester%203/Prak%20PBO/Final%20Project/PinjamYuk/docs/TaskFE/TASK-FE-10_INTEGRASI_E2E_DAN_DEMO_READINESS.md) | Integrasi End-to-End, Testing & Demo | Verifikasi integrasi full flow, polish UI/UX, skenario presentasi live | **[x] SELESAI** |
 
 ---
 

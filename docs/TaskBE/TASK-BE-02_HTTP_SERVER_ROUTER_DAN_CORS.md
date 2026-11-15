@@ -54,14 +54,14 @@ Ketika browser mengirim method `OPTIONS`, server langsung membalas dengan status
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] Server Java HTTP dapat dijalankan via terminal:
+- [x] Server Java HTTP dapat dijalankan via terminal:
   ```bash
   java -cp out sipinjam.AplikasiServer --port 8080
   ```
-- [ ] Endpoint `/api/health` mengembalikan status 200:
+- [x] Endpoint `/api/health` mengembalikan status 200:
   ```json
   { "sukses": true, "pesan": "SIPINJAM Server berjalan normal" }
   ```
-- [ ] Permintaan pre-flight `curl -I -X OPTIONS http://localhost:8080/api/health` menghasilkan header CORS yang benar.
-- [ ] Permintaan endpoint yang tidak terdaftar menghasilkan JSON respons error 404 tanpa membuat aplikasi crash.
+- [x] Permintaan pre-flight `curl -I -X OPTIONS http://localhost:8080/api/health` menghasilkan header CORS yang benar.
+- [x] Permintaan endpoint yang tidak terdaftar menghasilkan JSON respons error 404 tanpa membuat aplikasi crash.
 

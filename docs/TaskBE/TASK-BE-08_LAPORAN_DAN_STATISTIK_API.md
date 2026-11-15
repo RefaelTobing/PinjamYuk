@@ -88,7 +88,7 @@ Menyediakan endpoint analisis dan rekapitulasi data untuk Petugas Sarpras dan Do
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] Endpoint rekapitulasi kategori mengembalikan agregasi data yang sinkron dengan transaksi yang ada di memori/file.
-- [ ] Endpoint jatuh tempo mampu mendeteksi peminjaman yang melewati tanggal hari ini dan menghitung estimasi denda harian yang berjalan.
-- [ ] Akses oleh pengguna dengan peran Mahasiswa diblokir dengan HTTP 403 Forbidden.
+- [x] Endpoint rekapitulasi kategori mengembalikan agregasi data yang sinkron dengan transaksi yang ada di memori/file.
+- [x] Endpoint jatuh tempo mampu mendeteksi peminjaman yang melewati tanggal hari ini dan menghitung estimasi denda harian yang berjalan.
+- [x] Akses oleh pengguna dengan peran Mahasiswa diblokir dengan HTTP 403 Forbidden.
 

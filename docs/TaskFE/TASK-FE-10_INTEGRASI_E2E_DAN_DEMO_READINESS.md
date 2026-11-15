@@ -58,7 +58,7 @@ Siapkan alur demonstrasi interaktif yang mendemonstrasikan keunggulan arsitektur
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] Seluruh skenario alur transaksi dari Login $\to$ Pengajuan $\to$ Approval $\to$ Serah Terima $\to$ Pengembalian $\to$ Denda berjalan mulus tanpa error.
-- [ ] Pengguna mendapatkan notifikasi visual jelas (toast hijau untuk sukses, toast merah untuk error validasi).
-- [ ] Tim pengembang siap mendemonstrasikan aplikasi dan mempertanggungjawabkan implementasi OOP Java di depan dosen penguji.
+- [x] Seluruh skenario alur transaksi dari Login $\to$ Pengajuan $\to$ Approval $\to$ Serah Terima $\to$ Pengembalian $\to$ Denda berjalan mulus tanpa error.
+- [x] Pengguna mendapatkan notifikasi visual jelas (toast hijau untuk sukses, toast merah untuk error validasi).
+- [x] Tim pengembang siap mendemonstrasikan aplikasi dan mempertanggungjawabkan implementasi OOP Java di depan dosen penguji.
 

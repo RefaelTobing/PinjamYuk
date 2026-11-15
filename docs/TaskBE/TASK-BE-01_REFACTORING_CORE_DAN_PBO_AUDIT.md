@@ -48,12 +48,12 @@ Memastikan seluruh logika inti sistem SIPINJAM terbebas dari ketergantungan tamp
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] Paket `model`, `aturan`, `layanan`, `repositori`, dan `penyimpanan` terbukti 100% bebas dari dependensi Swing/AWT.
-- [ ] Seluruh 9 implementasi aturan (R1-R5, S1-S4) berjalan sempurna di bawah `ValidatorPeminjaman`.
-- [ ] Seluruh skenario pengujian di `UjiSkenario` sukses dieksekusi via terminal:
+- [x] Paket `model`, `aturan`, `layanan`, `repositori`, dan `penyimpanan` terbukti 100% bebas dari dependensi Swing/AWT.
+- [x] Seluruh 9 implementasi aturan (R1-R5, S1-S4) berjalan sempurna di bawah `ValidatorPeminjaman`.
+- [x] Seluruh skenario pengujian di `UjiSkenario` sukses dieksekusi via terminal:
   ```bash
   javac -encoding UTF-8 -d out $(find src -name "*.java")
   java -cp out sipinjam.uji.UjiSkenario
   ```
-- [ ] Seluruh 9 poin rubrik PBO (Class/Object, Constructor, Encapsulation, Inheritance, Polymorphism, Abstraction, Exception, Collection, File Handling) terverifikasi dan terdokumentasi.
+- [x] Seluruh 9 poin rubrik PBO (Class/Object, Constructor, Encapsulation, Inheritance, Polymorphism, Abstraction, Exception, Collection, File Handling) terverifikasi dan terdokumentasi.
 

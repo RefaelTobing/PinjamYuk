@@ -57,7 +57,7 @@ Membangun modul pengelolaan data master bagi Petugas Sarpras, mencakup pengelola
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] Petugas dapat menambahkan barang baru dengan input subkelas yang sesuai (elektronik/lab/furnitur) dan data tersimpan ke Backend Java.
-- [ ] Petugas dapat mengubah stok barang, dan stok baru langsung terrefleksi di katalog mahasiswa.
-- [ ] Petugas dapat menonaktifkan ruangan, dan ruangan tersebut otomatis hilang/terkunci dari pilihan booking mahasiswa.
+- [x] Petugas dapat menambahkan barang baru dengan input subkelas yang sesuai (elektronik/lab/furnitur) dan data tersimpan ke Backend Java.
+- [x] Petugas dapat mengubah stok barang, dan stok baru langsung terrefleksi di katalog mahasiswa.
+- [x] Petugas dapat menonaktifkan ruangan, dan ruangan tersebut otomatis hilang/terkunci dari pilihan booking mahasiswa.
 

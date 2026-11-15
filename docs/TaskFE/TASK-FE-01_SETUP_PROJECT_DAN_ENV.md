@@ -54,7 +54,7 @@ VITE_APP_TITLE=SIPINJAM - Sistem Peminjaman Kampus
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] Proyek Frontend berhasil dijalankan dengan `npm run dev` pada port lokal (contoh: `http://localhost:5173`).
-- [ ] Styling Tailwind CSS bekerja dengan benar.
-- [ ] Axios client berhasil melakukan request uji coba ke Backend Java (`http://localhost:8080/api/health`) dan menerima respons tanpa error CORS.
+- [x] Proyek Frontend berhasil dijalankan dengan `npm run dev` pada port lokal (contoh: `http://localhost:5173`).
+- [x] Styling Tailwind CSS bekerja dengan benar.
+- [x] Axios client berhasil melakukan request uji coba ke Backend Java (`http://localhost:8080/api/health`) dan menerima respons tanpa error CORS.
 

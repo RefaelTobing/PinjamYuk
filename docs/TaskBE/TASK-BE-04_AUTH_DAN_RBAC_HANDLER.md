@@ -107,8 +107,8 @@ Mengimplementasikan endpoint autentikasi dan pendaftaran akun pengguna ke sistem
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] User bawaan (`petugas`, `pembina`, `mahasiswa`, `mahasiswa2`) berhasil login dan mendapatkan payload profil lengkap beserta detail perannya.
-- [ ] Percobaan login dengan password salah mengembalikan HTTP 401 tanpa menyebabkan server crash.
-- [ ] Mahasiswa baru dapat didaftarkan lewat endpoint `/api/auth/register`, tersimpan ke file `data/pengguna.txt`, dan langsung dapat digunakan untuk login.
-- [ ] Pendaftaran dengan NIM atau username duplikat ditolak dengan status HTTP 400 dan pesan error yang deskriptif.
+- [x] User bawaan (`petugas`, `pembina`, `mahasiswa`, `mahasiswa2`) berhasil login dan mendapatkan payload profil lengkap beserta detail perannya.
+- [x] Percobaan login dengan password salah mengembalikan HTTP 401 tanpa menyebabkan server crash.
+- [x] Mahasiswa baru dapat didaftarkan lewat endpoint `/api/auth/register`, tersimpan ke file `data/pengguna.txt`, dan langsung dapat digunakan untuk login.
+- [x] Pendaftaran dengan NIM atau username duplikat ditolak dengan status HTTP 400 dan pesan error yang deskriptif.
 

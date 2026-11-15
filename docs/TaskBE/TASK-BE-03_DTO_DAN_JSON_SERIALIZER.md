@@ -54,7 +54,7 @@ Menyediakan lapisan *Data Transfer Object* (DTO) serta utilitas serialisasi (Obj
 ---
 
 ## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [ ] Utilitas JSON berhasil mengubah objek entitas Java menjadi format string JSON yang valid (RFC 8259).
-- [ ] Payload request JSON dari klien berhasil dipetakan ke objek DTO Java dengan penanganan kesalahan tipe data yang aman.
-- [ ] Serialisasi entitas polimorfik (misal daftar barang yang berisi campuran elektronik, furnitur, dan alat lab) menghasilkan atribut spesifik masing-masing subkelas (misal: `masaGaransi`, `laboratorium`, `bahan`).
+- [x] Utilitas JSON berhasil mengubah objek entitas Java menjadi format string JSON yang valid (RFC 8259).
+- [x] Payload request JSON dari klien berhasil dipetakan ke objek DTO Java dengan penanganan kesalahan tipe data yang aman.
+- [x] Serialisasi entitas polimorfik (misal daftar barang yang berisi campuran elektronik, furnitur, dan alat lab) menghasilkan atribut spesifik masing-masing subkelas (misal: `masaGaransi`, `laboratorium`, `bahan`).
 
