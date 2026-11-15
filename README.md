@@ -28,26 +28,37 @@ Data contoh dibuat otomatis saat aplikasi pertama kali dijalankan:
 | Mahasiswa | `mahasiswa` | `mahasiswa123` |
 | Mahasiswa kedua | `mahasiswa2` | `mahasiswa123` |
 
-## Cara menjalankan
+## Cara Menjalankan
 
-Prasyarat: JDK 8 atau lebih baru.
+### Opsi 1: Arsitektur Client-Server Baru (Backend Java REST API + Frontend Web Reaktif)
 
-```
+1. **Jalankan Backend Server Java (Port 8080)**:
+   ```bash
+   ./build.sh
+   ./run_server.sh
+   ```
+   *Health Check dapat diakses di: `http://localhost:8080/api/health`*
+
+2. **Jalankan Frontend Web Modern (Port 5173)**:
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+   *Buka antarmuka pengguna pada peramban di: `http://localhost:5173`*
+
+3. **Uji Otomatis Seluruh Endpoint REST API**:
+   ```bash
+   ./test_api.sh
+   ```
+
+---
+
+### Opsi 2: Desktop GUI Lama (Java Swing Monolit)
+
+```bash
 ./build.sh
 ./run.sh
 ```
-
-Atau tanpa skrip:
-
-```
-javac -encoding UTF-8 -d out $(find src -name "*.java")
-java -cp out sipinjam.AplikasiSipinjam
-```
-
-Folder data dapat ditentukan sendiri:
-
-```
-java -cp out sipinjam.AplikasiSipinjam --data /jalur/folder/data
 ```
 
 Aplikasi harus dijalankan dari folder proyek karena folder `data/` dibaca relatif terhadap direktori kerja.

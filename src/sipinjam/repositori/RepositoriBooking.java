@@ -18,6 +18,25 @@ public class RepositoriBooking {
         daftar.add(booking);
     }
 
+    public BookingRuangan cari(String id) {
+        for (BookingRuangan booking : daftar) {
+            if (booking.getId().equalsIgnoreCase(id)) {
+                return booking;
+            }
+        }
+        return null;
+    }
+
+    public List<BookingRuangan> cariAktif() {
+        List<BookingRuangan> hasil = new ArrayList<BookingRuangan>();
+        for (BookingRuangan booking : daftar) {
+            if (booking.getStatus().aktif()) {
+                hasil.add(booking);
+            }
+        }
+        return hasil;
+    }
+
     public List<BookingRuangan> padaTanggal(Ruangan ruangan, LocalDate tanggal) {
         List<BookingRuangan> hasil = new ArrayList<BookingRuangan>();
         for (BookingRuangan booking : daftar) {

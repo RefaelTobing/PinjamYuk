@@ -86,7 +86,182 @@ flowchart LR
 
 ---
 
-## 3. Design System (Frontend UI/UX)
+## 3. Struktur Direktori Proyek (Project Tree Structure)
+
+Berikut adalah struktur pohon direktori (*directory tree*) lengkap dari proyek **SIPINJAM (PinjamYuk)** setelah dipisahkan menjadi arsitektur Client-Server (**Backend Java** + **Frontend Web Bebas**):
+
+```
+PinjamYuk/
+├── data/                               # Direktori penyimpanan permanen (File Handling)
+│   ├── barang.txt                      # Data master inventaris barang & ruangan
+│   ├── booking.txt                     # Data transaksi booking ruangan
+│   ├── peminjaman.txt                  # Data transaksi peminjaman barang inventaris
+│   └── pengguna.txt                    # Data akun pengguna (Mahasiswa, Petugas, Pembina)
+│
+├── docs/                               # Dokumentasi arsitektur, desain, dan task
+│   ├── diagrams/                       # Diagram UML (.dot dan .png)
+│   │   ├── class_aturan_sipinjam.png
+│   │   ├── class_model_sipinjam.png
+│   │   ├── class_penyimpanan_sipinjam.png
+│   │   └── usecase_sipinjam.png
+│   ├── TaskBE/                         # Rincian task dan alur pengerjaan Backend (Java)
+│   │   ├── 00_ALUR_PENGERJAAN_BE.md
+│   │   ├── TASK-BE-01_REFACTORING_CORE_DAN_PBO_AUDIT.md
+│   │   ├── TASK-BE-02_HTTP_SERVER_ROUTER_DAN_CORS.md
+│   │   ├── TASK-BE-03_DTO_DAN_JSON_SERIALIZER.md
+│   │   ├── TASK-BE-04_AUTH_DAN_RBAC_HANDLER.md
+│   │   ├── TASK-BE-05_INVENTARIS_DAN_STOK_API.md
+│   │   ├── TASK-BE-06_TRANSAKSI_PEMINJAMAN_API.md
+│   │   ├── TASK-BE-07_BOOKING_RUANGAN_API.md
+│   │   ├── TASK-BE-08_LAPORAN_DAN_STATISTIK_API.md
+│   │   └── TASK-BE-09_PENGUJIAN_API_DAN_DOKUMENTASI.md
+│   ├── TaskFE/                         # Rincian task dan alur pengerjaan Frontend (Bebas)
+│   │   ├── 00_ALUR_PENGERJAAN_FE.md
+│   │   ├── TASK-FE-01_SETUP_PROJECT_DAN_ENV.md
+│   │   ├── TASK-FE-02_AUTH_ROUTING_DAN_LAYOUT.md
+│   │   ├── TASK-FE-03_MAHASISWA_KATALOG_DAN_PENGAJUAN.md
+│   │   ├── TASK-FE-04_MAHASISWA_BOOKING_RUANGAN.md
+│   │   ├── TASK-FE-05_MAHASISWA_RIWAYAT_DAN_DENDA.md
+│   │   ├── TASK-FE-06_DOSEN_PEMBINA_APPROVAL.md
+│   │   ├── TASK-FE-07_PETUGAS_MASTER_DATA.md
+│   │   ├── TASK-FE-08_PETUGAS_VERIFIKASI_DAN_OPERASIONAL.md
+│   │   ├── TASK-FE-09_PETUGAS_MONITORING_DAN_LAPORAN.md
+│   │   └── TASK-FE-10_INTEGRASI_E2E_DAN_DEMO_READINESS.md
+│   ├── DESKRIPSI_DAN_DESAIN_SISTEM.md  # Dokumen komprehensif arsitektur & desain
+│   ├── DesignSistem_SIPINJAM.jpeg      # Poster visual Design System SIPINJAM
+│   ├── DesignSistem_SIPINJAM.png       # Poster visual Design System SIPINJAM (PNG)
+│   └── DesignSistem_SIPINJAM.html      # Template HTML perender Design System
+│
+├── frontend/                           # [BARU] Proyek Frontend Bebas (React + Vite + Tailwind)
+│   ├── public/                         # Aset statis peramban (favicon, logo kampus)
+│   ├── src/
+│   │   ├── assets/                     # Gambar, ikon, dan ilustrasi
+│   │   ├── components/                 # Komponen UI bersama (Button, Modal, Badge, Card, dll.)
+│   │   ├── context/                    # State global (AuthContext, CartContext)
+│   │   ├── layouts/                    # AppLayout (Sidebar, Navbar), AuthLayout
+│   │   ├── pages/
+│   │   │   ├── auth/                   # LoginPage, RegisterPage
+│   │   │   ├── mahasiswa/              # KatalogBarang, BookingRuangan, RiwayatMahasiswa
+│   │   │   ├── pembina/                # AntreanPersetujuan, RiwayatPersetujuan
+│   │   │   └── petugas/                # MasterBarang, MasterRuangan, Sirkulasi, Laporan
+│   │   ├── services/                   # apiClient (Axios) & pemanggilan API backend
+│   │   ├── utils/                      # Helper format Rupiah, format tanggal Indonesia
+│   │   ├── App.jsx                     # Definisi rute & proteksi hak akses (RBAC)
+│   │   ├── index.css                   # Direktif Tailwind CSS
+│   │   └── main.jsx                    # Entry point aplikasi web
+│   ├── .env                            # Variabel lingkungan (VITE_API_BASE_URL=http://localhost:8080/api)
+│   ├── package.json                    # Dependensi frontend (React, Vite, Tailwind, Axios, Lucide)
+│   ├── tailwind.config.js              # Konfigurasi palet warna & tema Tailwind
+│   └── vite.config.js                  # Konfigurasi bundler Vite
+│
+├── out/                                # Direktori output kompilasi bytecode Java (*.class)
+│
+├── src/                                # [BACKEND WAJIB JAVA] Kode Sumber Java OOP
+│   └── sipinjam/
+│       ├── api/                        # [BARU] Lapisan REST API Server & Handlers
+│       │   ├── dto/                    # Data Transfer Objects (Request/Response)
+│       │   ├── handler/                # AuthHandler, InventarisHandler, PeminjamanHandler, BookingHandler, LaporanHandler
+│       │   ├── json/                   # Parser & Serializer JSON
+│       │   ├── HttpHelper.java         # Utilitas CORS, pembaca body, pembuat respons
+│       │   ├── HttpRouter.java         # Dispatcher rute endpoint HTTP
+│       │   └── HttpServerManager.java  # Inisialisasi com.sun.net.httpserver.HttpServer
+│       ├── aturan/                     # Logika Bisnis & Validasi (Strategy Pattern)
+│       │   ├── AturanBatasWaktu.java
+│       │   ├── AturanBentrokJadwal.java
+│       │   ├── AturanDurasiMaksimal.java
+│       │   ├── AturanJamOperasional.java
+│       │   ├── AturanKapasitasRuang.java
+│       │   ├── AturanKetersediaanStok.java
+│       │   ├── AturanMaksimalAktif.java
+│       │   ├── AturanPeminjaman.java   # Interface aturan peminjaman
+│       │   ├── AturanStatusMahasiswa.java
+│       │   ├── AturanTunggakanDenda.java
+│       │   ├── KonteksPengajuan.java
+│       │   └── ValidatorPeminjaman.java# Menjalankan seluruh aturan secara polimorfik
+│       ├── exception/                  # Custom Exception Hierarchy
+│       │   ├── AksesDitolakException.java
+│       │   ├── AturanDilanggarException.java
+│       │   ├── BentrokJadwalException.java
+│       │   ├── DataTidakDitemukanException.java
+│       │   ├── DiLuarJamOperasionalException.java
+│       │   ├── FormatBerkasException.java
+│       │   ├── KapasitasTerlampauiException.java
+│       │   └── StokTidakCukupException.java
+│       ├── layanan/                    # Service Layer (Facade)
+│       │   ├── KalkulatorDenda.java    # Hitung denda polimorfik (keterlambatan + kondisi)
+│       │   ├── LayananBookingRuangan.java
+│       │   ├── LayananKetersediaan.java# Hitung sisa stok dinamis per rentang tanggal
+│       │   ├── LayananPeminjaman.java
+│       │   └── RekapPeminjaman.java
+│       ├── model/                      # Domain Entities (Kaidah OOP Utama)
+│       │   ├── AlatLaboratorium.java   # Subkelas Barang
+│       │   ├── Barang.java             # Abstract Class
+│       │   ├── BarangElektronik.java   # Subkelas Barang
+│       │   ├── BarangFurnitur.java     # Subkelas Barang
+│       │   ├── BookingRuangan.java
+│       │   ├── DetailPeminjaman.java
+│       │   ├── DosenPembina.java       # Subkelas Pengguna
+│       │   ├── JadwalRuangan.java
+│       │   ├── KategoriBarang.java
+│       │   ├── KondisiBarang.java      # Enum kondisi (Baik, Rusak, Hilang)
+│       │   ├── Mahasiswa.java          # Subkelas Pengguna
+│       │   ├── Peminjaman.java
+│       │   ├── Pengembalian.java
+│       │   ├── Pengguna.java           # Abstract Class
+│       │   ├── Peran.java              # Enum peran (Mahasiswa, Petugas, Pembina)
+│       │   ├── PetugasSarpras.java     # Subkelas Pengguna
+│       │   ├── RincianDenda.java
+│       │   ├── Ruangan.java            # Subkelas Barang
+│       │   ├── SlotWaktu.java          # Overloading constructor & deteksi bentrok
+│       │   ├── StatusBooking.java      # Enum status booking
+│       │   └── StatusPeminjaman.java   # Enum status peminjaman
+│       ├── penyimpanan/                # Persistensi Berkas Teks
+│       │   ├── PemisahBaris.java       # Utilitas pemecah baris karakter pipa '|'
+│       │   └── PenyimpananData.java    # Baca & tulis data/
+│       ├── repositori/                 # In-Memory Collection Repositories
+│       │   ├── RepositoriBarang.java
+│       │   ├── RepositoriBooking.java
+│       │   ├── RepositoriPeminjaman.java
+│       │   └── RepositoriPengguna.java
+│       ├── tampilan/                   # Antarmuka Java Swing (Legacy Desktop - dipertahankan sebagai cadangan)
+│       │   ├── FormLogin.java
+│       │   ├── FormUtama.java
+│       │   ├── KomponenUI.java
+│       │   ├── PanelBooking.java
+│       │   ├── PanelMahasiswa.java
+│       │   ├── PanelPembina.java
+│       │   ├── PanelPetugas.java
+│       │   └── PanelRiwayat.java
+│       ├── uji/
+│       │   └── UjiSkenario.java        # Unit testing otomatis skenario TC-01 s.d. TC-18
+│       ├── AplikasiServer.java         # [BARU] Entry Point Server REST API
+│       ├── AplikasiSipinjam.java       # Entry Point GUI Swing lama
+│       └── KonteksAplikasi.java        # Composition Root (Perakitan seluruh objek)
+│
+├── .gitignore
+├── build.sh                            # Skrip kompilasi Java backend
+├── run.sh                              # Skrip menjalankan GUI lama
+├── run_server.sh                       # [BARU] Skrip menjalankan Java REST API Server
+└── README.md
+```
+
+---
+
+## 4. Rincian Bahasa Pemrograman & Teknologi yang Digunakan
+
+| Komponen | Bahasa / Teknologi | Versi | Peran & Alasan Penggunaan |
+| --- | --- | --- | --- |
+| **Backend Core & Engine** | **Java** | JDK 8 / 11 / 17 / 21 | **WAJIB** sesuai instruksi tugas Praktikum PBO. Digunakan untuk seluruh pemodelan OOP (Abstraction, Encapsulation, Inheritance, Polymorphism, Collection, Custom Exception Handling, dan File I/O). |
+| **Backend HTTP Server** | **Java HTTP Server** (`com.sun.net.httpserver`) | Bawaan JDK | Menyediakan REST API tanpa dependensi eksternal (zero-dependency), sehingga kompilasi via terminal `build.sh` tetap ringan dan tidak memerlukan konfigurasi Maven/Gradle rumit. |
+| **Frontend Framework** | **JavaScript / TypeScript (React.js)** | React 18/19 via **Vite** | **BEBAS**. Dipilih React + Vite karena sangat cepat saat kompilasi, reaktif mengelola state (seperti filter tanggal dan pemilihan slot ruangan), serta memudahkan presentasi antarmuka. |
+| **Styling & Tampilan** | **Tailwind CSS + HTML5** | Tailwind v3 / v4 | Menghasilkan antarmuka web modern yang responsif di desktop maupun tablet, dengan sistem warna peran (Biru, Emerald, Amber) yang rapi. |
+| **Komunikasi Client-Server** | **JSON (JavaScript Object Notation)** | Standar RFC 8259 | Format pertukaran data standar antara Frontend dan Backend melalui RESTful API over HTTP. |
+| **Media Penyimpanan** | **Text File Handling (`.txt`)** | Standar I/O Java (`java.io` & `java.nio`) | Sesuai ketentuan tugas PBO yang mensyaratkan penyimpanan data lokal dengan pembacaan dan penulisan berkas teks berpemisah pipa (`\|`) tanpa menggunakan RDBMS eksternal. |
+| **Automasi Scripting** | **Bash Shell Script (`.sh`)** | POSIX Shell | Memudahkan proses kompilasi (`build.sh`) dan eksekusi server backend (`run_server.sh`) di lingkungan Linux/macOS/Git Bash. |
+
+---
+
+## 5. Design System (Frontend UI/UX)
 
 Untuk memastikan pengalaman pengguna yang profesional, konsisten, dan mudah digunakan pada saat demonstrasi praktikum, sistem menerapkan panduan desain berikut:
 
@@ -117,7 +292,7 @@ Grid jadwal ruangan memiliki 3 state visual:
 
 ---
 
-## 4. Flowchart Alur Bisnis (Business Process Workflows)
+## 6. Flowchart Alur Bisnis (Business Process Workflows)
 
 ### 4.1 Flowchart Siklus Peminjaman Barang Inventaris
 
@@ -221,7 +396,7 @@ flowchart TD
 
 ---
 
-## 5. Rancangan Berorientasi Objek (Backend Java PBO)
+## 7. Rancangan Berorientasi Objek (Backend Java PBO)
 
 Backend Java mengimplementasikan struktur kelas yang modular dengan arah dependensi satu arah:
 $$\text{API Handlers} \longrightarrow \text{Layanan (Services)} \longrightarrow \text{Aturan \& Repositori} \longrightarrow \text{Model Domain}$$
@@ -346,18 +521,18 @@ classDiagram
 
 ---
 
-## 6. Format Penyimpanan Berkas Teks (`data/`)
+## 8. Format Penyimpanan Berkas Teks (`data/`)
 
 Data disimpan permanen menggunakan berkas teks berpemisah pipa (`|`) tanpa basis data SQL luar, sesuai persyaratan praktikum:
 
-### 6.1 `data/pengguna.txt`
+### 8.1 `data/pengguna.txt`
 ```
 USR-001|petugas|petugas123|Budi Santoso|PETUGAS_SARPRAS|NIP-19800101|Sarana dan Prasarana
 USR-002|pembina|pembina123|Dr. Hendra Wijaya|DOSEN_PEMBINA|NIDN-070102|Pembina Kemahasiswaan
 USR-003|mahasiswa|mahasiswa123|Ahmad Fauzi|MAHASISWA|21044110001|D3 Teknik Informatika|AKTIF|0
 ```
 
-### 6.2 `data/barang.txt`
+### 8.2 `data/barang.txt`
 ```
 PROY-01|Proyektor Epson EB-X400|Elektronik|5|5000000|TIDAK|BarangElektronik|24
 LAB-01|Mikroskop Binokuler Olympus|Laboratorium|3|12000000|YA|AlatLaboratorium|Lab Biologi
@@ -365,21 +540,21 @@ FUR-01|Kursi Lipat Chitose|Furnitur|50|250000|TIDAK|BarangFurnitur|Baja & Busa
 R-AULA-01|Aula Gedung Utama|Ruangan|1|0|TIDAK|Ruangan|150|AC, Sound System, Proyektor|AKTIF
 ```
 
-### 6.3 `data/peminjaman.txt`
+### 8.3 `data/peminjaman.txt`
 ```
 PINJAM-001|USR-003|2026-11-20|2026-11-22|DIKEMBALIKAN|Seminar Himpunan|2026-11-23|120000|LUNAS|PROY-01:1:BAIK:BAIK;FUR-01:10:BAIK:RUSAK_RINGAN
 ```
 
-### 6.4 `data/booking.txt`
+### 8.4 `data/booking.txt`
 ```
 BKG-001|USR-003|R-AULA-01|2026-11-25|08:00|12:00|80|Seminar Kewirausahaan|DISETUJUI|0
 ```
 
 ---
 
-## 7. Standar Kontrak REST API (JSON)
+## 9. Standar Kontrak REST API (JSON)
 
-### 7.1 Format Respons Berhasil (200 OK / 201 Created)
+### 9.1 Format Respons Berhasil (200 OK / 201 Created)
 ```json
 {
   "sukses": true,
@@ -393,7 +568,7 @@ BKG-001|USR-003|R-AULA-01|2026-11-25|08:00|12:00|80|Seminar Kewirausahaan|DISETU
 }
 ```
 
-### 7.2 Format Respons Kesalahan / Penolakan Aturan (400 / 403 / 409)
+### 9.2 Format Respons Kesalahan / Penolakan Aturan (400 / 403 / 409)
 ```json
 {
   "sukses": false,
@@ -408,7 +583,7 @@ BKG-001|USR-003|R-AULA-01|2026-11-25|08:00|12:00|80|Seminar Kewirausahaan|DISETU
 
 ---
 
-## 8. Panduan Menjalankan Sistem
+## 10. Panduan Menjalankan Sistem
 
 Untuk menjalankan seluruh sistem secara terpisah:
 
