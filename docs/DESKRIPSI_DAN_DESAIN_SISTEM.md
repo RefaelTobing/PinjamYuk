@@ -239,9 +239,13 @@ PinjamYuk/
 │       └── KonteksAplikasi.java        # Composition Root (Perakitan seluruh objek)
 │
 ├── .gitignore
-├── build.sh                            # Skrip kompilasi Java backend
-├── run.sh                              # Skrip menjalankan GUI lama
-├── run_server.sh                       # [BARU] Skrip menjalankan Java REST API Server
+├── build.sh                            # Skrip kompilasi Java backend (Linux/macOS)
+├── build.bat                           # [BARU] Skrip kompilasi Java backend (Windows)
+├── run.sh                              # Skrip menjalankan GUI lama (Linux/macOS)
+├── run.bat                             # [BARU] Skrip menjalankan GUI lama (Windows)
+├── run_server.sh                       # [BARU] Skrip menjalankan Java REST API Server (Linux/macOS)
+├── run_server.bat                      # [BARU] Skrip menjalankan Java REST API Server (Windows Command Prompt)
+├── run_server.ps1                      # [BARU] Skrip menjalankan Java REST API Server (Windows PowerShell)
 └── README.md
 ```
 
@@ -252,12 +256,12 @@ PinjamYuk/
 | Komponen | Bahasa / Teknologi | Versi | Peran & Alasan Penggunaan |
 | --- | --- | --- | --- |
 | **Backend Core & Engine** | **Java** | JDK 8 / 11 / 17 / 21 | **WAJIB** sesuai instruksi tugas Praktikum PBO. Digunakan untuk seluruh pemodelan OOP (Abstraction, Encapsulation, Inheritance, Polymorphism, Collection, Custom Exception Handling, dan File I/O). |
-| **Backend HTTP Server** | **Java HTTP Server** (`com.sun.net.httpserver`) | Bawaan JDK | Menyediakan REST API tanpa dependensi eksternal (zero-dependency), sehingga kompilasi via terminal `build.sh` tetap ringan dan tidak memerlukan konfigurasi Maven/Gradle rumit. |
+| **Backend HTTP Server** | **Java HTTP Server** (`com.sun.net.httpserver`) | Bawaan JDK | Menyediakan REST API tanpa dependensi eksternal (zero-dependency), sehingga kompilasi via terminal tetap ringan dan tidak memerlukan konfigurasi Maven/Gradle rumit. |
 | **Frontend Framework** | **JavaScript / TypeScript (React.js)** | React 18/19 via **Vite** | **BEBAS**. Dipilih React + Vite karena sangat cepat saat kompilasi, reaktif mengelola state (seperti filter tanggal dan pemilihan slot ruangan), serta memudahkan presentasi antarmuka. |
 | **Styling & Tampilan** | **Tailwind CSS + HTML5** | Tailwind v3 / v4 | Menghasilkan antarmuka web modern yang responsif di desktop maupun tablet, dengan sistem warna peran (Biru, Emerald, Amber) yang rapi. |
 | **Komunikasi Client-Server** | **JSON (JavaScript Object Notation)** | Standar RFC 8259 | Format pertukaran data standar antara Frontend dan Backend melalui RESTful API over HTTP. |
 | **Media Penyimpanan** | **Text File Handling (`.txt`)** | Standar I/O Java (`java.io` & `java.nio`) | Sesuai ketentuan tugas PBO yang mensyaratkan penyimpanan data lokal dengan pembacaan dan penulisan berkas teks berpemisah pipa (`\|`) tanpa menggunakan RDBMS eksternal. |
-| **Automasi Scripting** | **Bash Shell Script (`.sh`)** | POSIX Shell | Memudahkan proses kompilasi (`build.sh`) dan eksekusi server backend (`run_server.sh`) di lingkungan Linux/macOS/Git Bash. |
+| **Automasi Scripting** | **Shell Script (`.sh`) & Batch Script (`.bat`, `.ps1`)** | POSIX Shell & Windows Batch/PowerShell | Memudahkan proses kompilasi dan eksekusi server backend lintas platform (Linux, macOS, dan Windows). |
 
 ---
 

@@ -33,10 +33,18 @@ Data contoh dibuat otomatis saat aplikasi pertama kali dijalankan:
 ### Opsi 1: Arsitektur Client-Server Baru (Backend Java REST API + Frontend Web Reaktif)
 
 1. **Jalankan Backend Server Java (Port 8080)**:
-   ```bash
-   ./build.sh
-   ./run_server.sh
-   ```
+   - **Linux / macOS**:
+     ```bash
+     ./run_server.sh
+     ```
+   - **Windows (Command Prompt / Double Click)**:
+     ```cmd
+     run_server.bat
+     ```
+   - **Windows (PowerShell)**:
+     ```powershell
+     .\run_server.ps1
+     ```
    *Health Check dapat diakses di: `http://localhost:8080/api/health`*
 
 2. **Jalankan Frontend Web Modern (Port 5173)**:
@@ -55,9 +63,14 @@ Data contoh dibuat otomatis saat aplikasi pertama kali dijalankan:
 
 ### Opsi 2: Desktop GUI Lama (Java Swing Monolit)
 
-```bash
-./build.sh
-./run.sh
+- **Linux / macOS**:
+  ```bash
+  ./run.sh
+  ```
+- **Windows**:
+  ```cmd
+  run.bat
+  ```
 ```
 ```
 
