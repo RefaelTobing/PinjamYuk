@@ -40,4 +40,4 @@ Write-Host "  Data Dir : $DataDir" -ForegroundColor Green
 Write-Host "  Tekan Ctrl+C untuk menghentikan server." -ForegroundColor Yellow
 Write-Host "============================================================" -ForegroundColor Green
 
-java -Dfile.encoding=UTF-8 -cp out sipinjam.AplikasiServer --port $Port --data $DataDir
+java "-Dfile.encoding=UTF-8" -cp out sipinjam.AplikasiServer --port $Port --data $DataDir
