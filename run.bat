@@ -1,6 +1,9 @@
 @echo off
 setlocal
 
+REM Pindah ke direktori skrip ini berada
+cd /d "%~dp0"
+
 REM ============================================================
 REM  SIPINJAM (PinjamYuk) - Run Desktop GUI (Windows)
 REM ============================================================

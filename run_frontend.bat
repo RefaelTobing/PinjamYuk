@@ -5,7 +5,18 @@ REM ============================================================
 REM  SIPINJAM (PinjamYuk) - Run Frontend Web (Windows)
 REM ============================================================
 
-cd frontend
+cd /d "%~dp0frontend"
+
+where npm >nul 2>&1
+if %ERRORLEVEL% neq 0 (
+    echo ============================================================
+    echo [ERROR] 'npm' / Node.js tidak ditemukan di sistem Anda!
+    echo Silakan unduh dan pasang Node.js terlebih dahulu di:
+    echo https://nodejs.org/ (pilih versi LTS)
+    echo ============================================================
+    pause
+    exit /b 1
+)
 
 if not exist node_modules (
     echo ============================================================
@@ -14,7 +25,7 @@ if not exist node_modules (
     echo ============================================================
     call npm install
     if %ERRORLEVEL% neq 0 (
-        echo [ERROR] Gagal menjalankan npm install! Pastikan Node.js terpasang.
+        echo [ERROR] Gagal menjalankan npm install!
         pause
         exit /b %ERRORLEVEL%
     )
@@ -27,3 +38,6 @@ echo   Tekan Ctrl+C untuk berhenti.
 echo ============================================================
 
 call npm run dev
+if %ERRORLEVEL% neq 0 (
+    pause
+)

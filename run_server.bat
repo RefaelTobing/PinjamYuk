@@ -1,6 +1,9 @@
 @echo off
 setlocal enabledelayedexpansion
 
+REM Pindah ke direktori skrip ini berada
+cd /d "%~dp0"
+
 REM ============================================================
 REM  SIPINJAM (PinjamYuk) - Backend Server Runner (Windows)
 REM ============================================================
