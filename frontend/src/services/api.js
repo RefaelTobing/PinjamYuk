@@ -1,4 +1,6 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+// Base URL backend. Bisa dioverride lewat frontend/.env -> VITE_API_BASE_URL.
+// Default 8080 harus SAMA dengan port yang dipakai run_server (./run_server.ps1 -Port 8080).
+const BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api').replace(/\/+$/, '');
 
 async function request(endpoint, options = {}) {
   const url = `${BASE_URL}${endpoint}`;
@@ -21,8 +23,12 @@ async function request(endpoint, options = {}) {
     }
     return data;
   } catch (err) {
-    if (err.name === 'TypeError' && err.message.includes('fetch')) {
-      throw new Error('Tidak dapat terhubung ke Backend Server Java (Port 8080). Pastikan server backend telah aktif (./run_server.sh).');
+    if (err.name === 'TypeError') {
+      throw new Error(
+        `Tidak dapat terhubung ke Backend Server Java di ${BASE_URL}. ` +
+        'Pastikan server sudah jalan (./run_server.ps1) dan port-nya sama dengan VITE_API_BASE_URL ' +
+        '(mis. backend di 8081 -> set VITE_API_BASE_URL=http://localhost:8081/api di frontend/.env).'
+      );
     }
     throw err;
   }

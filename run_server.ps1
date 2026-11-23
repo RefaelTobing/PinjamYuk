@@ -17,6 +17,28 @@ if (-not (Get-Command javac -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
+# 1b. Cek apakah port sudah dipakai proses lain
+#     Ini penyebab paling sering dari "Port XXXX SUDAH DIGUNAKAN" (BindException):
+#     server lama masih hidup di background (java.exe tidak mati saat jendela ditutup).
+if (Get-Command Get-NetTCPConnection -ErrorAction SilentlyContinue) {
+    $pemakai = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue |
+        Select-Object -First 1
+    if ($pemakai) {
+        $namaProses = "tidak diketahui"
+        try { $namaProses = (Get-Process -Id $pemakai.OwningProcess -ErrorAction Stop).ProcessName } catch { }
+        Write-Host "============================================================" -ForegroundColor Red
+        Write-Host "[ERROR] Port $Port sudah dipakai proses lain!" -ForegroundColor Red
+        Write-Host "        PID $($pemakai.OwningProcess) ($namaProses)" -ForegroundColor Yellow
+        Write-Host "Solusi:" -ForegroundColor Yellow
+        Write-Host "  1. Hentikan proses itu  : Stop-Process -Id $($pemakai.OwningProcess) -Force" -ForegroundColor Yellow
+        Write-Host "  2. Atau pakai port lain : ./run_server.ps1 -Port 8081" -ForegroundColor Yellow
+        Write-Host "     (kalau ganti port, frontend harus ikut: VITE_API_BASE_URL=http://localhost:8081/api)" -ForegroundColor Yellow
+        Write-Host "============================================================" -ForegroundColor Red
+        Read-Host "Tekan Enter untuk keluar..."
+        exit 1
+    }
+}
+
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host "  Menyusun (compile) backend Java SIPINJAM..." -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor Cyan
