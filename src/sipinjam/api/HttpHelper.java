@@ -93,11 +93,18 @@ public class HttpHelper {
     }
 
     public static void kirimError(HttpExchange exchange, int statusCode, String pesan, String kodeKesalahan) throws IOException {
+        kirimError(exchange, statusCode, pesan, kodeKesalahan, null);
+    }
+
+    public static void kirimError(HttpExchange exchange, int statusCode, String pesan, String kodeKesalahan, Object detail) throws IOException {
         Map<String, Object> resp = new LinkedHashMap<String, Object>();
         resp.put("sukses", false);
         resp.put("pesan", pesan);
         if (kodeKesalahan != null && !kodeKesalahan.isEmpty()) {
             resp.put("kodeKesalahan", kodeKesalahan);
+        }
+        if (detail != null) {
+            resp.put("detail", detail);
         }
         kirimJson(exchange, statusCode, resp);
     }

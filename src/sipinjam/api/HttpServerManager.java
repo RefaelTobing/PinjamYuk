@@ -25,6 +25,9 @@ public class HttpServerManager {
         HttpRouter router = new HttpRouter(konteks);
 
         server.createContext("/api", router);
+        // Konteks akar: supaya membuka http://localhost:PORT/ (tanpa /api) juga
+        // menampilkan indeks API, bukan 404 HTML bawaan HttpServer.
+        server.createContext("/", router);
         server.setExecutor(Executors.newFixedThreadPool(10));
         server.start();
 

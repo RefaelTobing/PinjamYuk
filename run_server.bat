@@ -50,9 +50,24 @@ if !ERRORLEVEL! neq 0 (
     exit /b 1
 )
 
+REM 2. Cek apakah port sudah dipakai proses lain (penyebab BindException)
+set "PID_PORT="
+for /f "tokens=5" %%P in ('netstat -ano ^| findstr /r /c:":%PORT% .*LISTENING"') do set "PID_PORT=%%P"
+if defined PID_PORT (
+    echo ============================================================
+    echo [ERROR] Port %PORT% sudah dipakai proses lain ^(PID !PID_PORT!^)!
+    echo Solusi:
+    echo   1. Hentikan proses itu  : taskkill /PID !PID_PORT! /F
+    echo   2. Atau pakai port lain : run_server.bat --port 8081
+    echo      ^(kalau ganti port, frontend harus ikut: VITE_API_BASE_URL=http://localhost:8081/api^)
+    echo ============================================================
+    pause
+    exit /b 1
+)
+
 if not exist out mkdir out
 
-REM 2. Kumpulkan semua berkas .java ke argfile.
+REM 3. Kumpulkan semua berkas .java ke argfile.
 REM  CATATAN PENTING (jangan diubah):
 REM  1. Tiap path WAJIB diberi tanda kutip ("...") karena javac memecah
 REM     isi @argfile berdasarkan SPASI.
