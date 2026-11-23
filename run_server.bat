@@ -13,13 +13,13 @@ set DATA_DIR=data
 
 :parse_args
 if "%~1"=="" goto after_args
-if "%~1"=="--port" (
+if /I "%~1"=="--port" (
     set PORT=%~2
     shift
     shift
     goto parse_args
 )
-if "%~1"=="--data" (
+if /I "%~1"=="--data" (
     set DATA_DIR=%~2
     shift
     shift
@@ -35,7 +35,7 @@ echo ============================================================
 
 REM 1. Cek apakah javac tersedia di PATH
 where javac >nul 2>&1
-if %ERRORLEVEL% neq 0 (
+if !ERRORLEVEL! neq 0 (
     echo ============================================================
     echo [ERROR] 'javac' (Java Development Kit / JDK) tidak ditemukan!
     echo Kemungkinan penyebab:
@@ -52,18 +52,32 @@ if %ERRORLEVEL% neq 0 (
 
 if not exist out mkdir out
 
-REM Kumpulkan semua berkas .java ke file sementara
-dir /s /b src\*.java > sources.txt
-javac -encoding UTF-8 -d out @sources.txt
-set COMPILE_STATUS=%ERRORLEVEL%
-if exist sources.txt del sources.txt
+REM 2. Kumpulkan semua berkas .java ke argfile.
+REM    PENTING: tiap path diberi tanda kutip ("...") karena javac memecah
+REM    isi @argfile berdasarkan SPASI. Tanpa kutip, path seperti
+REM    "C:\...\Semester 3\Prak PBO\Final Project\PinjamYuk\src\..." akan
+REM    terpotong dan muncul error "invalid flag".
+if exist sources.txt del /q sources.txt
+for /r "%~dp0src" %%F in (*.java) do echo "%%F">>sources.txt
 
-if %COMPILE_STATUS% neq 0 (
+if not exist sources.txt (
+    echo ============================================================
+    echo [ERROR] Tidak ada berkas .java di folder src!
+    echo ============================================================
+    pause
+    exit /b 1
+)
+
+javac -encoding UTF-8 -d out @sources.txt
+set COMPILE_STATUS=!ERRORLEVEL!
+if exist sources.txt del /q sources.txt
+
+if !COMPILE_STATUS! neq 0 (
     echo ============================================================
     echo [ERROR] Kompilasi Java gagal! Periksa pesan error di atas.
     echo ============================================================
     pause
-    exit /b %COMPILE_STATUS%
+    exit /b !COMPILE_STATUS!
 )
 
 echo ============================================================
@@ -76,10 +90,6 @@ echo ============================================================
 
 java -Dfile.encoding=UTF-8 -cp out sipinjam.AplikasiServer --port %PORT% --data %DATA_DIR%
 
-if %ERRORLEVEL% neq 0 (
-    echo.
-    echo [INFO] Server backend telah berhenti.
-    pause
-)
-    pause
-)
+echo.
+echo [INFO] Server backend telah berhenti.
+pause

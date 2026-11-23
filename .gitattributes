@@ -1,0 +1,12 @@
+# Pastikan skrip Windows selalu memakai CRLF saat di-checkout,
+# dan skrip Unix selalu LF. cmd.exe gagal mem-parse .bat ber-CRLF-less
+# (LF-only) pada blok if(...) dan label goto.
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+*.ps1   text eol=crlf
+*.sh    text eol=lf
+
+# Berkas Java dan data teks memakai LF
+*.java  text eol=lf
+*.md    text eol=lf
+*.txt   text eol=lf

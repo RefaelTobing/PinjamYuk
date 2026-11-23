@@ -3,6 +3,9 @@ param (
     [string]$DataDir = "data"
 )
 
+# 0. Selalu jalankan dari folder skrip ini (PowerShell tidak otomatis cd)
+Set-Location -Path $PSScriptRoot
+
 # 1. Cek ketersediaan javac di PATH
 if (-not (Get-Command javac -ErrorAction SilentlyContinue)) {
     Write-Host "============================================================" -ForegroundColor Red
@@ -22,13 +25,20 @@ if (-not (Test-Path "out")) {
     New-Item -ItemType Directory -Path "out" | Out-Null
 }
 
-$javaFiles = Get-ChildItem -Path "src" -Recurse -Filter "*.java" | ForEach-Object { $_.FullName }
+# PENTING: setiap path WAJIB dibungkus tanda kutip karena javac memecah
+# isi @argfile berdasarkan SPASI. Path proyek ini mengandung spasi
+# ("Semester 3", "Prak PBO", "Final Project"), jadi tanpa kutip akan
+# muncul error "invalid flag".
+$srcDir = Join-Path $PSScriptRoot "src"
+$javaFiles = Get-ChildItem -Path $srcDir -Recurse -Filter "*.java" |
+    ForEach-Object { '"' + $_.FullName + '"' }
+
 if ($javaFiles.Count -eq 0) {
     Write-Host "[ERROR] Tidak ada berkas .java di folder src!" -ForegroundColor Red
     exit 1
 }
 
-$sourcesFile = "sources.txt"
+$sourcesFile = Join-Path $PSScriptRoot "sources.txt"
 $javaFiles | Out-File -FilePath $sourcesFile -Encoding ascii
 
 javac -encoding UTF-8 -d out ("@" + $sourcesFile)
@@ -39,7 +49,9 @@ if (Test-Path $sourcesFile) {
 }
 
 if ($compileExit -ne 0) {
+    Write-Host "============================================================" -ForegroundColor Red
     Write-Host "[ERROR] Kompilasi gagal! Periksa error di atas." -ForegroundColor Red
+    Write-Host "============================================================" -ForegroundColor Red
     exit $compileExit
 }
 
