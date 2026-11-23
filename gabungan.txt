@@ -1,0 +1,2600 @@
+﻿// ===== C:\PinjamYuk\src\sipinjam\aturan\AturanBatasWaktu.java =====
+package sipinjam.aturan;
+
+import java.time.temporal.ChronoUnit;
+
+import sipinjam.exception.AturanDilanggarException;
+
+/** R4: barang paling lambat H-1, ruangan paling lambat H-3. */
+public class AturanBatasWaktu implements AturanPeminjaman {
+    private static final int MINIMAL_BARANG = 1;
+    private static final int MINIMAL_RUANGAN = 3;
+
+    @Override
+    public String getNamaAturan() {
+        return "R4 Batas waktu pengajuan";
+    }
+
+    @Override
+    public void periksa(KonteksPengajuan konteks) throws AturanDilanggarException {
+        long selisih = ChronoUnit.DAYS.between(konteks.getHariIni(), konteks.getTanggalMulai());
+        int minimal = konteks.isRuangan() ? MINIMAL_RUANGAN : MINIMAL_BARANG;
+        if (selisih < minimal) {
+            throw new AturanDilanggarException(getNamaAturan(),
+                    "Pengajuan paling lambat H-" + minimal + ", sedangkan jarak saat ini H-" + selisih);
+        }
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\aturan\AturanBentrokJadwal.java =====
+package sipinjam.aturan;
+
+import sipinjam.exception.AturanDilanggarException;
+import sipinjam.exception.BentrokJadwalException;
+import sipinjam.model.BookingRuangan;
+
+/** S3: menolak slot yang bertumpang tindih dengan booking aktif lain. */
+public class AturanBentrokJadwal implements AturanPeminjaman {
+
+    @Override
+    public String getNamaAturan() {
+        return "S3 Bentrok jadwal";
+    }
+
+    @Override
+    public void periksa(KonteksPengajuan konteks) throws AturanDilanggarException {
+        if (!konteks.isRuangan()) {
+            return;
+        }
+        BookingRuangan bentrok = konteks.getRepoBooking().cariBentrok(
+                konteks.getRuang(), konteks.getTanggalMulai(), konteks.getSlot());
+        if (bentrok != null) {
+            throw new BentrokJadwalException("Slot " + konteks.getSlot() + " pada "
+                    + konteks.getRuang().getNama() + " bentrok dengan booking " + bentrok.getSlot()
+                    + " milik " + bentrok.getPemohon().getNama()
+                    + " (" + bentrok.getStatus().getLabel() + ")");
+        }
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\aturan\AturanDurasiMaksimal.java =====
+package sipinjam.aturan;
+
+import sipinjam.exception.AturanDilanggarException;
+
+/** R5: barang maksimal tujuh hari, ruangan minimal satu jam dan maksimal empat jam. */
+public class AturanDurasiMaksimal implements AturanPeminjaman {
+    private static final int MAKS_HARI = 7;
+    private static final int MAKS_JAM = 4;
+    private static final int MIN_JAM = 1;
+
+    @Override
+    public String getNamaAturan() {
+        return "R5 Durasi maksimal";
+    }
+
+    @Override
+    public void periksa(KonteksPengajuan konteks) throws AturanDilanggarException {
+        if (konteks.isRuangan()) {
+            int jam = konteks.getSlot().durasiJam();
+            if (jam < MIN_JAM || jam > MAKS_JAM) {
+                throw new AturanDilanggarException(getNamaAturan(),
+                        "Durasi ruangan harus " + MIN_JAM + " sampai " + MAKS_JAM + " jam, bukan " + jam + " jam");
+            }
+        } else if (konteks.getDurasiHari() > MAKS_HARI) {
+            throw new AturanDilanggarException(getNamaAturan(),
+                    "Durasi peminjaman maksimal " + MAKS_HARI + " hari, bukan " + konteks.getDurasiHari() + " hari");
+        }
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\aturan\AturanJamOperasional.java =====
+package sipinjam.aturan;
+
+import java.time.LocalTime;
+
+import sipinjam.exception.AturanDilanggarException;
+import sipinjam.exception.DiLuarJamOperasionalException;
+
+/** S1 dan S2: slot berada di antara 07.00-21.00 dan kelipatan satu jam. */
+public class AturanJamOperasional implements AturanPeminjaman {
+    private static final LocalTime BUKA = LocalTime.of(7, 0);
+    private static final LocalTime TUTUP = LocalTime.of(21, 0);
+
+    @Override
+    public String getNamaAturan() {
+        return "S1 Jam operasional";
+    }
+
+    @Override
+    public void periksa(KonteksPengajuan konteks) throws AturanDilanggarException {
+        if (!konteks.isRuangan()) {
+            return;
+        }
+        if (!konteks.getSlot().diDalam(BUKA, TUTUP)) {
+            throw new DiLuarJamOperasionalException("Slot " + konteks.getSlot()
+                    + " berada di luar jam operasional 07.00-21.00");
+        }
+        if (!konteks.getSlot().kelipatanJam()) {
+            throw new DiLuarJamOperasionalException("Slot " + konteks.getSlot()
+                    + " bukan kelipatan satu jam");
+        }
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\aturan\AturanKapasitasRuang.java =====
+package sipinjam.aturan;
+
+import sipinjam.exception.AturanDilanggarException;
+import sipinjam.exception.KapasitasTerlampauiException;
+
+/** S4: jumlah peserta tidak boleh melebihi kapasitas ruangan. */
+public class AturanKapasitasRuang implements AturanPeminjaman {
+
+    @Override
+    public String getNamaAturan() {
+        return "S4 Kapasitas ruangan";
+    }
+
+    @Override
+    public void periksa(KonteksPengajuan konteks) throws AturanDilanggarException {
+        if (!konteks.isRuangan()) {
+            return;
+        }
+        if (konteks.getJumlahPeserta() <= 0) {
+            throw new KapasitasTerlampauiException("Jumlah peserta harus lebih dari nol");
+        }
+        if (konteks.getJumlahPeserta() > konteks.getRuang().getKapasitas()) {
+            throw new KapasitasTerlampauiException("Peserta " + konteks.getJumlahPeserta()
+                    + " orang melebihi kapasitas " + konteks.getRuang().getNama()
+                    + " (" + konteks.getRuang().getKapasitas() + " orang)");
+        }
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\aturan\AturanKetersediaanStok.java =====
+package sipinjam.aturan;
+
+import sipinjam.exception.AturanDilanggarException;
+import sipinjam.exception.StokTidakCukupException;
+import sipinjam.model.DetailPeminjaman;
+
+/** Pemeriksaan stok barang pada rentang tanggal yang diminta. */
+public class AturanKetersediaanStok implements AturanPeminjaman {
+
+    @Override
+    public String getNamaAturan() {
+        return "Ketersediaan stok";
+    }
+
+    @Override
+    public void periksa(KonteksPengajuan konteks) throws AturanDilanggarException {
+        if (konteks.isRuangan()) {
+            return;
+        }
+        for (DetailPeminjaman baris : konteks.getDetail()) {
+            int terpakai = konteks.getRepoPeminjaman().terpakai(baris.getBarang(),
+                    konteks.getTanggalMulai(), konteks.getTanggalSelesai());
+            int sisa = baris.getBarang().getStok() - terpakai;
+            if (baris.getJumlah() > sisa) {
+                throw new StokTidakCukupException("Stok " + baris.getBarang().getNama()
+                        + " tersisa " + Math.max(0, sisa) + " unit, diminta " + baris.getJumlah() + " unit");
+            }
+        }
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\aturan\AturanMaksimalAktif.java =====
+package sipinjam.aturan;
+
+import sipinjam.exception.AturanDilanggarException;
+
+/** R2: maksimal dua pengajuan aktif (peminjaman dan booking) dalam satu waktu. */
+public class AturanMaksimalAktif implements AturanPeminjaman {
+    private static final int BATAS = 2;
+
+    @Override
+    public String getNamaAturan() {
+        return "R2 Batas pengajuan aktif";
+    }
+
+    @Override
+    public void periksa(KonteksPengajuan konteks) throws AturanDilanggarException {
+        int aktif = konteks.getRepoPeminjaman().hitungAktif(konteks.getPemohon())
+                + konteks.getRepoBooking().hitungAktif(konteks.getPemohon());
+        if (aktif >= BATAS) {
+            throw new AturanDilanggarException(getNamaAturan(),
+                    "Sudah ada " + aktif + " pengajuan aktif, batas maksimal " + BATAS);
+        }
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\aturan\AturanPeminjaman.java =====
+package sipinjam.aturan;
+
+import sipinjam.exception.AturanDilanggarException;
+
+/**
+ * Kontrak satu aturan pengajuan. Setiap aturan berdiri sendiri sebagai kelas,
+ * sehingga penambahan aturan tidak mengubah kode pemanggil.
+ */
+public interface AturanPeminjaman {
+
+    String getNamaAturan();
+
+    void periksa(KonteksPengajuan konteks) throws AturanDilanggarException;
+}
+// ===== C:\PinjamYuk\src\sipinjam\aturan\AturanStatusMahasiswa.java =====
+package sipinjam.aturan;
+
+import sipinjam.exception.AturanDilanggarException;
+
+/** R1: hanya mahasiswa berstatus aktif yang boleh mengajukan. */
+public class AturanStatusMahasiswa implements AturanPeminjaman {
+
+    @Override
+    public String getNamaAturan() {
+        return "R1 Status mahasiswa";
+    }
+
+    @Override
+    public void periksa(KonteksPengajuan konteks) throws AturanDilanggarException {
+        if (!konteks.getPemohon().isAktif()) {
+            throw new AturanDilanggarException(getNamaAturan(),
+                    "Akun mahasiswa berstatus tidak aktif sehingga tidak dapat mengajukan");
+        }
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\aturan\AturanTunggakanDenda.java =====
+package sipinjam.aturan;
+
+import sipinjam.exception.AturanDilanggarException;
+
+/** R3: pengajuan ditolak bila masih ada denda yang belum dibayar. */
+public class AturanTunggakanDenda implements AturanPeminjaman {
+
+    @Override
+    public String getNamaAturan() {
+        return "R3 Tunggakan denda";
+    }
+
+    @Override
+    public void periksa(KonteksPengajuan konteks) throws AturanDilanggarException {
+        if (konteks.getRepoPeminjaman().adaTunggakan(konteks.getPemohon())
+                || konteks.getRepoBooking().adaTunggakan(konteks.getPemohon())) {
+            throw new AturanDilanggarException(getNamaAturan(),
+                    "Masih ada denda yang belum dibayar, lunasi terlebih dahulu");
+        }
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\aturan\KonteksPengajuan.java =====
+package sipinjam.aturan;
+
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
+
+import sipinjam.model.DetailPeminjaman;
+import sipinjam.model.Mahasiswa;
+import sipinjam.model.Ruangan;
+import sipinjam.model.SlotWaktu;
+import sipinjam.repositori.RepositoriBooking;
+import sipinjam.repositori.RepositoriPeminjaman;
+
+/**
+ * Data yang dibutuhkan seluruh aturan dalam satu pemeriksaan.
+ * Dua pembuat objek (untuk barang dan untuk ruangan) memakai overloading.
+ */
+public class KonteksPengajuan {
+    private final Mahasiswa pemohon;
+    private final boolean ruangan;
+    private final LocalDate tanggalMulai;
+    private final LocalDate tanggalSelesai;
+    private final int durasiHari;
+    private final SlotWaktu slot;
+    private final Ruangan ruang;
+    private final int jumlahPeserta;
+    private final List<DetailPeminjaman> detail;
+    private final RepositoriPeminjaman repoPeminjaman;
+    private final RepositoriBooking repoBooking;
+    private final LocalDate hariIni;
+
+    private KonteksPengajuan(Mahasiswa pemohon, boolean ruangan, LocalDate tanggalMulai,
+                             LocalDate tanggalSelesai, int durasiHari, SlotWaktu slot,
+                             Ruangan ruang, int jumlahPeserta,
+                             List<DetailPeminjaman> detail, RepositoriPeminjaman repoPeminjaman,
+                             RepositoriBooking repoBooking, LocalDate hariIni) {
+        this.pemohon = pemohon;
+        this.ruangan = ruangan;
+        this.tanggalMulai = tanggalMulai;
+        this.tanggalSelesai = tanggalSelesai;
+        this.durasiHari = durasiHari;
+        this.slot = slot;
+        this.ruang = ruang;
+        this.jumlahPeserta = jumlahPeserta;
+        this.detail = detail;
+        this.repoPeminjaman = repoPeminjaman;
+        this.repoBooking = repoBooking;
+        this.hariIni = hariIni;
+    }
+
+    public static KonteksPengajuan untukBarang(Mahasiswa pemohon, LocalDate mulai, LocalDate selesai,
+                                               List<DetailPeminjaman> detail,
+                                               RepositoriPeminjaman repoPeminjaman,
+                                               RepositoriBooking repoBooking, LocalDate hariIni) {
+        int durasi = (int) Math.max(1, java.time.temporal.ChronoUnit.DAYS.between(mulai, selesai));
+        return new KonteksPengajuan(pemohon, false, mulai, selesai, durasi, null, null, 0, detail,
+                repoPeminjaman, repoBooking, hariIni);
+    }
+
+    public static KonteksPengajuan untukRuangan(Mahasiswa pemohon, Ruangan ruang, LocalDate tanggal,
+                                                SlotWaktu slot, int jumlahPeserta,
+                                                RepositoriPeminjaman repoPeminjaman,
+                                                RepositoriBooking repoBooking, LocalDate hariIni) {
+        return new KonteksPengajuan(pemohon, true, tanggal, tanggal, 0, slot, ruang, jumlahPeserta,
+                Collections.<DetailPeminjaman>emptyList(), repoPeminjaman, repoBooking, hariIni);
+    }
+
+    public Mahasiswa getPemohon() {
+        return pemohon;
+    }
+
+    public boolean isRuangan() {
+        return ruangan;
+    }
+
+    public LocalDate getTanggalMulai() {
+        return tanggalMulai;
+    }
+
+    public LocalDate getTanggalSelesai() {
+        return tanggalSelesai;
+    }
+
+    public int getDurasiHari() {
+        return durasiHari;
+    }
+
+    public SlotWaktu getSlot() {
+        return slot;
+    }
+
+    public Ruangan getRuang() {
+        return ruang;
+    }
+
+    public int getJumlahPeserta() {
+        return jumlahPeserta;
+    }
+
+    public List<DetailPeminjaman> getDetail() {
+        return detail;
+    }
+
+    public RepositoriPeminjaman getRepoPeminjaman() {
+        return repoPeminjaman;
+    }
+
+    public RepositoriBooking getRepoBooking() {
+        return repoBooking;
+    }
+
+    public LocalDate getHariIni() {
+        return hariIni;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\aturan\ValidatorPeminjaman.java =====
+package sipinjam.aturan;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import sipinjam.exception.AturanDilanggarException;
+
+/**
+ * Menjalankan seluruh aturan yang terdaftar pada satu koleksi.
+ * Penambahan aturan baru cukup dengan menambah objek pada daftar.
+ */
+public class ValidatorPeminjaman {
+    private final List<AturanPeminjaman> daftarAturan;
+
+    public ValidatorPeminjaman(List<AturanPeminjaman> daftarAturan) {
+        this.daftarAturan = new ArrayList<AturanPeminjaman>(daftarAturan);
+    }
+
+    public ValidatorPeminjaman() {
+        this(Arrays.<AturanPeminjaman>asList(
+                new AturanStatusMahasiswa(),
+                new AturanMaksimalAktif(),
+                new AturanTunggakanDenda(),
+                new AturanBatasWaktu(),
+                new AturanDurasiMaksimal(),
+                new AturanKetersediaanStok(),
+                new AturanBentrokJadwal(),
+                new AturanJamOperasional(),
+                new AturanKapasitasRuang()));
+    }
+
+    public void tambahAturan(AturanPeminjaman aturan) {
+        daftarAturan.add(aturan);
+    }
+
+    /**
+     * Seluruh pelanggaran dikumpulkan lebih dahulu agar pengguna
+     * dapat memperbaiki banyak hal dalam satu kali perbaikan.
+     */
+    public void validasi(KonteksPengajuan konteks) throws AturanDilanggarException {
+        List<String> pesan = new ArrayList<String>();
+        for (AturanPeminjaman aturan : daftarAturan) {
+            try {
+                aturan.periksa(konteks);
+            } catch (AturanDilanggarException e) {
+                pesan.add(e.getMessage());
+            }
+        }
+        if (!pesan.isEmpty()) {
+            StringBuilder gabung = new StringBuilder();
+            for (int i = 0; i < pesan.size(); i++) {
+                if (i > 0) {
+                    gabung.append("; ");
+                }
+                gabung.append(pesan.get(i));
+            }
+            throw new AturanDilanggarException("Validasi pengajuan", gabung.toString());
+        }
+    }
+
+    public List<AturanPeminjaman> getDaftarAturan() {
+        return Collections.unmodifiableList(daftarAturan);
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\exception\AksesDitolakException.java =====
+package sipinjam.exception;
+
+/** Pengguna tidak berhak melakukan operasi yang diminta. */
+public class AksesDitolakException extends Exception {
+
+    public AksesDitolakException(String pesan) {
+        super(pesan);
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\exception\AturanDilanggarException.java =====
+package sipinjam.exception;
+
+/** Dilempar ketika salah satu aturan pengajuan tidak terpenuhi. */
+public class AturanDilanggarException extends Exception {
+    private final String namaAturan;
+
+    public AturanDilanggarException(String namaAturan, String pesan) {
+        super(pesan);
+        this.namaAturan = namaAturan;
+    }
+
+    public String getNamaAturan() {
+        return namaAturan;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\exception\BentrokJadwalException.java =====
+package sipinjam.exception;
+
+/** Slot ruangan sudah dipakai pengajuan lain yang bertumpang tindih. */
+public class BentrokJadwalException extends AturanDilanggarException {
+
+    public BentrokJadwalException(String pesan) {
+        super("Bentrok jadwal", pesan);
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\exception\DataTidakDitemukanException.java =====
+package sipinjam.exception;
+
+/** Data yang dicari tidak ada pada koleksi. */
+public class DataTidakDitemukanException extends Exception {
+
+    public DataTidakDitemukanException(String pesan) {
+        super(pesan);
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\exception\DiLuarJamOperasionalException.java =====
+package sipinjam.exception;
+
+/** Slot berada di luar jam operasional atau bukan kelipatan jam. */
+public class DiLuarJamOperasionalException extends AturanDilanggarException {
+
+    public DiLuarJamOperasionalException(String pesan) {
+        super("Jam operasional", pesan);
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\exception\FormatBerkasException.java =====
+package sipinjam.exception;
+
+/** Baris data pada berkas tidak sesuai format yang diharapkan. */
+public class FormatBerkasException extends Exception {
+    private final int nomorBaris;
+
+    public FormatBerkasException(int nomorBaris, String pesan) {
+        super(pesan);
+        this.nomorBaris = nomorBaris;
+    }
+
+    public int getNomorBaris() {
+        return nomorBaris;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\exception\KapasitasTerlampauiException.java =====
+package sipinjam.exception;
+
+/** Jumlah peserta melebihi kapasitas ruangan. */
+public class KapasitasTerlampauiException extends AturanDilanggarException {
+
+    public KapasitasTerlampauiException(String pesan) {
+        super("Kapasitas ruangan", pesan);
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\exception\StokTidakCukupException.java =====
+package sipinjam.exception;
+
+/** Stok barang tidak mencukupi pada rentang tanggal yang diminta. */
+public class StokTidakCukupException extends AturanDilanggarException {
+
+    public StokTidakCukupException(String pesan) {
+        super("Ketersediaan stok", pesan);
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\layanan\KalkulatorDenda.java =====
+package sipinjam.layanan;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
+import sipinjam.model.DetailPeminjaman;
+import sipinjam.model.KondisiBarang;
+import sipinjam.model.Peminjaman;
+import sipinjam.model.RincianDenda;
+
+/** Perhitungan denda keterlambatan, kondisi barang, dan pembatalan ruangan. */
+public class KalkulatorDenda {
+    public static final double DENDA_PEMBATALAN = 50000.0;
+
+    public RincianDenda hitung(Peminjaman peminjaman, LocalDate tanggalKembali) {
+        long hari = peminjaman.hariTerlambat(tanggalKembali);
+        double dendaTerlambat = 0.0;
+        double dendaKondisi = 0.0;
+        StringBuilder catatan = new StringBuilder();
+
+        for (DetailPeminjaman baris : peminjaman.getDetail()) {
+            double tarif = baris.getBarang().tarifHarian() * hari * baris.getJumlah();
+            KondisiBarang akhir = baris.getKondisiAkhir() == null
+                    ? KondisiBarang.BAIK : baris.getKondisiAkhir();
+            double kondisi = baris.getBarang().biayaKondisi(akhir) * baris.getJumlah();
+            baris.setSubtotalDenda(tarif + kondisi);
+            dendaTerlambat += tarif;
+            dendaKondisi += kondisi;
+            if (kondisi > 0) {
+                catatan.append(baris.getBarang().getNama()).append(": ").append(akhir.getLabel())
+                        .append("; ");
+            }
+        }
+
+        RincianDenda rincian = new RincianDenda(hari, dendaTerlambat, dendaKondisi);
+        rincian.setKeterangan(catatan.length() == 0
+                ? (hari > 0 ? "Terlambat " + hari + " hari" : "Tanpa denda")
+                : catatan.toString());
+        return rincian;
+    }
+
+    /** Denda pembatalan hanya berlaku bila dibatalkan kurang dari satu hari sebelum pemakaian. */
+    public double dendaPembatalan(LocalDate tanggalPakai, LocalDate hariIni) {
+        long selisih = ChronoUnit.DAYS.between(hariIni, tanggalPakai);
+        return selisih < 1 ? DENDA_PEMBATALAN : 0.0;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\layanan\LayananBookingRuangan.java =====
+package sipinjam.layanan;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import sipinjam.model.BookingRuangan;
+import sipinjam.model.JadwalRuangan;
+import sipinjam.model.Ruangan;
+import sipinjam.model.SlotWaktu;
+import sipinjam.model.StatusBooking;
+import sipinjam.repositori.RepositoriBooking;
+
+/** Pengelolaan jadwal slot ruangan. */
+public class LayananBookingRuangan {
+    private static final LocalTime BUKA = LocalTime.of(7, 0);
+    private static final LocalTime TUTUP = LocalTime.of(21, 0);
+
+    private final RepositoriBooking repoBooking;
+
+    public LayananBookingRuangan(RepositoriBooking repoBooking) {
+        this.repoBooking = repoBooking;
+    }
+
+    /** Slot acuan satu jam mulai pukul 07.00 sampai 21.00. */
+    public List<SlotWaktu> templateSlot() {
+        List<SlotWaktu> hasil = new ArrayList<SlotWaktu>();
+        for (int jam = BUKA.getHour(); jam < TUTUP.getHour(); jam++) {
+            hasil.add(new SlotWaktu(jam, jam + 1));
+        }
+        return hasil;
+    }
+
+    public JadwalRuangan jadwal(Ruangan ruangan, LocalDate tanggal) {
+        JadwalRuangan jadwal = new JadwalRuangan(ruangan, tanggal);
+        for (BookingRuangan booking : repoBooking.padaTanggal(ruangan, tanggal)) {
+            jadwal.tambah(booking);
+        }
+        return jadwal;
+    }
+
+    public List<SlotWaktu> slotKosong(Ruangan ruangan, LocalDate tanggal) {
+        return jadwal(ruangan, tanggal).slotKosong(templateSlot());
+    }
+
+    public BookingRuangan cariBentrok(Ruangan ruangan, LocalDate tanggal, SlotWaktu slot) {
+        return repoBooking.cariBentrok(ruangan, tanggal, slot);
+    }
+
+    /**
+     * Memperbarui status booking mengikuti waktu berjalan:
+     * disetujui menjadi terpakai saat slot dimulai, terpakai menjadi selesai saat slot berakhir.
+     */
+    public int perbaruiStatusBerjalan(LocalDate hariIni, LocalTime sekarang) {
+        int berubah = 0;
+        for (BookingRuangan booking : repoBooking.semua()) {
+            if (booking.getStatus() == StatusBooking.DISETUJUI
+                    && booking.getTanggal().equals(hariIni)
+                    && !sekarang.isBefore(booking.getSlot().getJamMulai())
+                    && sekarang.isBefore(booking.getSlot().getJamSelesai())) {
+                booking.ubahStatus(StatusBooking.TERPAKAI);
+                berubah++;
+            } else if (booking.getStatus() == StatusBooking.TERPAKAI
+                    && (booking.getTanggal().isBefore(hariIni)
+                        || (booking.getTanggal().equals(hariIni)
+                            && !sekarang.isBefore(booking.getSlot().getJamSelesai())))) {
+                booking.ubahStatus(StatusBooking.SELESAI);
+                berubah++;
+            }
+        }
+        return berubah;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\layanan\LayananKetersediaan.java =====
+package sipinjam.layanan;
+
+import java.time.LocalDate;
+
+import sipinjam.model.Barang;
+import sipinjam.repositori.RepositoriPeminjaman;
+
+/** Menghitung sisa stok barang pada rentang tanggal tertentu. */
+public class LayananKetersediaan {
+    private final RepositoriPeminjaman repoPeminjaman;
+
+    public LayananKetersediaan(RepositoriPeminjaman repoPeminjaman) {
+        this.repoPeminjaman = repoPeminjaman;
+    }
+
+    public int terpakai(Barang barang, LocalDate mulai, LocalDate selesai) {
+        return repoPeminjaman.terpakai(barang, mulai, selesai);
+    }
+
+    public int sisaStok(Barang barang, LocalDate mulai, LocalDate selesai) {
+        return Math.max(0, barang.getStok() - terpakai(barang, mulai, selesai));
+    }
+
+    public boolean tersedia(Barang barang, int jumlah, LocalDate mulai, LocalDate selesai) {
+        return sisaStok(barang, mulai, selesai) >= jumlah;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\layanan\LayananPeminjaman.java =====
+package sipinjam.layanan;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import sipinjam.aturan.KonteksPengajuan;
+import sipinjam.aturan.ValidatorPeminjaman;
+import sipinjam.exception.AturanDilanggarException;
+import sipinjam.exception.AksesDitolakException;
+import sipinjam.model.BookingRuangan;
+import sipinjam.model.DetailPeminjaman;
+import sipinjam.model.DosenPembina;
+import sipinjam.model.KondisiBarang;
+import sipinjam.model.Mahasiswa;
+import sipinjam.model.Peminjaman;
+import sipinjam.model.Pengembalian;
+import sipinjam.model.RincianDenda;
+import sipinjam.model.Ruangan;
+import sipinjam.model.SlotWaktu;
+import sipinjam.model.StatusBooking;
+import sipinjam.model.StatusPeminjaman;
+import sipinjam.penyimpanan.PenyimpananData;
+import sipinjam.repositori.RepositoriBooking;
+import sipinjam.repositori.RepositoriPeminjaman;
+
+/** Fasade seluruh alur bisnis peminjaman barang dan booking ruangan. */
+public class LayananPeminjaman {
+    private final RepositoriPeminjaman repoPeminjaman;
+    private final RepositoriBooking repoBooking;
+    private final ValidatorPeminjaman validator;
+    private final LayananBookingRuangan layananBooking;
+    private final KalkulatorDenda kalkulatorDenda;
+    private final PenyimpananData penyimpanan;
+
+    public LayananPeminjaman(RepositoriPeminjaman repoPeminjaman, RepositoriBooking repoBooking,
+                             ValidatorPeminjaman validator, LayananBookingRuangan layananBooking,
+                             KalkulatorDenda kalkulatorDenda, PenyimpananData penyimpanan) {
+        this.repoPeminjaman = repoPeminjaman;
+        this.repoBooking = repoBooking;
+        this.validator = validator;
+        this.layananBooking = layananBooking;
+        this.kalkulatorDenda = kalkulatorDenda;
+        this.penyimpanan = penyimpanan;
+    }
+
+    public Peminjaman ajukanBarang(Mahasiswa pemohon, List<DetailPeminjaman> detail,
+                                   LocalDate mulai, LocalDate selesai, String keperluan,
+                                   LocalDate hariIni) throws AturanDilanggarException {
+        validator.validasi(KonteksPengajuan.untukBarang(pemohon, mulai, selesai, detail,
+                repoPeminjaman, repoBooking, hariIni));
+
+        Peminjaman peminjaman = new Peminjaman(repoPeminjaman.idBerikutnya(), pemohon, hariIni,
+                mulai, selesai, keperluan);
+        for (DetailPeminjaman baris : detail) {
+            peminjaman.tambahDetail(baris);
+        }
+        repoPeminjaman.tambah(peminjaman);
+        simpan();
+        return peminjaman;
+    }
+
+    public BookingRuangan ajukanBooking(Mahasiswa pemohon, Ruangan ruangan, LocalDate tanggal,
+                                        SlotWaktu slot, int jumlahPeserta, String keperluan,
+                                        LocalDate hariIni) throws AturanDilanggarException {
+        validator.validasi(KonteksPengajuan.untukRuangan(pemohon, ruangan, tanggal, slot,
+                jumlahPeserta, repoPeminjaman, repoBooking, hariIni));
+
+        BookingRuangan booking = new BookingRuangan(repoBooking.idBerikutnya(), ruangan, pemohon,
+                hariIni, tanggal, slot, jumlahPeserta, keperluan, StatusBooking.DIAJUKAN, "", 0.0, false);
+        repoBooking.tambah(booking);
+        simpan();
+        return booking;
+    }
+
+    public void setujuiPembina(Peminjaman peminjaman, DosenPembina pembina)
+            throws AksesDitolakException {
+        if (peminjaman.getStatus() != StatusPeminjaman.DIAJUKAN) {
+            throw new AksesDitolakException("Hanya pengajuan berstatus diajukan yang dapat disetujui");
+        }
+        if (!peminjaman.butuhPersetujuanPembina()) {
+            throw new AksesDitolakException("Pengajuan ini tidak memerlukan persetujuan pembina");
+        }
+        peminjaman.setIdPembina(pembina.getNidn());
+        peminjaman.setCatatanPetugas("Disetujui pembina " + pembina.getNama());
+        simpan();
+    }
+
+    public void tolakPembina(Peminjaman peminjaman, DosenPembina pembina, String catatan)
+            throws AksesDitolakException {
+        if (peminjaman.getStatus() != StatusPeminjaman.DIAJUKAN) {
+            throw new AksesDitolakException("Hanya pengajuan berstatus diajukan yang dapat ditolak");
+        }
+        peminjaman.setIdPembina(pembina.getNidn());
+        peminjaman.setCatatanPetugas("Ditolak pembina: " + catatan);
+        peminjaman.ubahStatus(StatusPeminjaman.DITOLAK);
+        simpan();
+    }
+
+    public void verifikasiPetugas(Peminjaman peminjaman, boolean setuju, String catatan)
+            throws AksesDitolakException {
+        if (peminjaman.getStatus() != StatusPeminjaman.DIAJUKAN) {
+            throw new AksesDitolakException("Pengajuan ini sudah diproses sebelumnya");
+        }
+        if (setuju && peminjaman.butuhPersetujuanPembina() && peminjaman.getIdPembina().isEmpty()) {
+            throw new AksesDitolakException("Pengajuan menunggu persetujuan dosen pembina");
+        }
+        if (setuju) {
+            peminjaman.ubahStatus(StatusPeminjaman.DISETUJUI);
+            peminjaman.setCatatanPetugas(catatan.isEmpty() ? "Disetujui petugas" : catatan);
+        } else {
+            peminjaman.ubahStatus(StatusPeminjaman.DITOLAK);
+            peminjaman.setCatatanPetugas("Ditolak: " + catatan);
+        }
+        simpan();
+    }
+
+    public void serahTerima(Peminjaman peminjaman) throws AksesDitolakException {
+        if (peminjaman.getStatus() != StatusPeminjaman.DISETUJUI) {
+            throw new AksesDitolakException("Barang hanya dapat diserahkan setelah pengajuan disetujui");
+        }
+        peminjaman.ubahStatus(StatusPeminjaman.DIPINJAM);
+        simpan();
+    }
+
+    public RincianDenda catatPengembalian(Peminjaman peminjaman,
+                                          Map<DetailPeminjaman, KondisiBarang> kondisiAkhir,
+                                          LocalDate tanggalKembali, boolean dendaLunas)
+            throws AksesDitolakException {
+        if (peminjaman.getStatus() != StatusPeminjaman.DIPINJAM) {
+            throw new AksesDitolakException("Hanya peminjaman berstatus dipinjam yang dapat dikembalikan");
+        }
+        for (Map.Entry<DetailPeminjaman, KondisiBarang> entri : kondisiAkhir.entrySet()) {
+            entri.getKey().setKondisiAkhir(entri.getValue());
+        }
+        RincianDenda rincian = kalkulatorDenda.hitung(peminjaman, tanggalKembali);
+        peminjaman.setPengembalian(new Pengembalian(tanggalKembali, rincian.getTotal(), dendaLunas));
+        peminjaman.ubahStatus(StatusPeminjaman.DIKEMBALIKAN);
+        simpan();
+        return rincian;
+    }
+
+    public void batalkanPeminjaman(Peminjaman peminjaman) throws AksesDitolakException {
+        if (peminjaman.getStatus() != StatusPeminjaman.DIAJUKAN
+                && peminjaman.getStatus() != StatusPeminjaman.DISETUJUI) {
+            throw new AksesDitolakException("Pengajuan ini tidak dapat dibatalkan lagi");
+        }
+        peminjaman.ubahStatus(StatusPeminjaman.DIBATALKAN);
+        simpan();
+    }
+
+    public void verifikasiBooking(BookingRuangan booking, boolean setuju, String catatan)
+            throws AksesDitolakException {
+        if (booking.getStatus() != StatusBooking.DIAJUKAN) {
+            throw new AksesDitolakException("Booking ini sudah diproses sebelumnya");
+        }
+        booking.setCatatanPetugas(setuju ? (catatan.isEmpty() ? "Disetujui petugas" : catatan)
+                : "Ditolak: " + catatan);
+        booking.ubahStatus(setuju ? StatusBooking.DISETUJUI : StatusBooking.DITOLAK);
+        simpan();
+    }
+
+    /** Mengembalikan nilai denda pembatalan yang dikenakan (0 bila masih H-1 atau lebih). */
+    public double batalkanBooking(BookingRuangan booking, LocalDate hariIni)
+            throws AksesDitolakException {
+        if (booking.getStatus() != StatusBooking.DIAJUKAN
+                && booking.getStatus() != StatusBooking.DISETUJUI) {
+            throw new AksesDitolakException("Booking ini tidak dapat dibatalkan lagi");
+        }
+        double denda = kalkulatorDenda.dendaPembatalan(booking.getTanggal(), hariIni);
+        booking.setDendaPembatalan(denda);
+        booking.ubahStatus(StatusBooking.DIBATALKAN);
+        simpan();
+        return denda;
+    }
+
+    public void lunasiDenda(Peminjaman peminjaman) {
+        if (peminjaman.getPengembalian() != null) {
+            peminjaman.getPengembalian().setLunas(true);
+        }
+        simpan();
+    }
+
+    public void lunasiDenda(BookingRuangan booking) {
+        booking.setDendaLunas(true);
+        simpan();
+    }
+
+    public List<Peminjaman> menungguPembina() {
+        return repoPeminjaman.menungguPembina();
+    }
+
+    public List<Peminjaman> jatuhTempo(LocalDate hariIni) {
+        return repoPeminjaman.jatuhTempo(hariIni);
+    }
+
+    public List<Peminjaman> peminjamanAktif() {
+        List<Peminjaman> hasil = new ArrayList<Peminjaman>();
+        for (Peminjaman peminjaman : repoPeminjaman.semua()) {
+            if (peminjaman.getStatus().aktif()) {
+                hasil.add(peminjaman);
+            }
+        }
+        return hasil;
+    }
+
+    public int perbaruiStatusBerjalan(LocalDate hariIni) {
+        int berubah = layananBooking.perbaruiStatusBerjalan(hariIni, java.time.LocalTime.now());
+        if (berubah > 0) {
+            simpan();
+        }
+        return berubah;
+    }
+
+    public void simpan() {
+        penyimpanan.simpan();
+    }
+
+    public RepositoriPeminjaman getRepoPeminjaman() {
+        return repoPeminjaman;
+    }
+
+    public RepositoriBooking getRepoBooking() {
+        return repoBooking;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\layanan\RekapPeminjaman.java =====
+package sipinjam.layanan;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import sipinjam.model.BookingRuangan;
+import sipinjam.model.DetailPeminjaman;
+import sipinjam.model.Peminjaman;
+
+/** Rekap peminjaman, keterlambatan, dan utilisasi ruangan. */
+public class RekapPeminjaman {
+
+    public Map<String, Integer> perKategori(List<Peminjaman> daftar) {
+        Map<String, Integer> hasil = new LinkedHashMap<String, Integer>();
+        for (Peminjaman peminjaman : daftar) {
+            for (DetailPeminjaman baris : peminjaman.getDetail()) {
+                String kategori = baris.getBarang().getKategori() == null
+                        ? "Lainnya" : baris.getBarang().getKategori().getNama();
+                Integer lama = hasil.get(kategori);
+                hasil.put(kategori, (lama == null ? 0 : lama) + baris.getJumlah());
+            }
+        }
+        return hasil;
+    }
+
+    public double tingkatKeterlambatan(List<Peminjaman> daftar) {
+        int kembali = 0;
+        int terlambat = 0;
+        for (Peminjaman peminjaman : daftar) {
+            if (peminjaman.getPengembalian() == null) {
+                continue;
+            }
+            kembali++;
+            if (peminjaman.hariTerlambat(peminjaman.getPengembalian().getTanggalKembali()) > 0) {
+                terlambat++;
+            }
+        }
+        return kembali == 0 ? 0.0 : (terlambat * 100.0 / kembali);
+    }
+
+    public Map<String, Integer> utilisasiPerJam(List<BookingRuangan> daftar) {
+        Map<String, Integer> hasil = new LinkedHashMap<String, Integer>();
+        for (BookingRuangan booking : daftar) {
+            String jam = String.format("%02d:00", booking.getSlot().getJamMulai().getHour());
+            Integer lama = hasil.get(jam);
+            hasil.put(jam, (lama == null ? 0 : lama) + 1);
+        }
+        return hasil;
+    }
+
+    public int jamTerpakai(List<BookingRuangan> daftar) {
+        int total = 0;
+        for (BookingRuangan booking : daftar) {
+            total += booking.getSlot().durasiJam();
+        }
+        return total;
+    }
+
+    public double totalDenda(List<Peminjaman> daftar) {
+        double total = 0.0;
+        for (Peminjaman peminjaman : daftar) {
+            if (peminjaman.getPengembalian() != null) {
+                total += peminjaman.getPengembalian().getTotalDenda();
+            }
+        }
+        return total;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\AlatLaboratorium.java =====
+package sipinjam.model;
+
+/** Alat laboratorium: tarif harian Rp15.000. */
+public class AlatLaboratorium extends Barang {
+
+    public AlatLaboratorium(String kode, String nama, KategoriBarang kategori, int stok,
+                            double hargaSatuan, boolean perluPersetujuan) {
+        super(kode, nama, kategori, stok, hargaSatuan, perluPersetujuan);
+    }
+
+    @Override
+    public String getJenisBarang() {
+        return "ALAT_LAB";
+    }
+
+    @Override
+    public double tarifHarian() {
+        return 15000.0;
+    }
+
+    @Override
+    public double biayaKondisi(KondisiBarang kondisi) {
+        if (kondisi == KondisiBarang.RUSAK_RINGAN) {
+            return 75000.0;
+        }
+        if (kondisi == KondisiBarang.RUSAK_BERAT) {
+            return 0.50 * getHargaSatuan();
+        }
+        if (kondisi == KondisiBarang.HILANG) {
+            return getHargaSatuan();
+        }
+        return 0.0;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\Barang.java =====
+package sipinjam.model;
+
+/**
+ * Induk seluruh sumber daya yang dapat dipinjam: barang inventaris dan ruangan.
+ * Tarif denda ditentukan oleh masing-masing subclass (polymorphism).
+ */
+public abstract class Barang {
+    private final String kode;
+    private String nama;
+    private KategoriBarang kategori;
+    private int stok;
+    private double hargaSatuan;
+    private boolean perluPersetujuan;
+
+    protected Barang(String kode, String nama, KategoriBarang kategori, int stok,
+                     double hargaSatuan, boolean perluPersetujuan) {
+        if (kode == null || kode.trim().isEmpty()) {
+            throw new IllegalArgumentException("Kode barang tidak boleh kosong");
+        }
+        if (stok < 0) {
+            throw new IllegalArgumentException("Stok tidak boleh negatif");
+        }
+        this.kode = kode.trim();
+        this.nama = nama;
+        this.kategori = kategori;
+        this.stok = stok;
+        this.hargaSatuan = hargaSatuan;
+        this.perluPersetujuan = perluPersetujuan;
+    }
+
+    /** Nama jenis untuk ditampilkan dan disimpan pada berkas. */
+    public abstract String getJenisBarang();
+
+    /** Tarif denda keterlambatan per hari. */
+    public abstract double tarifHarian();
+
+    /** Biaya kerusakan atau kehilangan sesuai jenis barang. */
+    public abstract double biayaKondisi(KondisiBarang kondisi);
+
+    /**
+     * Perhitungan denda yang sama untuk seluruh jenis barang,
+     * memakai tarif yang berbeda dari subclass.
+     */
+    public double hitungDenda(long hariTerlambat, KondisiBarang kondisi) {
+        long hari = Math.max(0, hariTerlambat);
+        return (tarifHarian() * hari) + biayaKondisi(kondisi);
+    }
+
+    /** Ruangan tidak dipinjam per tanggal, melainkan per slot jam. */
+    public boolean dikelolaPerSlot() {
+        return false;
+    }
+
+    public String getKode() {
+        return kode;
+    }
+
+    public String getNama() {
+        return nama;
+    }
+
+    public void setNama(String nama) {
+        if (nama == null || nama.trim().isEmpty()) {
+            throw new IllegalArgumentException("Nama barang tidak boleh kosong");
+        }
+        this.nama = nama.trim();
+    }
+
+    public KategoriBarang getKategori() {
+        return kategori;
+    }
+
+    public void setKategori(KategoriBarang kategori) {
+        this.kategori = kategori;
+    }
+
+    public int getStok() {
+        return stok;
+    }
+
+    public void setStok(int stok) {
+        if (stok < 0) {
+            throw new IllegalArgumentException("Stok tidak boleh negatif");
+        }
+        this.stok = stok;
+    }
+
+    public double getHargaSatuan() {
+        return hargaSatuan;
+    }
+
+    public void setHargaSatuan(double hargaSatuan) {
+        this.hargaSatuan = hargaSatuan;
+    }
+
+    public boolean isPerluPersetujuan() {
+        return perluPersetujuan;
+    }
+
+    public void setPerluPersetujuan(boolean perluPersetujuan) {
+        this.perluPersetujuan = perluPersetujuan;
+    }
+
+    @Override
+    public String toString() {
+        return nama + " [" + kode + "]";
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\BarangElektronik.java =====
+package sipinjam.model;
+
+/** Barang elektronik: tarif harian Rp10.000. */
+public class BarangElektronik extends Barang {
+
+    public BarangElektronik(String kode, String nama, KategoriBarang kategori, int stok,
+                            double hargaSatuan, boolean perluPersetujuan) {
+        super(kode, nama, kategori, stok, hargaSatuan, perluPersetujuan);
+    }
+
+    @Override
+    public String getJenisBarang() {
+        return "ELEKTRONIK";
+    }
+
+    @Override
+    public double tarifHarian() {
+        return 10000.0;
+    }
+
+    @Override
+    public double biayaKondisi(KondisiBarang kondisi) {
+        if (kondisi == KondisiBarang.RUSAK_RINGAN) {
+            return 100000.0;
+        }
+        if (kondisi == KondisiBarang.RUSAK_BERAT) {
+            return 0.40 * getHargaSatuan();
+        }
+        if (kondisi == KondisiBarang.HILANG) {
+            return getHargaSatuan();
+        }
+        return 0.0;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\BarangFurnitur.java =====
+package sipinjam.model;
+
+/** Furnitur: tarif harian Rp5.000. */
+public class BarangFurnitur extends Barang {
+
+    public BarangFurnitur(String kode, String nama, KategoriBarang kategori, int stok,
+                          double hargaSatuan, boolean perluPersetujuan) {
+        super(kode, nama, kategori, stok, hargaSatuan, perluPersetujuan);
+    }
+
+    @Override
+    public String getJenisBarang() {
+        return "FURNITUR";
+    }
+
+    @Override
+    public double tarifHarian() {
+        return 5000.0;
+    }
+
+    @Override
+    public double biayaKondisi(KondisiBarang kondisi) {
+        if (kondisi == KondisiBarang.RUSAK_RINGAN) {
+            return 25000.0;
+        }
+        if (kondisi == KondisiBarang.RUSAK_BERAT) {
+            return 0.30 * getHargaSatuan();
+        }
+        if (kondisi == KondisiBarang.HILANG) {
+            return getHargaSatuan();
+        }
+        return 0.0;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\BookingRuangan.java =====
+package sipinjam.model;
+
+import java.time.LocalDate;
+
+/** Pengajuan pemakaian ruangan pada satu slot jam. */
+public class BookingRuangan {
+    private final String id;
+    private final Ruangan ruangan;
+    private final Mahasiswa pemohon;
+    private final LocalDate tanggalPengajuan;
+    private LocalDate tanggal;
+    private SlotWaktu slot;
+    private int jumlahPeserta;
+    private String keperluan;
+    private StatusBooking status;
+    private String catatanPetugas;
+    private double dendaPembatalan;
+    private boolean dendaLunas;
+
+    public BookingRuangan(String id, Ruangan ruangan, Mahasiswa pemohon, LocalDate tanggalPengajuan,
+                          LocalDate tanggal, SlotWaktu slot, int jumlahPeserta, String keperluan,
+                          StatusBooking status, String catatanPetugas,
+                          double dendaPembatalan, boolean dendaLunas) {
+        if (ruangan == null || pemohon == null || tanggal == null || slot == null) {
+            throw new IllegalArgumentException("Ruangan, pemohon, tanggal, dan slot wajib diisi");
+        }
+        this.id = id;
+        this.ruangan = ruangan;
+        this.pemohon = pemohon;
+        this.tanggalPengajuan = tanggalPengajuan;
+        this.tanggal = tanggal;
+        this.slot = slot;
+        this.jumlahPeserta = jumlahPeserta;
+        this.keperluan = keperluan;
+        this.status = status == null ? StatusBooking.DIAJUKAN : status;
+        this.catatanPetugas = catatanPetugas == null ? "" : catatanPetugas;
+        this.dendaPembatalan = dendaPembatalan;
+        this.dendaLunas = dendaLunas;
+    }
+
+    public void ubahStatus(StatusBooking tujuan) {
+        if (tujuan == null) {
+            throw new IllegalArgumentException("Status tujuan tidak boleh kosong");
+        }
+        if (!status.bolehKe(tujuan)) {
+            throw new IllegalStateException("Status " + status.getLabel()
+                    + " tidak dapat berpindah ke " + tujuan.getLabel());
+        }
+        this.status = tujuan;
+    }
+
+    public boolean adaTunggakan() {
+        return dendaPembatalan > 0 && !dendaLunas;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public Ruangan getRuangan() {
+        return ruangan;
+    }
+
+    public Mahasiswa getPemohon() {
+        return pemohon;
+    }
+
+    public LocalDate getTanggalPengajuan() {
+        return tanggalPengajuan;
+    }
+
+    public LocalDate getTanggal() {
+        return tanggal;
+    }
+
+    public void setTanggal(LocalDate tanggal) {
+        this.tanggal = tanggal;
+    }
+
+    public SlotWaktu getSlot() {
+        return slot;
+    }
+
+    public void setSlot(SlotWaktu slot) {
+        this.slot = slot;
+    }
+
+    public int getJumlahPeserta() {
+        return jumlahPeserta;
+    }
+
+    public void setJumlahPeserta(int jumlahPeserta) {
+        this.jumlahPeserta = jumlahPeserta;
+    }
+
+    public String getKeperluan() {
+        return keperluan;
+    }
+
+    public void setKeperluan(String keperluan) {
+        this.keperluan = keperluan;
+    }
+
+    public StatusBooking getStatus() {
+        return status;
+    }
+
+    public String getCatatanPetugas() {
+        return catatanPetugas;
+    }
+
+    public void setCatatanPetugas(String catatanPetugas) {
+        this.catatanPetugas = catatanPetugas == null ? "" : catatanPetugas;
+    }
+
+    public double getDendaPembatalan() {
+        return dendaPembatalan;
+    }
+
+    public void setDendaPembatalan(double dendaPembatalan) {
+        this.dendaPembatalan = Math.max(0.0, dendaPembatalan);
+    }
+
+    public boolean isDendaLunas() {
+        return dendaLunas;
+    }
+
+    public void setDendaLunas(boolean dendaLunas) {
+        this.dendaLunas = dendaLunas;
+    }
+
+    @Override
+    public String toString() {
+        return ruangan.getNama() + " " + tanggal + " " + slot;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\DetailPeminjaman.java =====
+package sipinjam.model;
+
+/** Satu baris barang pada sebuah pengajuan peminjaman. */
+public class DetailPeminjaman {
+    private final Barang barang;
+    private int jumlah;
+    private KondisiBarang kondisiAwal;
+    private KondisiBarang kondisiAkhir;
+    private double subtotalDenda;
+
+    public DetailPeminjaman(Barang barang, int jumlah, KondisiBarang kondisiAwal) {
+        if (barang == null) {
+            throw new IllegalArgumentException("Barang tidak boleh kosong");
+        }
+        if (jumlah <= 0) {
+            throw new IllegalArgumentException("Jumlah minimal 1");
+        }
+        this.barang = barang;
+        this.jumlah = jumlah;
+        this.kondisiAwal = kondisiAwal == null ? KondisiBarang.BAIK : kondisiAwal;
+        this.kondisiAkhir = null;
+        this.subtotalDenda = 0.0;
+    }
+
+    public Barang getBarang() {
+        return barang;
+    }
+
+    public int getJumlah() {
+        return jumlah;
+    }
+
+    public void setJumlah(int jumlah) {
+        if (jumlah <= 0) {
+            throw new IllegalArgumentException("Jumlah minimal 1");
+        }
+        this.jumlah = jumlah;
+    }
+
+    public KondisiBarang getKondisiAwal() {
+        return kondisiAwal;
+    }
+
+    public void setKondisiAwal(KondisiBarang kondisiAwal) {
+        this.kondisiAwal = kondisiAwal;
+    }
+
+    public KondisiBarang getKondisiAkhir() {
+        return kondisiAkhir;
+    }
+
+    public void setKondisiAkhir(KondisiBarang kondisiAkhir) {
+        this.kondisiAkhir = kondisiAkhir;
+    }
+
+    public double getSubtotalDenda() {
+        return subtotalDenda;
+    }
+
+    public void setSubtotalDenda(double subtotalDenda) {
+        this.subtotalDenda = Math.max(0.0, subtotalDenda);
+    }
+
+    @Override
+    public String toString() {
+        return barang.getNama() + " x" + jumlah;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\DosenPembina.java =====
+package sipinjam.model;
+
+/** Pengguna yang menyetujui pengajuan tertentu. */
+public class DosenPembina extends Pengguna {
+    private String nidn;
+    private String jabatan;
+
+    public DosenPembina(String id, String nama, String username, String password,
+                        String nidn, String jabatan) {
+        super(id, nama, username, password);
+        this.nidn = nidn;
+        this.jabatan = jabatan;
+    }
+
+    @Override
+    public Peran getPeran() {
+        return Peran.PEMBINA;
+    }
+
+    @Override
+    public String tampilkanProfil() {
+        return super.tampilkanProfil() + " (" + nidn + " - " + jabatan + ")";
+    }
+
+    public String getNidn() {
+        return nidn;
+    }
+
+    public void setNidn(String nidn) {
+        this.nidn = nidn;
+    }
+
+    public String getJabatan() {
+        return jabatan;
+    }
+
+    public void setJabatan(String jabatan) {
+        this.jabatan = jabatan;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\JadwalRuangan.java =====
+package sipinjam.model;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/** Kumpulan booking pada satu ruangan untuk satu tanggal. */
+public class JadwalRuangan {
+    private final Ruangan ruangan;
+    private final LocalDate tanggal;
+    private final List<BookingRuangan> daftar;
+
+    public JadwalRuangan(Ruangan ruangan, LocalDate tanggal) {
+        this.ruangan = ruangan;
+        this.tanggal = tanggal;
+        this.daftar = new ArrayList<BookingRuangan>();
+    }
+
+    public void tambah(BookingRuangan booking) {
+        if (booking != null && booking.getTanggal().equals(tanggal)
+                && booking.getRuangan().getKode().equals(ruangan.getKode())) {
+            daftar.add(booking);
+        }
+    }
+
+    /** Booking aktif yang bertumpang tindih dengan slot yang diminta. */
+    public BookingRuangan cariBentrok(SlotWaktu slot) {
+        for (BookingRuangan booking : daftar) {
+            if (booking.getStatus().mengunciSlot() && booking.getSlot().bertumpangTindih(slot)) {
+                return booking;
+            }
+        }
+        return null;
+    }
+
+    /** Slot dari daftar acuan yang belum dipakai booking aktif. */
+    public List<SlotWaktu> slotKosong(List<SlotWaktu> acuan) {
+        List<SlotWaktu> hasil = new ArrayList<SlotWaktu>();
+        for (SlotWaktu slot : acuan) {
+            if (cariBentrok(slot) == null) {
+                hasil.add(slot);
+            }
+        }
+        return hasil;
+    }
+
+    public List<BookingRuangan> getDaftar() {
+        return Collections.unmodifiableList(daftar);
+    }
+
+    public Ruangan getRuangan() {
+        return ruangan;
+    }
+
+    public LocalDate getTanggal() {
+        return tanggal;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\KategoriBarang.java =====
+package sipinjam.model;
+
+/** Data induk kategori barang. */
+public class KategoriBarang {
+    private final String kode;
+    private String nama;
+
+    public KategoriBarang(String kode, String nama) {
+        if (kode == null || kode.trim().isEmpty()) {
+            throw new IllegalArgumentException("Kode kategori tidak boleh kosong");
+        }
+        this.kode = kode.trim();
+        this.nama = nama;
+    }
+
+    public String getKode() {
+        return kode;
+    }
+
+    public String getNama() {
+        return nama;
+    }
+
+    public void setNama(String nama) {
+        this.nama = nama;
+    }
+
+    @Override
+    public String toString() {
+        return nama;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\KondisiBarang.java =====
+package sipinjam.model;
+
+/** Kondisi barang saat diserahkan atau dikembalikan. */
+public enum KondisiBarang {
+    BAIK("Baik"),
+    RUSAK_RINGAN("Rusak Ringan"),
+    RUSAK_BERAT("Rusak Berat"),
+    HILANG("Hilang");
+
+    private final String label;
+
+    KondisiBarang(String label) {
+        this.label = label;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\Mahasiswa.java =====
+package sipinjam.model;
+
+/** Pengguna yang mengajukan peminjaman dan booking. */
+public class Mahasiswa extends Pengguna {
+    private final String nim;
+    private String programStudi;
+    private String noTelepon;
+    private boolean aktif;
+
+    public Mahasiswa(String id, String nama, String username, String password,
+                     String nim, String programStudi, String noTelepon, boolean aktif) {
+        super(id, nama, username, password);
+        if (nim == null || nim.trim().isEmpty()) {
+            throw new IllegalArgumentException("NIM tidak boleh kosong");
+        }
+        this.nim = nim.trim();
+        this.programStudi = programStudi;
+        this.noTelepon = noTelepon;
+        this.aktif = aktif;
+    }
+
+    @Override
+    public Peran getPeran() {
+        return Peran.MAHASISWA;
+    }
+
+    @Override
+    public String tampilkanProfil() {
+        return super.tampilkanProfil() + " (" + nim + " - " + programStudi + ")";
+    }
+
+    public String getNim() {
+        return nim;
+    }
+
+    public String getProgramStudi() {
+        return programStudi;
+    }
+
+    public void setProgramStudi(String programStudi) {
+        this.programStudi = programStudi;
+    }
+
+    public String getNoTelepon() {
+        return noTelepon;
+    }
+
+    public void setNoTelepon(String noTelepon) {
+        this.noTelepon = noTelepon;
+    }
+
+    public boolean isAktif() {
+        return aktif;
+    }
+
+    public void setAktif(boolean aktif) {
+        this.aktif = aktif;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\Peminjaman.java =====
+package sipinjam.model;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/** Pengajuan peminjaman barang beserta detail dan siklus statusnya. */
+public class Peminjaman {
+    private final String id;
+    private final Mahasiswa pemohon;
+    private final LocalDate tanggalPengajuan;
+    private LocalDate tanggalMulai;
+    private LocalDate tanggalSelesai;
+    private String keperluan;
+    private final List<DetailPeminjaman> detail;
+    private StatusPeminjaman status;
+    private String catatanPetugas;
+    private String idPembina;
+    private Pengembalian pengembalian;
+
+    public Peminjaman(String id, Mahasiswa pemohon, LocalDate tanggalPengajuan,
+                      LocalDate tanggalMulai, LocalDate tanggalSelesai, String keperluan) {
+        if (pemohon == null) {
+            throw new IllegalArgumentException("Pemohon wajib diisi");
+        }
+        if (tanggalMulai == null || tanggalSelesai == null) {
+            throw new IllegalArgumentException("Tanggal peminjaman wajib diisi");
+        }
+        if (tanggalSelesai.isBefore(tanggalMulai)) {
+            throw new IllegalArgumentException("Tanggal selesai tidak boleh sebelum tanggal mulai");
+        }
+        this.id = id;
+        this.pemohon = pemohon;
+        this.tanggalPengajuan = tanggalPengajuan;
+        this.tanggalMulai = tanggalMulai;
+        this.tanggalSelesai = tanggalSelesai;
+        this.keperluan = keperluan;
+        this.detail = new ArrayList<DetailPeminjaman>();
+        this.status = StatusPeminjaman.DIAJUKAN;
+        this.catatanPetugas = "";
+        this.idPembina = "";
+        this.pengembalian = null;
+    }
+
+    public void tambahDetail(DetailPeminjaman baris) {
+        if (baris == null) {
+            throw new IllegalArgumentException("Detail peminjaman tidak boleh kosong");
+        }
+        for (DetailPeminjaman ada : detail) {
+            if (ada.getBarang().getKode().equals(baris.getBarang().getKode())) {
+                throw new IllegalArgumentException("Barang " + baris.getBarang().getNama()
+                        + " sudah ada pada pengajuan ini");
+            }
+        }
+        detail.add(baris);
+    }
+
+    public void ubahStatus(StatusPeminjaman tujuan) {
+        if (tujuan == null) {
+            throw new IllegalArgumentException("Status tujuan tidak boleh kosong");
+        }
+        if (!status.bolehKe(tujuan)) {
+            throw new IllegalStateException("Status " + status.getLabel()
+                    + " tidak dapat berpindah ke " + tujuan.getLabel());
+        }
+        this.status = tujuan;
+    }
+
+    /** Lama peminjaman dalam hari, minimal satu hari. */
+    public int durasiHari() {
+        long hari = ChronoUnit.DAYS.between(tanggalMulai, tanggalSelesai);
+        return (int) Math.max(1, hari);
+    }
+
+    /** Rentang tanggal bertumpang tindih dengan peminjaman lain. */
+    public boolean bertumpangTindih(LocalDate mulai, LocalDate selesai) {
+        return !tanggalMulai.isAfter(selesai) && !mulai.isAfter(tanggalSelesai);
+    }
+
+    public long hariTerlambat(LocalDate tanggalKembali) {
+        if (tanggalKembali == null || !tanggalKembali.isAfter(tanggalSelesai)) {
+            return 0;
+        }
+        return ChronoUnit.DAYS.between(tanggalSelesai, tanggalKembali);
+    }
+
+    public boolean butuhPersetujuanPembina() {
+        for (DetailPeminjaman baris : detail) {
+            if (baris.getBarang().isPerluPersetujuan()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int totalUnit() {
+        int total = 0;
+        for (DetailPeminjaman baris : detail) {
+            total += baris.getJumlah();
+        }
+        return total;
+    }
+
+    public boolean adaTunggakan() {
+        return pengembalian != null && pengembalian.getTotalDenda() > 0 && !pengembalian.isLunas();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public Mahasiswa getPemohon() {
+        return pemohon;
+    }
+
+    public LocalDate getTanggalPengajuan() {
+        return tanggalPengajuan;
+    }
+
+    public LocalDate getTanggalMulai() {
+        return tanggalMulai;
+    }
+
+    public void setTanggalMulai(LocalDate tanggalMulai) {
+        this.tanggalMulai = tanggalMulai;
+    }
+
+    public LocalDate getTanggalSelesai() {
+        return tanggalSelesai;
+    }
+
+    public void setTanggalSelesai(LocalDate tanggalSelesai) {
+        this.tanggalSelesai = tanggalSelesai;
+    }
+
+    public String getKeperluan() {
+        return keperluan;
+    }
+
+    public void setKeperluan(String keperluan) {
+        this.keperluan = keperluan;
+    }
+
+    public List<DetailPeminjaman> getDetail() {
+        return Collections.unmodifiableList(detail);
+    }
+
+    public StatusPeminjaman getStatus() {
+        return status;
+    }
+
+    public String getCatatanPetugas() {
+        return catatanPetugas;
+    }
+
+    public void setCatatanPetugas(String catatanPetugas) {
+        this.catatanPetugas = catatanPetugas == null ? "" : catatanPetugas;
+    }
+
+    public String getIdPembina() {
+        return idPembina;
+    }
+
+    public void setIdPembina(String idPembina) {
+        this.idPembina = idPembina == null ? "" : idPembina;
+    }
+
+    public Pengembalian getPengembalian() {
+        return pengembalian;
+    }
+
+    public void setPengembalian(Pengembalian pengembalian) {
+        this.pengembalian = pengembalian;
+    }
+
+    @Override
+    public String toString() {
+        return id + " - " + pemohon.getNama() + " - " + status.getLabel();
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\Pengembalian.java =====
+package sipinjam.model;
+
+import java.time.LocalDate;
+
+/** Catatan pengembalian barang beserta denda yang timbul. */
+public class Pengembalian {
+    private final LocalDate tanggalKembali;
+    private double totalDenda;
+    private boolean lunas;
+
+    public Pengembalian(LocalDate tanggalKembali, double totalDenda, boolean lunas) {
+        if (tanggalKembali == null) {
+            throw new IllegalArgumentException("Tanggal kembali tidak boleh kosong");
+        }
+        this.tanggalKembali = tanggalKembali;
+        this.totalDenda = Math.max(0.0, totalDenda);
+        this.lunas = lunas;
+    }
+
+    public LocalDate getTanggalKembali() {
+        return tanggalKembali;
+    }
+
+    public double getTotalDenda() {
+        return totalDenda;
+    }
+
+    public void setTotalDenda(double totalDenda) {
+        this.totalDenda = Math.max(0.0, totalDenda);
+    }
+
+    public boolean isLunas() {
+        return lunas;
+    }
+
+    public void setLunas(boolean lunas) {
+        this.lunas = lunas;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\Pengguna.java =====
+package sipinjam.model;
+
+/**
+ * Induk seluruh pengguna aplikasi.
+ * Seluruh atribut dilindungi (private) dan hanya diakses melalui method.
+ */
+public abstract class Pengguna {
+    private final String id;
+    private String nama;
+    private final String username;
+    private String password;
+
+    protected Pengguna(String id, String nama, String username, String password) {
+        if (id == null || id.trim().isEmpty()) {
+            throw new IllegalArgumentException("Id pengguna tidak boleh kosong");
+        }
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("Username tidak boleh kosong");
+        }
+        this.id = id.trim();
+        this.nama = nama;
+        this.username = username.trim();
+        this.password = password;
+    }
+
+    /** Peran ditentukan oleh subclass, bukan oleh atribut yang bisa diubah. */
+    public abstract Peran getPeran();
+
+    public String tampilkanProfil() {
+        return getPeran().getLabel() + " - " + nama;
+    }
+
+    public boolean cekPassword(String masukan) {
+        return password != null && password.equals(masukan);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getNama() {
+        return nama;
+    }
+
+    public void setNama(String nama) {
+        if (nama == null || nama.trim().isEmpty()) {
+            throw new IllegalArgumentException("Nama tidak boleh kosong");
+        }
+        this.nama = nama.trim();
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        if (password == null || password.trim().length() < 6) {
+            throw new IllegalArgumentException("Kata sandi minimal 6 karakter");
+        }
+        this.password = password;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\Peran.java =====
+package sipinjam.model;
+
+/** Peran pengguna aplikasi. */
+public enum Peran {
+    MAHASISWA("Mahasiswa"),
+    PETUGAS("Petugas Sarana dan Prasarana"),
+    PEMBINA("Dosen Pembina");
+
+    private final String label;
+
+    Peran(String label) {
+        this.label = label;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\PetugasSarpras.java =====
+package sipinjam.model;
+
+/** Pengguna yang mengelola inventaris dan memverifikasi pengajuan. */
+public class PetugasSarpras extends Pengguna {
+    private String nip;
+    private String unitKerja;
+
+    public PetugasSarpras(String id, String nama, String username, String password,
+                           String nip, String unitKerja) {
+        super(id, nama, username, password);
+        this.nip = nip;
+        this.unitKerja = unitKerja;
+    }
+
+    @Override
+    public Peran getPeran() {
+        return Peran.PETUGAS;
+    }
+
+    @Override
+    public String tampilkanProfil() {
+        return super.tampilkanProfil() + " (" + nip + " - " + unitKerja + ")";
+    }
+
+    public String getNip() {
+        return nip;
+    }
+
+    public void setNip(String nip) {
+        this.nip = nip;
+    }
+
+    public String getUnitKerja() {
+        return unitKerja;
+    }
+
+    public void setUnitKerja(String unitKerja) {
+        this.unitKerja = unitKerja;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\RincianDenda.java =====
+package sipinjam.model;
+
+/** Rincian perhitungan denda agar dapat ditampilkan dan dipertanggungjawabkan. */
+public class RincianDenda {
+    private final long hariTerlambat;
+    private final double dendaTerlambat;
+    private final double dendaKondisi;
+    private String keterangan;
+
+    public RincianDenda(long hariTerlambat, double dendaTerlambat, double dendaKondisi) {
+        this.hariTerlambat = Math.max(0, hariTerlambat);
+        this.dendaTerlambat = Math.max(0.0, dendaTerlambat);
+        this.dendaKondisi = Math.max(0.0, dendaKondisi);
+        this.keterangan = "";
+    }
+
+    public long getHariTerlambat() {
+        return hariTerlambat;
+    }
+
+    public double getDendaTerlambat() {
+        return dendaTerlambat;
+    }
+
+    public double getDendaKondisi() {
+        return dendaKondisi;
+    }
+
+    public double getTotal() {
+        return dendaTerlambat + dendaKondisi;
+    }
+
+    public String getKeterangan() {
+        return keterangan;
+    }
+
+    public void setKeterangan(String keterangan) {
+        this.keterangan = keterangan;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\Ruangan.java =====
+package sipinjam.model;
+
+/**
+ * Ruangan: sumber daya yang dipesan per slot jam.
+ * Tidak memiliki denda harian maupun denda kondisi; yang berlaku adalah denda pembatalan.
+ */
+public class Ruangan extends Barang {
+    private int kapasitas;
+    private String fasilitas;
+
+    public Ruangan(String kode, String nama, KategoriBarang kategori, int kapasitas, String fasilitas) {
+        super(kode, nama, kategori, 0, 0.0, false);
+        if (kapasitas <= 0) {
+            throw new IllegalArgumentException("Kapasitas ruangan harus lebih dari nol");
+        }
+        this.kapasitas = kapasitas;
+        this.fasilitas = fasilitas;
+    }
+
+    @Override
+    public String getJenisBarang() {
+        return "RUANGAN";
+    }
+
+    @Override
+    public double tarifHarian() {
+        return 0.0;
+    }
+
+    @Override
+    public double biayaKondisi(KondisiBarang kondisi) {
+        return 0.0;
+    }
+
+    @Override
+    public boolean dikelolaPerSlot() {
+        return true;
+    }
+
+    public int getKapasitas() {
+        return kapasitas;
+    }
+
+    public void setKapasitas(int kapasitas) {
+        if (kapasitas <= 0) {
+            throw new IllegalArgumentException("Kapasitas ruangan harus lebih dari nol");
+        }
+        this.kapasitas = kapasitas;
+    }
+
+    public String getFasilitas() {
+        return fasilitas;
+    }
+
+    public void setFasilitas(String fasilitas) {
+        this.fasilitas = fasilitas;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\SlotWaktu.java =====
+package sipinjam.model;
+
+import java.time.Duration;
+import java.time.LocalTime;
+
+/**
+ * Interval jam pemakaian ruangan.
+ * Dua constructor disediakan agar objek dapat dibuat dari LocalTime
+ * maupun dari jam bulat (overloading constructor).
+ */
+public class SlotWaktu {
+    private final LocalTime jamMulai;
+    private final LocalTime jamSelesai;
+
+    public SlotWaktu(LocalTime jamMulai, LocalTime jamSelesai) {
+        if (jamMulai == null || jamSelesai == null) {
+            throw new IllegalArgumentException("Jam mulai dan jam selesai wajib diisi");
+        }
+        if (!jamSelesai.isAfter(jamMulai)) {
+            throw new IllegalArgumentException("Jam selesai harus setelah jam mulai");
+        }
+        this.jamMulai = jamMulai;
+        this.jamSelesai = jamSelesai;
+    }
+
+    public SlotWaktu(int jamMulai, int jamSelesai) {
+        this(LocalTime.of(jamMulai, 0), LocalTime.of(jamSelesai, 0));
+    }
+
+    public LocalTime getJamMulai() {
+        return jamMulai;
+    }
+
+    public LocalTime getJamSelesai() {
+        return jamSelesai;
+    }
+
+    /** Lama pemakaian dalam satuan jam. */
+    public int durasiJam() {
+        return (int) Duration.between(jamMulai, jamSelesai).toMinutes() / 60;
+    }
+
+    /**
+     * Bentrok bila mulai1 < selesai2 dan mulai2 < selesai1.
+     * Slot yang berakhir tepat saat slot lain mulai tidak dianggap bentrok.
+     */
+    public boolean bertumpangTindih(SlotWaktu lain) {
+        if (lain == null) {
+            return false;
+        }
+        return jamMulai.isBefore(lain.jamSelesai) && lain.jamMulai.isBefore(jamSelesai);
+    }
+
+    public boolean kelipatanJam() {
+        return jamMulai.getMinute() == 0 && jamSelesai.getMinute() == 0;
+    }
+
+    public boolean diDalam(LocalTime buka, LocalTime tutup) {
+        return !jamMulai.isBefore(buka) && !jamSelesai.isAfter(tutup);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%02d:%02d-%02d:%02d", jamMulai.getHour(), jamMulai.getMinute(),
+                jamSelesai.getHour(), jamSelesai.getMinute());
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\StatusBooking.java =====
+package sipinjam.model;
+
+/** Status siklus booking ruangan. */
+public enum StatusBooking {
+    DIAJUKAN("Diajukan"),
+    DISETUJUI("Disetujui"),
+    TERPAKAI("Terpakai"),
+    SELESAI("Selesai"),
+    DITOLAK("Ditolak"),
+    DIBATALKAN("Dibatalkan");
+
+    private final String label;
+
+    StatusBooking(String label) {
+        this.label = label;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public boolean bolehKe(StatusBooking tujuan) {
+        switch (this) {
+            case DIAJUKAN:
+                return tujuan == DISETUJUI || tujuan == DITOLAK || tujuan == DIBATALKAN;
+            case DISETUJUI:
+                return tujuan == TERPAKAI || tujuan == DIBATALKAN || tujuan == DITOLAK;
+            case TERPAKAI:
+                return tujuan == SELESAI;
+            default:
+                return false;
+        }
+    }
+
+    /** Status yang mengunci slot sehingga tidak dapat diajukan orang lain. */
+    public boolean mengunciSlot() {
+        return this == DIAJUKAN || this == DISETUJUI || this == TERPAKAI;
+    }
+
+    public boolean aktif() {
+        return mengunciSlot();
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\model\StatusPeminjaman.java =====
+package sipinjam.model;
+
+/** Status siklus peminjaman barang beserta aturan perpindahannya. */
+public enum StatusPeminjaman {
+    DIAJUKAN("Diajukan"),
+    DISETUJUI("Disetujui"),
+    DIPINJAM("Dipinjam"),
+    DIKEMBALIKAN("Dikembalikan"),
+    DITOLAK("Ditolak"),
+    DIBATALKAN("Dibatalkan");
+
+    private final String label;
+
+    StatusPeminjaman(String label) {
+        this.label = label;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public boolean bolehKe(StatusPeminjaman tujuan) {
+        switch (this) {
+            case DIAJUKAN:
+                return tujuan == DISETUJUI || tujuan == DITOLAK || tujuan == DIBATALKAN;
+            case DISETUJUI:
+                // penolakan masih mungkin terjadi setelah persetujuan pembina,
+                // misalnya ketika stok ternyata tidak tersedia saat serah terima
+                return tujuan == DIPINJAM || tujuan == DIBATALKAN || tujuan == DITOLAK;
+            case DIPINJAM:
+                return tujuan == DIKEMBALIKAN;
+            default:
+                return false;
+        }
+    }
+
+    /** Status yang masih menahan stok barang. */
+    public boolean menahanStok() {
+        return this == DISETUJUI || this == DIPINJAM;
+    }
+
+    /** Status yang dihitung sebagai pengajuan aktif milik mahasiswa. */
+    public boolean aktif() {
+        return this == DIAJUKAN || this == DISETUJUI || this == DIPINJAM;
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\repositori\RepositoriBarang.java =====
+package sipinjam.repositori;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import sipinjam.model.Barang;
+import sipinjam.model.Ruangan;
+
+/** Koleksi barang dan ruangan beserta pencariannya. */
+public class RepositoriBarang {
+    private final List<Barang> daftar = new ArrayList<Barang>();
+
+    public void tambah(Barang barang) {
+        if (barang == null) {
+            throw new IllegalArgumentException("Barang tidak boleh kosong");
+        }
+        if (cari(barang.getKode()) != null) {
+            throw new IllegalArgumentException("Kode " + barang.getKode() + " sudah dipakai");
+        }
+        daftar.add(barang);
+    }
+
+    public Barang cari(String kode) {
+        for (Barang barang : daftar) {
+            if (barang.getKode().equalsIgnoreCase(kode)) {
+                return barang;
+            }
+        }
+        return null;
+    }
+
+    public Ruangan cariRuangan(String kode) {
+        Barang barang = cari(kode);
+        return barang instanceof Ruangan ? (Ruangan) barang : null;
+    }
+
+    /** Hanya barang inventaris, tanpa ruangan. */
+    public List<Barang> daftarBarang() {
+        List<Barang> hasil = new ArrayList<Barang>();
+        for (Barang barang : daftar) {
+            if (!barang.dikelolaPerSlot()) {
+                hasil.add(barang);
+            }
+        }
+        return hasil;
+    }
+
+    public List<Ruangan> daftarRuangan() {
+        List<Ruangan> hasil = new ArrayList<Ruangan>();
+        for (Barang barang : daftar) {
+            if (barang instanceof Ruangan) {
+                hasil.add((Ruangan) barang);
+            }
+        }
+        return hasil;
+    }
+
+    public List<Barang> semua() {
+        return Collections.unmodifiableList(daftar);
+    }
+
+    public int jumlah() {
+        return daftar.size();
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\repositori\RepositoriBooking.java =====
+package sipinjam.repositori;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import sipinjam.model.BookingRuangan;
+import sipinjam.model.Mahasiswa;
+import sipinjam.model.Ruangan;
+import sipinjam.model.SlotWaktu;
+
+/** Koleksi booking ruangan dan pemeriksaan bentrok slot. */
+public class RepositoriBooking {
+    private final List<BookingRuangan> daftar = new ArrayList<BookingRuangan>();
+
+    public void tambah(BookingRuangan booking) {
+        daftar.add(booking);
+    }
+
+    public BookingRuangan cari(String id) {
+        for (BookingRuangan booking : daftar) {
+            if (booking.getId().equalsIgnoreCase(id)) {
+                return booking;
+            }
+        }
+        return null;
+    }
+
+    public List<BookingRuangan> cariAktif() {
+        List<BookingRuangan> hasil = new ArrayList<BookingRuangan>();
+        for (BookingRuangan booking : daftar) {
+            if (booking.getStatus().aktif()) {
+                hasil.add(booking);
+            }
+        }
+        return hasil;
+    }
+
+    public List<BookingRuangan> padaTanggal(Ruangan ruangan, LocalDate tanggal) {
+        List<BookingRuangan> hasil = new ArrayList<BookingRuangan>();
+        for (BookingRuangan booking : daftar) {
+            if (booking.getRuangan().getKode().equals(ruangan.getKode())
+                    && booking.getTanggal().equals(tanggal)) {
+                hasil.add(booking);
+            }
+        }
+        return hasil;
+    }
+
+    /** Booking aktif pertama yang slotnya bertumpang tindih, atau null. */
+    public BookingRuangan cariBentrok(Ruangan ruangan, LocalDate tanggal, SlotWaktu slot) {
+        for (BookingRuangan booking : padaTanggal(ruangan, tanggal)) {
+            if (booking.getStatus().mengunciSlot() && booking.getSlot().bertumpangTindih(slot)) {
+                return booking;
+            }
+        }
+        return null;
+    }
+
+    public int hitungAktif(Mahasiswa mahasiswa) {
+        int aktif = 0;
+        for (BookingRuangan booking : daftar) {
+            if (booking.getPemohon().getUsername().equals(mahasiswa.getUsername())
+                    && booking.getStatus().aktif()) {
+                aktif++;
+            }
+        }
+        return aktif;
+    }
+
+    public boolean adaTunggakan(Mahasiswa mahasiswa) {
+        for (BookingRuangan booking : daftar) {
+            if (booking.getPemohon().getUsername().equals(mahasiswa.getUsername())
+                    && booking.adaTunggakan()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<BookingRuangan> daftarUntuk(Mahasiswa mahasiswa) {
+        List<BookingRuangan> hasil = new ArrayList<BookingRuangan>();
+        for (BookingRuangan booking : daftar) {
+            if (booking.getPemohon().getUsername().equals(mahasiswa.getUsername())) {
+                hasil.add(booking);
+            }
+        }
+        return hasil;
+    }
+
+    public List<BookingRuangan> denganStatus(sipinjam.model.StatusBooking status) {
+        List<BookingRuangan> hasil = new ArrayList<BookingRuangan>();
+        for (BookingRuangan booking : daftar) {
+            if (booking.getStatus() == status) {
+                hasil.add(booking);
+            }
+        }
+        return hasil;
+    }
+
+    public List<BookingRuangan> semua() {
+        return Collections.unmodifiableList(daftar);
+    }
+
+    public String idBerikutnya() {
+        return String.format("B%04d", daftar.size() + 1);
+    }
+
+    public void kosongkan() {
+        daftar.clear();
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\repositori\RepositoriPeminjaman.java =====
+package sipinjam.repositori;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import sipinjam.model.Barang;
+import sipinjam.model.DetailPeminjaman;
+import sipinjam.model.Mahasiswa;
+import sipinjam.model.Peminjaman;
+
+/** Koleksi peminjaman barang beserta perhitungan pemakaian stok. */
+public class RepositoriPeminjaman {
+    private final List<Peminjaman> daftar = new ArrayList<Peminjaman>();
+
+    public void tambah(Peminjaman peminjaman) {
+        daftar.add(peminjaman);
+    }
+
+    public Peminjaman cari(String id) {
+        for (Peminjaman peminjaman : daftar) {
+            if (peminjaman.getId().equalsIgnoreCase(id)) {
+                return peminjaman;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Jumlah unit barang yang sudah menahan stok pada rentang tanggal tertentu.
+     * Hanya peminjaman berstatus DISETUJUI atau DIPINJAM yang dihitung.
+     */
+    public int terpakai(Barang barang, LocalDate mulai, LocalDate selesai) {
+        int total = 0;
+        for (Peminjaman peminjaman : daftar) {
+            if (!peminjaman.getStatus().menahanStok()) {
+                continue;
+            }
+            if (!peminjaman.bertumpangTindih(mulai, selesai)) {
+                continue;
+            }
+            for (DetailPeminjaman baris : peminjaman.getDetail()) {
+                if (baris.getBarang().getKode().equals(barang.getKode())) {
+                    total += baris.getJumlah();
+                }
+            }
+        }
+        return total;
+    }
+
+    public int hitungAktif(Mahasiswa mahasiswa) {
+        int aktif = 0;
+        for (Peminjaman peminjaman : daftar) {
+            if (peminjaman.getPemohon().getUsername().equals(mahasiswa.getUsername())
+                    && peminjaman.getStatus().aktif()) {
+                aktif++;
+            }
+        }
+        return aktif;
+    }
+
+    public boolean adaTunggakan(Mahasiswa mahasiswa) {
+        for (Peminjaman peminjaman : daftar) {
+            if (peminjaman.getPemohon().getUsername().equals(mahasiswa.getUsername())
+                    && peminjaman.adaTunggakan()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<Peminjaman> daftarUntuk(Mahasiswa mahasiswa) {
+        List<Peminjaman> hasil = new ArrayList<Peminjaman>();
+        for (Peminjaman peminjaman : daftar) {
+            if (peminjaman.getPemohon().getUsername().equals(mahasiswa.getUsername())) {
+                hasil.add(peminjaman);
+            }
+        }
+        return hasil;
+    }
+
+    public List<Peminjaman> denganStatus(sipinjam.model.StatusPeminjaman status) {
+        List<Peminjaman> hasil = new ArrayList<Peminjaman>();
+        for (Peminjaman peminjaman : daftar) {
+            if (peminjaman.getStatus() == status) {
+                hasil.add(peminjaman);
+            }
+        }
+        return hasil;
+    }
+
+    /** Peminjaman yang menunggu persetujuan pembina. */
+    public List<Peminjaman> menungguPembina() {
+        List<Peminjaman> hasil = new ArrayList<Peminjaman>();
+        for (Peminjaman peminjaman : daftar) {
+            if (peminjaman.getStatus() == sipinjam.model.StatusPeminjaman.DIAJUKAN
+                    && peminjaman.butuhPersetujuanPembina()
+                    && peminjaman.getIdPembina().isEmpty()) {
+                hasil.add(peminjaman);
+            }
+        }
+        return hasil;
+    }
+
+    public List<Peminjaman> jatuhTempo(LocalDate hariIni) {
+        List<Peminjaman> hasil = new ArrayList<Peminjaman>();
+        for (Peminjaman peminjaman : daftar) {
+            if (peminjaman.getStatus() == sipinjam.model.StatusPeminjaman.DIPINJAM
+                    && peminjaman.getTanggalSelesai().isBefore(hariIni)) {
+                hasil.add(peminjaman);
+            }
+        }
+        return hasil;
+    }
+
+    public List<Peminjaman> semua() {
+        return Collections.unmodifiableList(daftar);
+    }
+
+    public String idBerikutnya() {
+        return String.format("P%04d", daftar.size() + 1);
+    }
+
+    /** Dipakai saat memuat data dari berkas. */
+    public void kosongkan() {
+        daftar.clear();
+    }
+}
+// ===== C:\PinjamYuk\src\sipinjam\repositori\RepositoriPengguna.java =====
+package sipinjam.repositori;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import sipinjam.model.Mahasiswa;
+import sipinjam.model.Pengguna;
+
+/** Koleksi pengguna dan autentikasi. */
+public class RepositoriPengguna {
+    private final List<Pengguna> daftar = new ArrayList<Pengguna>();
+
+    public void tambah(Pengguna pengguna) {
+        if (pengguna == null) {
+            throw new IllegalArgumentException("Pengguna tidak boleh kosong");
+        }
+        if (cariUsername(pengguna.getUsername()) != null) {
+            throw new IllegalArgumentException("Username " + pengguna.getUsername() + " sudah dipakai");
+        }
+        daftar.add(pengguna);
+    }
+
+    public Pengguna cariUsername(String username) {
+        for (Pengguna pengguna : daftar) {
+            if (pengguna.getUsername().equalsIgnoreCase(username)) {
+                return pengguna;
+            }
+        }
+        return null;
+    }
+
+    /** Mengembalikan null bila username tidak ada atau kata sandi salah. */
+    public Pengguna login(String username, String password) {
+        Pengguna pengguna = cariUsername(username);
+        if (pengguna != null && pengguna.cekPassword(password)) {
+            return pengguna;
+        }
+        return null;
+    }
+
+    public List<Mahasiswa> daftarMahasiswa() {
+        List<Mahasiswa> hasil = new ArrayList<Mahasiswa>();
+        for (Pengguna pengguna : daftar) {
+            if (pengguna instanceof Mahasiswa) {
+                hasil.add((Mahasiswa) pengguna);
+            }
+        }
+        return hasil;
+    }
+
+    public List<Pengguna> semua() {
+        return Collections.unmodifiableList(daftar);
+    }
+
+    public String idBerikutnya() {
+        return String.format("U%03d", daftar.size() + 1);
+    }
+}

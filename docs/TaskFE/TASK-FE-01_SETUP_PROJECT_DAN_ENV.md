@@ -63,8 +63,8 @@ Buat wrapper pemanggilan HTTP yang terstandarisasi untuk menangani permintaan ke
 ---
 
 ## 4. Checklist Penerimaan Tugas (Definition of Done)
-- [ ] Server development Vite berjalan lancar via `npm run dev` di port 5173.
-- [ ] Tailwind CSS v4 terpasang dengan plugin `@tailwindcss/vite` tanpa error build.
-- [ ] Class utilitas kustom `.bg-dot-grid` dapat dirender dengan rapi.
-- [ ] Modul `api.js` berhasil melakukan uji *health check* ke `GET http://localhost:8080/api/health`.
-- [ ] Helper pemformatan Rupiah dan Tanggal berfungsi akurat.
+- [x] Server development Vite berjalan lancar via `npm run dev` di port 5173.
+- [x] Tailwind CSS v4 terpasang dengan plugin `@tailwindcss/vite` tanpa error build.
+- [x] Class utilitas kustom `.bg-dot-grid` dapat dirender dengan rapi.
+- [x] Modul `api.js` berhasil melakukan uji *health check* ke `GET http://localhost:8080/api/health`.
+- [x] Helper pemformatan Rupiah dan Tanggal berfungsi akurat.

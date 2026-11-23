@@ -1,4 +1,7 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const BASE_URL = 
+  (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL) ||
+  (typeof process !== 'undefined' && process.env && process.env.VITE_API_BASE_URL) ||
+  'http://localhost:8080/api';
 
 async function request(endpoint, options = {}) {
   const url = `${BASE_URL}${endpoint}`;
@@ -16,13 +19,19 @@ async function request(endpoint, options = {}) {
     if (!res.ok) {
       const error = new Error(data.pesan || `HTTP Error ${res.status}`);
       error.status = res.status;
+      error.pesan = data.pesan || error.message;
+      error.kodeKesalahan = data.kodeKesalahan || null;
       error.data = data;
       throw error;
     }
     return data;
   } catch (err) {
     if (err.name === 'TypeError' && err.message.includes('fetch')) {
-      throw new Error('Tidak dapat terhubung ke Backend Server Java (Port 8080). Pastikan server backend telah aktif (./run_server.sh).');
+      const connError = new Error('Tidak dapat terhubung ke Backend Server Java (Port 8080). Pastikan server backend telah aktif (./run_server.sh atau npm run backend).');
+      connError.status = 503;
+      connError.pesan = connError.message;
+      connError.kodeKesalahan = 'KONEKSI_GAGAL';
+      throw connError;
     }
     throw err;
   }
@@ -135,20 +144,41 @@ export const api = {
   getLaporanJatuhTempo: () => request('/laporan/jatuh-tempo')
 };
 
+/**
+ * Utilitas Pemformatan Mata Uang Rupiah (contoh: Rp10.000)
+ */
 export const formatRupiah = (val) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    maximumFractionDigits: 0
-  }).format(val || 0);
+  if (val === null || val === undefined || isNaN(Number(val))) return 'Rp0';
+  const num = Math.round(Number(val));
+  const formatted = Math.abs(num).toLocaleString('id-ID');
+  return num < 0 ? `-Rp${formatted}` : `Rp${formatted}`;
 };
 
+/**
+ * Utilitas Pemformatan Tanggal Indonesia (contoh: 24 Nov 2026)
+ */
 export const formatTanggal = (str) => {
   if (!str) return '-';
   try {
-    const d = new Date(str + 'T00:00:00');
+    if (typeof str === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(str.trim())) {
+      const [year, month, day] = str.trim().split('-').map(Number);
+      const d = new Date(year, month - 1, day);
+      return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(d);
+    }
+    const d = new Date(str);
+    if (isNaN(d.getTime())) return String(str);
     return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(d);
   } catch (e) {
-    return str;
+    return String(str);
   }
+};
+
+/**
+ * Utilitas Pemformatan Rentang Tanggal (contoh: 24 Nov 2026 – 26 Nov 2026)
+ */
+export const formatRentang = (tglMulai, tglSelesai) => {
+  if (!tglMulai && !tglSelesai) return '-';
+  if (tglMulai && !tglSelesai) return formatTanggal(tglMulai);
+  if (!tglMulai && tglSelesai) return formatTanggal(tglSelesai);
+  return `${formatTanggal(tglMulai)} \u2013 ${formatTanggal(tglSelesai)}`;
 };
