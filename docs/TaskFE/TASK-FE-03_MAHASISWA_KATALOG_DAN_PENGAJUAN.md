@@ -1,66 +1,70 @@
-# TASK-FE-03: Katalog Inventaris, Cek Stok Real-Time & Pengajuan Multi-Item
-
-## 1. Identitas Task
-- **ID Task**: `TASK-FE-03`
-- **Fase**: Fase 2 (Modul Utama Mahasiswa)
-- **Komponen**: `KatalogBarangPage`, `DateRangeFilter`, `BarangCard`, `CartDrawer`, `ModalPengajuan`
-- **Aktor**: Mahasiswa
-- **Kebutuhan Fungsional**: FR-08, FR-09, FR-10, UC06, UC07
-- **Tingkat Kesulitan**: Tinggi
-- **Estimasi Waktu**: 2 Hari
+# TASK-FE-03: Navbar Universal & Katalog Inventaris Mahasiswa
+## Implementasi Sesuai Mockup `katalog_inventaris_mahasiswa.png`
 
 ---
 
-## 2. Deskripsi & Tujuan
-Membangun antarmuka katalog peminjaman barang inventaris kampus untuk mahasiswa. Mahasiswa memilih rentang tanggal peminjaman (mulai & selesai), sistem secara otomatis mengecek ketersediaan stok aktual pada rentang tersebut, mahasiswa dapat memasukkan satu atau lebih barang ke dalam keranjang belanja (*cart*), mengisi alasan keperluan kegiatan, dan mengirim pengajuan peminjaman ke Backend.
+## 1. Ringkasan Tugas
+Mengimplementasikan komponen Header Navbar Universal yang beradaptasi dengan peran pengguna, serta membangun antarmuka **Katalog Inventaris Mahasiswa** berbasis grid 3-kolom, filter pencarian terpadu, pemilih rentang tanggal, filter kategori, indikator sisa stok dinamis real-time, dan kontrol penambahan kuantitas barang ke keranjang (*stepper*).
 
 ---
 
-## 3. Spesifikasi Tampilan & Interaksi
-
-### 3.1 Date Range Selector (Pemeriksaan Stok Dinamis)
-- Dua date-picker: `Tanggal Mulai` dan `Tanggal Selesai`.
-- **Validasi Klien Awal (R4 & R5)**:
-  - Tanggal mulai minimal adalah besok (H-1).
-  - Durasi peminjaman maksimal 7 hari.
-  - Tanggal selesai tidak boleh lebih awal dari tanggal mulai.
-- **Auto Re-Fetch**: Setiap kali rentang tanggal berubah, komponen otomatis memanggil:
-  `GET /api/inventaris/barang?mulai=...&selesai=...`
-  untuk memperbarui sisa stok tersedia masing-masing barang.
-
-### 3.2 Katalog & Kartu Barang (`BarangCard`)
-- Menampilkan:
-  - Foto/Ikon representatif sesuai jenis (Elektronik, Lab, Furnitur).
-  - Nama dan kode barang.
-  - Kategori barang.
-  - Status stok:
-    - Hijau: Tersedia $\ge 1$ unit.
-    - Merah: Habis (stok = 0 pada rentang tanggal tersebut).
-  - Badge khusus: `"Perlu Persetujuan Pembina"` (jika barang bernilai tinggi/lab).
-  - Tombol: `+ Tambah ke Keranjang` (disabled jika stok 0).
-
-### 3.3 Keranjang Multi-Item (`CartDrawer` / `CartModal`)
-- Menampilkan daftar barang yang dipilih beserta kontrol kuantitas ($+$ / $-$).
-- Membatasi kuantitas agar tidak melebihi sisa stok yang tersedia.
-- Formulir input: `Keperluan Peminjaman` (Textarea, wajib diisi minimal 10 karakter).
-- Ringkasan aturan: Peringatan batas maksimal pengajuan aktif (maks. 2 pengajuan).
-- Tombol: `Kirim Pengajuan Peminjaman`.
-
----
-
-## 4. Langkah-Langkah Pengerjaan
-1. Buat `CartContext.jsx` untuk menyimpan daftar barang yang dipilih, tanggal peminjaman, dan kuantitas.
-2. Bangun halaman `KatalogBarangPage.jsx` dengan filter kategori dan pencarian nama.
-3. Integrasikan pemanggilan API cek ketersediaan stok dari Backend Java.
-4. Buat drawer/modal keranjang pengajuan multi-item.
-5. Tangani respons gagal dari backend (misal jika melanggar R1 status mahasiswa tidak aktif atau R3 memiliki tunggakan denda) dengan modal pesan kesalahan yang informatif.
+## 2. Acuan Visual Mockup (`katalog_inventaris_mahasiswa.png`)
+* **Top Header Navbar Universal**:
+  - Kiri: Logo kubus 3D dalam rounded square biru + Teks `SIPINJAM` + Badge peran `Kampus` (pill biru muda).
+  - Tengah: Segmented pill tabs navigasi Mahasiswa:
+    1. `Katalog Barang` (aktif: latar biru sangat muda `bg-blue-50 text-blue-700 font-semibold rounded-xl px-5 py-2`).
+    2. `Booking Ruangan` (inaktif).
+    3. `Riwayat` (inaktif).
+  - Kanan:
+    - Tombol Ikon Keranjang belanja dengan badge lingkaran biru gelap counter jumlah item (contoh badge angka `2`).
+    - Kapsul Avatar Profil Mahasiswa: Lingkaran inisial `R` + Teks `Refael • Mahasiswa` dalam pill berborder halus.
+* **Judul Halaman**:
+  - `Katalog Inventaris` (`text-3xl font-extrabold text-slate-900 mb-6`).
+* **Bilah Filter Terpadu (Filter Bar Card)**:
+  - Kotak putih panjang berborder rounded dengan 3 kontrol sejajar:
+    1. **Input Pencarian**: Ikon kaca pembesar + placeholder `Cari nama atau kode barang...`.
+    2. **Pemilih Tanggal**: Ikon kalender + tampilan rentang `24 Nov 2026 – 26 Nov 2026`.
+    3. **Dropdown Kategori**: Ikon panah bawah + pilihan `Semua Kategori`, `Elektronik`, `Laboratorium`, `Audio`, `Perlengkapan`, dll.
+* **Kartu Inventaris (3-Column Grid)**:
+  - Layout: `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6`.
+  - Struktur Kartu:
+    - **Area Ilustrasi Perangkat**: Kotak abu-abu terang rounded di bagian atas (`bg-slate-50 rounded-2xl h-44 flex items-center justify-center relative`).
+    - **Badge Status di Pojok Kanan Atas Ilustrasi**: Badge `Perlu Pembina` (latar kuning peach lembut) jika barang memerlukan izin pembina.
+    - **Ikon Perangkat**: Ikon modern di tengah (Proyektor, Mikroskop, Pengeras Suara, Kursi Lipat, Mic Wireless, Kamera 4K).
+    - **Metadata Barang**:
+      - Judul barang (contoh: `Proyektor Epson EB-X400`) font tebal `text-lg`.
+      - Kode & Kategori (contoh: `PROY-01 • Elektronik`) warna abu-abu `text-xs`.
+      - Informasi Stok: `Sisa Stok: 3 / 5 Unit` (angka sisa warna hijau tebal).
+      - Tarif Denda: `Denda Telat: Rp10.000/hari`.
+    - **Tombol Aksi**:
+      - Jika belum di keranjang: Tombol outline `+ Tambah` bergaris biru/slate.
+      - Jika sudah ada di keranjang: Kontrol stepper `[- 1 Unit +]` dengan tombol plus biru solid.
 
 ---
 
-## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [x] Pengguna dapat memfilter barang berdasarkan rentang tanggal dan melihat sisa stok yang berubah secara dinamis.
-- [x] Validasi tanggal berjalan di sisi klien (minimal H-1 dan maksimal 7 hari).
-- [x] Mahasiswa dapat memilih beberapa jenis barang sekaligus (multi-item) dan mengatur jumlahnya.
-- [x] Pengajuan berhasil terkirim ke `POST /api/peminjaman` dan menghasilkan nomor registrasi peminjaman.
-- [x] Jika mahasiswa melanggar aturan kelayakan (misal melebihi batas 2 pengajuan aktif), pesan error dari server tertampil jelas.
+## 3. Rincian Pekerjaan Teknis
 
+### A. Komponen Topbar Universal (`Navbar.jsx`)
+- Menerima props `peran`, `penggunaAktif`, `jumlahKeranjang`, dan `tabAktif`.
+- Secara otomatis menyesuaikan warna aksen dan pilihan tab berdasarkan peran pengguna:
+  - Mahasiswa: Aksen biru, badge `Kampus`. Tab: `Katalog Barang`, `Booking Ruangan`, `Riwayat`.
+  - Petugas: Aksen hijau zamrud, badge `Petugas`. Tab: `Sirkulasi`, `Master Data`, `Laporan`.
+  - Pembina: Aksen amber, badge `Dosen Pembina`. Tab: `Antrean Persetujuan`, `Riwayat`.
+
+### B. Logika Filter & Pengecekan Stok Dinamis
+1. Ketika pengguna mengubah tanggal mulai atau tanggal selesai pada filter bar:
+   - Kirim permintaan `GET /api/inventaris/barang?tglMulai=YYYY-MM-DD&tglSelesai=YYYY-MM-DD`.
+   - Backend Java menghitung `sisaStok` untuk setiap barang dengan mengurangkan peminjaman aktif lain pada rentang tersebut.
+   - Frontend memperbarui label `Sisa Stok: X / Y Unit` secara otomatis.
+   - Jika sisa stok = 0, tombol dinonaktifkan (*disabled*) dengan label `Stok Habis`.
+2. Pencarian teks menyaring berdasarkan nama barang dan kode barang secara lokal/responsif.
+3. Dropdown kategori menyaring daftar barang berdasarkan ID kategori.
+
+---
+
+## 4. Checklist Penerimaan Tugas (Definition of Done)
+- [ ] Tampilan katalog inventaris sesuai persis dengan `katalog_inventaris_mahasiswa.png`.
+- [ ] Header navbar floating universal menampilkan pill tabs, counter keranjang, dan profil pengguna dengan rapi.
+- [ ] Grid 3-kolom responsif menyesuaikan layar mobile, tablet, dan desktop.
+- [ ] Pengecekan sisa stok dinamis terhubung ke REST API saat rentang tanggal berubah.
+- [ ] Tombol `+ Tambah` berhasil bertransisi menjadi stepper `[- X Unit +]` saat item masuk ke keranjang.

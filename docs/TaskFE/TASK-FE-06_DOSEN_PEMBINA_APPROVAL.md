@@ -1,58 +1,70 @@
-# TASK-FE-06: Dashboard Antrean Persetujuan Pembina
-
-## 1. Identitas Task
-- **ID Task**: `TASK-FE-06`
-- **Fase**: Fase 3 (Modul Dosen Pembina)
-- **Komponen**: `AntreanPersetujuanPage`, `CardPengajuanPembina`, `ModalReviewPersetujuan`
-- **Aktor**: Dosen Pembina
-- **Kebutuhan Fungsional**: FR-11, FR-17, UC10, UC14
-- **Tingkat Kesulitan**: Sedang
-- **Estimasi Waktu**: 1 Hari
+# TASK-FE-06: Dashboard Antrean Persetujuan Dosen Pembina
+## Implementasi Sesuai Mockup `persetujuan_dosen_pembina_minimalist.png`
 
 ---
 
-## 2. Deskripsi & Tujuan
-Membangun antarmuka khusus untuk Dosen Pembina. Dosen Pembina bertanggung jawab meninjau pengajuan peminjaman barang inventaris khusus (misalnya alat laboratorium, sensor praktikum bernilai tinggi, atau perangkat elektronik sensitif yang ditandai `perluPersetujuan = true`). Dosen Pembina dapat melihat detail mahasiswa pemohon, daftar barang, alasan kegiatan, lalu memberikan keputusan **Setujui** atau **Tolak** dengan menyertakan catatan resmi.
+## 1. Ringkasan Tugas
+Membangun antarmuka khusus **Dosen Pembina** untuk meninjau, menyetujui, atau menolak pengajuan peminjaman barang inventaris khusus (alat laboratorium sensitif dan perangkat elektronik bernilai tinggi) sesuai berkas mockup `frontend/MockUpPinjamYuk/persetujuan_dosen_pembina_minimalist.png`.
 
 ---
 
-## 3. Spesifikasi Tampilan & Interaksi
-
-### 3.1 Daftar Antrean Pengajuan Menunggu Persetujuan
-- Menampilkan tabel/kartu pengajuan dengan status `MENUNGGU_PEMBINA`.
-- Kolom/Informasi:
-  - ID Peminjaman & Tanggal Pengajuan.
-  - Identitas Mahasiswa (Nama, NIM, Program Studi).
-  - Rentang Tanggal Kegiatan & Keperluan.
-  - Daftar Barang Khusus yang diajukan beserta jumlahnya.
-  - Tombol aksi: `Tinjau Pengajuan`.
-
-### 3.2 Modal Review & Form Keputusan (`ModalReviewPersetujuan`)
-- Menampilkan detail lengkap pengajuan dan ketersediaan stok barang.
-- Dua Opsi Tindakan:
-  - **Tombol Hijau**: `Setujui Pengajuan` (Catatan opsional).
-  - **Tombol Merah**: `Tolak Pengajuan` (Input textarea catatan alasan penolakan **wajib diisi** minimal 10 karakter).
-- Saat konfirmasi dikirim, memanggil endpoint:
-  `POST /api/peminjaman/{id}/persetujuan-pembina`
-  dengan payload `{ "setuju": true/false, "catatan": "..." }`.
-
-### 3.3 Tab Riwayat Keputusan Pembina
-- Menampilkan daftar pengajuan yang sebelumnya sudah pernah ditinjau oleh pembina (baik disetujui maupun ditolak) beserta catatan historisnya.
+## 2. Acuan Visual Mockup (`persetujuan_dosen_pembina_minimalist.png`)
+* **Header Navbar Dosen Pembina**:
+  - Logo kubus 3D dalam rounded square oranye/terracotta + Teks `SIPINJAM` + Badge peran `Dosen Pembina` (pill peach/amber).
+  - Segmented pill tabs: `Antrean Persetujuan` (aktif: latar amber muda `bg-amber-100 text-amber-900`) dan `Riwayat`.
+  - Kapsul Profil: Avatar biru/gelap + Teks `Dr. Hendra Wijaya • Dosen Pembina`.
+* **Header Halaman**:
+  - Judul: `Antrean Persetujuan Barang Khusus` (`text-3xl font-extrabold text-slate-900`).
+  - Badge counter antrean: `• 2 Menunggu` dalam pill peach/oranye.
+  - Teks deskripsi kanan: `Pemberian rekomendasi kelayakan peminjaman inventaris bernilai tinggi.`
+* **Kartu Antrean Pengajuan (Minimalist Card List)**:
+  - Latar putih dengan border lembut `border-slate-200/80` dan sudut melengkung `rounded-2xl`.
+  - **Baris Atas**:
+    - ID Transaksi & Tanggal: `PINJAM-005 • Diajukan 23 Nov 2026`.
+    - Badge Kategori Otorisasi di kanan: `🛡️ Perlu Otorisasi Lab/Elektronik` (pill abu-abu keunguan).
+  - **Profil Pemohon**:
+    - Avatar bulat (ikon topi toga wisuda atau user).
+    - Nama & Identitas: `Ahmad Fauzi` (`text-base font-bold`) dan subteks `NIM 21044110001 • D3 Teknik Informatika`.
+  - **Kotak Rincian Jadwal & Keperluan** (kotak abu-abu terang di tengah):
+    - Kiri: `JADWAL PEMINJAMAN` + ikon kalender + `24–26 Nov 2026 (3 Hari)`.
+    - Kanan: `KEPERLUAN` + ikon dokumen/video + teks deskripsi kegiatan.
+  - **Kotak Sorotan Aset Bernilai Tinggi**:
+    - Latar kotak ungu muda/biru muda lembut dengan ikon mikroskop atau kamera.
+    - Judul aset: `2x Mikroskop Binokuler Olympus`.
+    - Subteks: `Estimasi Nilai: Rp12.000.000 • Lab Mikrobiologi Terpadu`.
+    - Badge kanan: `• Aset Bernilai Tinggi` (pill peach/oranye).
+  - **Baris Aksi Bawah**:
+    - Kiri: Tautan dokumen `📄 Lihat Berkas Proposal PDF`.
+    - Kanan: Tombol aksi sejajar:
+      - Tombol `Tolak` (warna teks merah/rose lembut berlatar pink muda).
+      - Tombol `✓ Setujui Pengajuan` (warna cokelat/terracotta amber tua solid: `bg-amber-900 hover:bg-amber-800 text-white font-semibold px-6 py-2.5 rounded-xl`).
+* **Footer Keterangan**:
+  - Ikon info + teks: `ⓘ Persetujuan otomatis diteruskan ke Petugas Loket Sarpras untuk persiapan serah-terima fisik.`
 
 ---
 
-## 4. Langkah-Langkah Pengerjaan
-1. Bangun halaman `AntreanPersetujuanPage.jsx`.
-2. Hubungkan pemanggilan API `GET /api/peminjaman?status=MENUNGGU_PEMBINA`.
-3. Buat modal dialog interaktif untuk aksi persetujuan / penolakan.
-4. Terapkan validasi form penolakan (catatan alasan tidak boleh kosong).
-5. Segarkan daftar antrean secara otomatis setelah aksi berhasil dieksekusi.
+## 3. Rincian Pekerjaan Teknis
+
+### A. Pengambilan Data Antrean Pembina
+1. Mengirim permintaan `GET /api/peminjaman?status=MENUNGGU_PEMBINA`.
+2. Menampilkan daftar pengajuan yang mengandung item bertanda `perluPersetujuan = true`.
+
+### B. Aksi Persetujuan & Penolakan
+1. **Setujui Pengajuan**:
+   - Dosen mengklik tombol `Setujui Pengajuan`.
+   - Mengirim permintaan `POST /api/peminjaman/{id}/persetujuan-pembina` dengan payload `{ "disetujui": true }`.
+   - Status peminjaman di Backend Java otomatis berubah menjadi `DISETUJUI` (atau siap diverifikasi Sarpras).
+   - Kartu dihapus dari antrean dengan animasi transisi mulus dan memunculkan toast sukses.
+2. **Tolak Pengajuan**:
+   - Membuka modal konfirmasi penolakan dengan field alasan penolakan wajib.
+   - Mengirim permintaan `POST /api/peminjaman/{id}/persetujuan-pembina` dengan payload `{ "disetujui": false, "alasan": "..." }`.
+   - Status peminjaman di Backend Java berubah menjadi `DITOLAK`.
 
 ---
 
-## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [x] Pengajuan yang mengandung barang khusus otomatis muncul pada antrean Dosen Pembina.
-- [x] Dosen Pembina dapat menyetujui pengajuan, yang secara otomatis mengubah status transaksi menjadi `DIAJUKAN` (siap diproses Petugas Sarpras).
-- [x] Dosen Pembina dapat menolak pengajuan dengan alasan wajib, yang langsung mengubah status transaksi menjadi `DITOLAK`.
-- [x] Tampilan responsif dan mudah digunakan oleh dosen di berbagai perangkat (tablet/laptop).
-
+## 4. Checklist Penerimaan Tugas (Definition of Done)
+- [ ] Tampilan antrean persetujuan pembina sesuai persis dengan `persetujuan_dosen_pembina_minimalist.png`.
+- [ ] Indikator `• Aset Bernilai Tinggi` dan estimasi nilai aset tampil dengan jelas.
+- [ ] Tombol `Setujui Pengajuan` berhasil memperbarui status transaksi di Backend Java.
+- [ ] Tombol `Tolak` menampilkan dialog input alasan sebelum mengirimkan pembatalan.
+- [ ] Notifikasi informatif bawah ("diteruskan ke Petugas Loket Sarpras") terpasang rapi.

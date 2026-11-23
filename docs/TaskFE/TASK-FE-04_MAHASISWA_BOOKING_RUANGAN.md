@@ -1,59 +1,61 @@
-# TASK-FE-04: Visualisasi Slot & Booking Ruangan Interaktif
-
-## 1. Identitas Task
-- **ID Task**: `TASK-FE-04`
-- **Fase**: Fase 2 (Modul Utama Mahasiswa)
-- **Komponen**: `BookingRuanganPage`, `RuanganSelector`, `JadwalSlotGrid`, `ModalBookingRuangan`
-- **Aktor**: Mahasiswa
-- **Kebutuhan Fungsional**: FR-19, FR-20, FR-21, UC06, UC07
-- **Tingkat Kesulitan**: Tinggi
-- **Estimasi Waktu**: 2 Hari
+# TASK-FE-04: Visualisasi Slot Waktu & Booking Ruangan Mahasiswa
+## Implementasi Pemesanan Ruangan Kampus Interaktif (S1 – S7)
 
 ---
 
-## 2. Deskripsi & Tujuan
-Membangun antarmuka visualisasi ketersediaan ruangan kampus per slot waktu jam (07.00 - 21.00) pada tanggal tertentu. Mahasiswa dapat memilih ruangan, melihat slot mana yang masih kosong dan mana yang sudah terisi, memilih slot berurutan (1 s.d. 4 jam), memasukkan estimasi jumlah peserta dan keperluan, serta mengajukan booking tanpa risiko bentrok jadwal.
+## 1. Ringkasan Tugas
+Membangun antarmuka pemesanan fasilitas ruangan kampus bagi mahasiswa, mencakup pemilihan tanggal pemakaian, visualisasi status 14 slot jam (07.00 – 21.00 WIB) per ruangan, deteksi bentrok jadwal interaktif, input keperluan dan estimasi peserta, serta eksekusi pengajuan booking ke Backend Java.
 
 ---
 
-## 3. Spesifikasi Tampilan & Interaksi
-
-### 3.1 Pilihan Ruangan & Tanggal
-- Dropdown/Card pemilih ruangan (Ruang Rapat, Aula, Lab Komputer) lengkap dengan info kapasitas maksimal dan fasilitas (AC, Proyektor, Sound System).
-- Date picker tanggal pemakaian (minimal H-3 sesuai aturan R4 pemesanan ruangan).
-
-### 3.2 Visualisasi Matriks Slot Waktu (`JadwalSlotGrid`)
-- Menampilkan deretan 14 slot jam (07.00-08.00 hingga 20.00-21.00).
-- Kode Warna Interaktif:
-  - **Hijau**: Slot `KOSONG` (dapat diklik untuk dipilih).
-  - **Merah / Abu Terkunci**: Slot `TERISI` / `TERPAKAI` (menampilkan tooltip keterangan kegiatan, tidak bisa diklik).
-  - **Biru Bergaris Terang**: Slot yang sedang `DIPILIH` oleh mahasiswa saat ini.
-- Batasan Pilihan:
-  - Durasi minimal 1 jam, maksimal 4 jam (Aturan S2).
-  - Slot yang dipilih wajib berurutan (kontinu) dalam hari yang sama.
-
-### 3.3 Formulir Konfirmasi Booking (`ModalBookingRuangan`)
-- Rangkuman: Ruangan terpilih, tanggal, jam mulai s.d. jam selesai, total durasi.
-- Input: `Jumlah Peserta` (Input angka; validasi tidak boleh melebihi kapasitas ruangan sesuai aturan S4).
-- Input: `Keperluan Kegiatan` (Textarea).
-- Peringatan Denda: Teks peringatan bahwa pembatalan mendadak kurang dari 1 hari sebelum tanggal kegiatan dikenakan denda Rp50.000 (Aturan S6).
-- Tombol: `Kirim Pengajuan Booking`.
+## 2. Acuan Visual & Aturan Bisnis
+* **Header Navigasi**: Tab `Booking Ruangan` aktif pada pill navigasi header mahasiswa.
+* **Komposisi Tampilan**:
+  - **Daftar Pilihan Ruangan**: Kartu informasi ruangan (nama ruangan, kode, kapasitas maksimum peserta, fasilitas yang tersedia seperti proyektor, AC, sound system).
+  - **Panel Pemilih Tanggal**: Kontrol tanggal pemakaian untuk melihat ketersediaan jadwal pada hari tertentu.
+  - **Grid Visualisasi 14 Slot Jam**:
+    - Jam operasional: `07:00 - 08:00` s.d. `20:00 - 21:00` (14 slot berurutan).
+    - Status Warna Slot:
+      - Hijau muda / Putih: `TERSEDIA` (Dapat dipilih).
+      - Biru terang: `DIPILIH` (Sedang dipilih oleh mahasiswa).
+      - Merah muda / Abu-abu: `TERPAKAI / DIBOOKING` (Dinonaktifkan, menampilkan info peminjam/acara singkat).
+  - **Form Detail Pemesanan**:
+    - Input `Jumlah Peserta`: Dilengkapi validasi agar tidak melebihi kapasitas ruangan (`AturanKapasitasRuang`).
+    - Input `Keperluan Acara`: Textarea deskripsi kegiatan mahasiswa / organisasi.
+    - Peringatan Denda Pembatalan: Alert box kuning yang mengingatkan bahwa pembatalan kurang dari H-1 dikenakan denda administratif Rp50.000.
+    - Tombol Aksi: `[📅 Ajukan Booking Ruangan]` warna biru tua solid.
 
 ---
 
-## 4. Langkah-Langkah Pengerjaan
-1. Bangun komponen grid visual slot waktu jam (`JadwalSlotGrid.jsx`).
-2. Buat logika pemilihan rentang slot kontinu (menghitung `jamMulai` dan `jamSelesai`).
-3. Hubungkan dengan endpoint Backend `GET /api/booking/jadwal?kodeRuangan=...&tanggal=...`.
-4. Implementasikan modal konfirmasi booking dan kirim payload ke `POST /api/booking`.
-5. Tampilkan indikator loading dan penanganan respons gagal (misal 409 Conflict jika slot baru saja diambil orang lain).
+## 3. Rincian Pekerjaan Teknis
+
+### A. Pengambilan Data Ketersediaan Slot
+1. Saat pengguna memilih ruangan dan tanggal:
+   - Kirim permintaan `GET /api/booking/jadwal?kodeRuangan=...&tanggal=YYYY-MM-DD`.
+   - Backend Java mengembalikan status ke-14 slot jam (apakah ada transaksi yang telah berstatus `DISETUJUI` atau `DIGUNAKAN`).
+2. Slot yang sudah terisi otomatis di-disable sehingga pengguna tidak dapat mengklik dua kali pada waktu yang sama.
+
+### B. Validasi Sisi Klien & Pengiriman Data
+1. Mahasiswa memilih satu atau beberapa slot jam yang berurutan (misal: 09:00 - 12:00).
+2. Memvalidasi jumlah peserta $\le$ kapasitas ruangan fisik.
+3. Mengirim permintaan `POST /api/booking` dengan payload:
+   ```json
+   {
+     "kodeRuangan": "R-101",
+     "tanggal": "2026-11-26",
+     "slotMulai": 3,
+     "slotSelesai": 5,
+     "keperluan": "Seminar Teknologi Informasi Himpunan",
+     "jumlahPeserta": 45
+   }
+   ```
+4. Jika sukses, tampilkan notifikasi toast berhasil dan arahkan ke tab `Riwayat`.
 
 ---
 
-## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [x] Grid slot jam 07.00 s.d 21.00 tampil rapi dan responsif di layar desktop maupun mobile.
-- [x] Slot yang sudah terisi tampil terkunci (disabled) dan tidak dapat dipilih.
-- [x] Pengguna tidak dapat memilih durasi melebihi batas 4 jam dalam 1 pengajuan.
-- [x] Validasi input peserta mendeteksi jika melebihi kapasitas ruangan dan mencegah pengiriman formulir.
-- [x] Pengajuan booking berhasil tersimpan ke backend dan slot tersebut seketika berubah warna menjadi terisi/terkunci pada grid jadwal.
-
+## 4. Checklist Penerimaan Tugas (Definition of Done)
+- [ ] Grid 14 slot jam (07.00 - 21.00) ter-render rapi dengan kode warna status yang jelas.
+- [ ] Deteksi bentrok jadwal berfungsi otomatis saat tanggal atau ruangan diganti.
+- [ ] Validasi kapasitas ruangan mencegah pengajuan peserta yang berlebihan.
+- [ ] Alert denda pembatalan Rp50.000 terpasang jelas di form pemesanan.
+- [ ] Pengajuan booking berhasil terkirim dan tercatat di database file backend.

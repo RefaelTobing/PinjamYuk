@@ -1,63 +1,67 @@
-# TASK-FE-07: Pengelolaan Master Data Inventaris, Ruang & Tarif Denda
-
-## 1. Identitas Task
-- **ID Task**: `TASK-FE-07`
-- **Fase**: Fase 4 (Modul Petugas Sarpras)
-- **Komponen**: `MasterInventarisPage`, `MasterRuanganPage`, `ModalFormBarang`, `ModalFormRuangan`, `TarifDendaCard`
-- **Aktor**: Petugas Sarana dan Prasarana
-- **Kebutuhan Fungsional**: FR-03, FR-04, FR-05, FR-06, FR-07, UC03, UC04, UC05
-- **Tingkat Kesulitan**: Sedang
-- **Estimasi Waktu**: 2 Hari
+# TASK-FE-07: Master Data Fasilitas Petugas Sarpras
+## Implementasi Sesuai Mockup `master_data_fasilitas_petugas_sarpras.png`
 
 ---
 
-## 2. Deskripsi & Tujuan
-Membangun modul pengelolaan data master bagi Petugas Sarpras, mencakup pengelolaan inventaris barang kampus (tambah barang baru, perbarui stok, ubah harga referensi denda, pengaturan switch persetujuan dosen pembina), pengelolaan data ruangan (nama, kapasitas peserta, daftar fasilitas, sakelar status aktif/nonaktif), dan informasi tarif denda operasional.
+## 1. Ringkasan Tugas
+Membangun modul manajemen master data fasilitas kampus (barang inventaris dan ruangan) bagi Petugas Sarana Prasarana sesuai berkas mockup `frontend/MockUpPinjamYuk/master_data_fasilitas_petugas_sarpras.png`. Fitur mencakup tab switcher inventaris/ruangan, bilah pencarian & filter kategori pill, tabel data master terpadu, modal formulir CRUD dengan subtype OOP (Elektronik, Alat Lab, Furnitur), serta kartu edukasi operasional di bagian bawah.
 
 ---
 
-## 3. Spesifikasi Tampilan & Form Input
-
-### 3.1 Manajemen Barang Inventaris (`MasterInventarisPage`)
-- Tabel interaktif dengan fitur filter kategori, search kode/nama, dan paginasi/sorting.
-- Kolom: Kode, Nama Barang, Kategori, Subtipe Polimorfik (Elektronik / Lab / Furnitur), Stok Total, Harga Satuan, Butuh Pembina (Badge Ya/Tidak), dan Aksi (Edit).
-- Tombol: `+ Tambah Barang Baru`.
-
-### 3.2 Modal Form Tambah / Edit Barang (`ModalFormBarang`)
-- Field Umum: Kode Barang, Nama Barang, Kategori, Jumlah Stok, Harga Satuan, Switch "Perlu Persetujuan Pembina".
-- Dynamic Sub-Fields (berdasarkan tipe kelas turunan OOP):
-  - Jika **Barang Elektronik**: Input Masa Garansi (bulan).
-  - Jika **Alat Laboratorium**: Input Nama Laboratorium pemilik.
-  - Jika **Barang Furnitur**: Input Jenis Bahan (Kayu, Logam, Plastik).
-
-### 3.3 Manajemen Ruangan (`MasterRuanganPage`)
-- Kartu/Tabel daftar ruangan kampus (Aula, Rapat, Lab).
-- Form Input: Kode Ruangan, Nama Ruangan, Kapasitas Peserta, Daftar Fasilitas (tag input/chips), Sakelar Status (Aktif / Nonaktif).
-- Catatan: Ruangan yang di-nonaktifkan tidak akan muncul pada pilihan booking mahasiswa (Aturan S7).
-
-### 3.4 Ringkasan Tarif Denda Resmi
-- Panel informasi ketentuan denda sesuai SK kampus:
-  - Denda harian keterlambatan: Elektronik (Rp10.000/hari), Alat Lab (Rp15.000/hari), Furnitur (Rp5.000/hari).
-  - Denda kerusakan/kehilangan: Rusak Ringan (flat), Rusak Berat (% harga), Hilang (100% harga).
-  - Denda pembatalan booking ruangan $< \text{H}-1$: Rp50.000.
-
----
-
-## 4. Langkah-Langkah Pengerjaan
-1. Bangun halaman `MasterInventarisPage.jsx` dan `MasterRuanganPage.jsx`.
-2. Buat modal form pembuatan dan penyuntingan barang dengan dukungan dynamic fields untuk atribut polimorfik.
-3. Hubungkan ke endpoint API Backend:
-   - `GET /api/inventaris/barang`
-   - `POST /api/inventaris/barang`
-   - `PUT /api/inventaris/barang/{kode}`
-   - `GET /api/inventaris/ruangan`
-   - `POST /api/inventaris/ruangan`
-4. Berikan notifikasi toast saat data master berhasil disimpan atau diperbarui.
+## 2. Acuan Visual Mockup (`master_data_fasilitas_petugas_sarpras.png`)
+* **Header Navbar Petugas**:
+  - Logo kubus 3D dalam rounded square hijau mint + Teks `SIPINJAM` + Badge peran `Petugas` (pill hijau mint).
+  - Segmented pill tabs: `Sirkulasi`, `Master Data` (aktif: latar hijau mint `bg-emerald-100 text-emerald-900`), dan `Laporan`.
+  - Kapsul Profil: Avatar inisial hijau `B` + Teks `Budi Santoso • Petugas`.
+* **Header Halaman**:
+  - Judul: `Master Data Fasilitas` (`text-3xl font-extrabold text-slate-900`).
+  - Subteks: `Kelola katalog inventaris aset fisik, spesifikasi alat, tarif denda, dan kapasitas ruangan kampus.`
+  - Pojok Kanan: Tombol utama `+ Tambah Data` warna hijau zamrud solid (`bg-emerald-800 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-xl`).
+* **Tab Navigasi Fasilitas & Ringkasan Cepat**:
+  - Kiri: Segmented pills: `📦 Inventaris Barang (12)` dan `🏢 Ruangan Kampus (4)`.
+  - Kanan: Indikator ringkasan dot berwarna: `🟢 74 Unit Siap Pakai` • `🔵 14 Unit Sedang Terpinjam`.
+* **Bilah Filter & Pencarian**:
+  - Input field pencarian: `Cari kode, nama barang, nomor seri...`.
+  - Kategori Pill Filter: `Semua` (aktif: hijau toska), `Elektronik`, `Alat Laboratorium`, `Furnitur`.
+  - Tombol aksi kanan: `📥 Export Excel` (outline abu-abu).
+* **Tabel Master Data Fasilitas**:
+  - Kolom: `KODE`, `NAMA BARANG`, `KATEGORI`, `STOK TOTAL`, `HARGA SATUAN / DENDA`, `AKSI`.
+  - Format Baris:
+    - `KODE`: Pill abu-abu kebiruan rounded (contoh: `PROY-01`, `LAB-01`, `FUR-01`, `AUD-02`).
+    - `NAMA BARANG`: Nama tebal + subteks nomor seri & lokasi gudang (contoh: `SN: EP-400-8821 • Gudang LT-1`).
+    - `KATEGORI`: Teks kategori + badge `Perlu Pembina` jika memerlukan otorisasi.
+    - `STOK TOTAL`: Angka total unit + rincian `3 Tersedia • 2 Dipinjam`.
+    - `HARGA SATUAN / DENDA`: Nilai aset (contoh: `Rp5.000.000`) dan tarif denda (contoh: `Denda Rp10.000/hari` warna merah bata).
+    - `AKSI`: Ikon edit pensil dan ikon hapus tempat sampah.
+  - Pagination Bawah: Teks `Menampilkan 4 dari 12 barang`, tombol `Sebelumnya`, nomor halaman `[1]` (aktif: hijau zamrud gelap), `2`, `3`, dan tombol `Selanjutnya`.
+* **3 Kartu Wawasan Operasional di Bagian Bawah**:
+  1. **Validasi Pembina**: Ikon centang pelindung, penjelasan aturan barang berisiko tinggi.
+  2. **Tarif & Kompensasi**: Ikon kartu uang, penjelasan akumulasi denda 1x24 jam keterlambatan.
+  3. **Sinkronisasi Barcode**: Ikon barcode/QR, integrasi label fisik dan inspeksi mobile.
 
 ---
 
-## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [x] Petugas dapat menambahkan barang baru dengan input subkelas yang sesuai (elektronik/lab/furnitur) dan data tersimpan ke Backend Java.
-- [x] Petugas dapat mengubah stok barang, dan stok baru langsung terrefleksi di katalog mahasiswa.
-- [x] Petugas dapat menonaktifkan ruangan, dan ruangan tersebut otomatis hilang/terkunci dari pilihan booking mahasiswa.
+## 3. Rincian Pekerjaan Teknis
 
+### A. Pengambilan & Penyaringan Master Data
+- Menampilkan data dari `GET /api/inventaris/barang` dan `GET /api/inventaris/ruangan`.
+- Filter instan berdasarkan pencarian teks dan filter kategori.
+- Navigasi tab antara `Inventaris Barang` dan `Ruangan Kampus`.
+
+### B. Modal Tambah & Edit Fasilitas
+1. Modal interaktif untuk menambah/mengedit barang inventaris dengan pilihan sub-tipe OOP:
+   - `ELEKTRONIK`: Tarif harian Rp10.000, biaya rusak ringan Rp100.000, rusak berat 40% harga.
+   - `ALAT_LAB`: Tarif harian Rp15.000, biaya rusak ringan Rp75.000, rusak berat 50% harga.
+   - `FURNITUR`: Tarif harian Rp5.000, biaya rusak ringan Rp25.000, rusak berat 30% harga.
+2. Form untuk ruangan:
+   - Nama ruangan, kode ruangan, kapasitas maksimum, fasilitas yang tersedia.
+3. Mengirimkan permintaan `POST /api/inventaris/barang` atau `PUT /api/inventaris/barang/{kode}`.
+
+---
+
+## 4. Checklist Penerimaan Tugas (Definition of Done)
+- [ ] Tampilan halaman master data sesuai 100% dengan `master_data_fasilitas_petugas_sarpras.png`.
+- [ ] Tab peralihan antara Inventaris Barang dan Ruangan Kampus berfungsi lancar.
+- [ ] Filter pencarian dan filter pill kategori merender data secara instan.
+- [ ] Form modal Tambah/Edit Barang memvalidasi input sesuai subtipe OOP.
+- [ ] Tiga kartu wawasan operasional di bagian bawah terpasang dengan ikon dan teks rapi.

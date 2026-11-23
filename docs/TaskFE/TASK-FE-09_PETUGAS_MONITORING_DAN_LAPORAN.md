@@ -1,63 +1,75 @@
-# TASK-FE-09: Monitoring Overdue & Visualisasi Grafik Laporan
-
-## 1. Identitas Task
-- **ID Task**: `TASK-FE-09`
-- **Fase**: Fase 4 (Modul Petugas Sarpras & Dosen Pembina)
-- **Komponen**: `MonitoringJatuhTempoPage`, `DashboardLaporanPage`, `ChartKategori`, `ChartUtilisasiRuangan`
-- **Aktor**: Petugas Sarpras, Dosen Pembina
-- **Kebutuhan Fungsional**: FR-17, FR-25, UC14, UC15
-- **Tingkat Kesulitan**: Sedang
-- **Estimasi Waktu**: 1.5 Hari
+# TASK-FE-09: Monitoring Sirkulasi, Jatuh Tempo & Analitik Laporan
+## Implementasi Sesuai Mockup `monitoring_laporan_sirkulasi_petugas_sarpras.png`
 
 ---
 
-## 2. Deskripsi & Tujuan
-Membangun pusat kendali monitoring dan analitik visual untuk Petugas Sarpras dan Dosen Pembina, terdiri atas:
-1. Peringatan dini (*Overdue Alerts*) untuk barang yang mendekati atau telah melewati tanggal batas pengembalian.
-2. Visualisasi grafik statistik rekapitulasi peminjaman barang per kategori inventaris.
-3. Analisis persentase kepatuhan dan keterlambatan pengembalian mahasiswa.
-4. Diagram utilisasi jam pemakaian ruangan kampus (jam sibuk vs jam lengang).
+## 1. Ringkasan Tugas
+Membangun modul pengawasan dan analitik operasional kampus untuk Petugas Sarana Prasarana sesuai berkas mockup `frontend/MockUpPinjamYuk/monitoring_laporan_sirkulasi_petugas_sarpras.png`. Antarmuka mencakup 3 kartu ringkasan metrik statistik utama, tabel daftar jatuh tempo prioritas dengan aksi tindak lanjut (Kirim Pengingat / Lihat Kuitansi), fitur filter periode bulan, ekspor laporan rekapitulasi, dan kartu status integrasi sistem.
 
 ---
 
-## 3. Spesifikasi Tampilan & Komponen
-
-### 3.1 Papan Pantau Jatuh Tempo (`MonitoringJatuhTempoPage`)
-- Kartu Peringatan Bahaya (Merah) untuk transaksi yang **LEWAT TENGGAT**:
-  - Nama Mahasiswa, NIM, Nomor Kontak/Prodi.
-  - Jumlah hari terlambat berjalan.
-  - Estimasi denda harian yang terus bertambah.
-  - Daftar barang yang belum dikembalikan.
-- Kartu Peringatan Waspada (Kuning) untuk transaksi yang **JATUH TEMPO HARI INI**.
-
-### 3.2 Dashboard Laporan & Grafik Visual (`DashboardLaporanPage`)
-- **Metric Cards**:
-  - Total Peminjaman Aktif
-  - Total Booking Hari Ini
-  - Persentase Pengembalian Tepat Waktu
-  - Akumulasi Denda
-- **Visualisasi Chart (menggunakan Chart.js / Recharts / Tailwind Bar)**:
-  1. **Donut / Pie Chart**: Proporsi peminjaman barang per kategori (Elektronik vs Alat Laboratorium vs Furnitur).
-  2. **Bar Chart**: Frekuensi pemakaian ruangan kampus berdasarkan slot jam operasional (07.00 s.d. 21.00) untuk evaluasi utilisasi sarana kampus.
-- **Tabel Rekapitulasi**:
-  Tabel ringkasan data yang dapat dicetak (*print-friendly view*) untuk lampiran laporan resmi praktikum.
+## 2. Acuan Visual Mockup (`monitoring_laporan_sirkulasi_petugas_sarpras.png`)
+* **Header Navbar Petugas**:
+  - Tab `Laporan` aktif di navbar (pill hijau mint terang `bg-emerald-100 text-emerald-900 font-semibold`).
+  - Kapsul Profil: `Budi Santoso • Petugas`.
+* **Header Halaman**:
+  - Breadcrumbs: `PETUGAS SARPRAS / ANALITIK & PENGAWASAN`.
+  - Judul: `Monitoring & Laporan Sirkulasi` (`text-3xl font-extrabold text-slate-900`).
+  - Subteks: `Pantau kepatuhan peminjaman, estimasi barang jatuh tempo, dan rekapitulasi penerimaan kompensasi denda operasional kampus secara real-time.`
+  - Kontrol Kanan Atas:
+    - Dropdown Periode: `📅 Bulan Ini: November 2026 ˇ`.
+    - Tombol Unduh: `📥 Unduh Rekap Laporan` warna biru tua solid (`bg-blue-700 hover:bg-blue-800 text-white font-semibold px-5 py-2.5 rounded-xl`).
+* **3 Kartu Ringkasan Metrik (Top Analytics Cards)**:
+  1. **Total Transaksi Bulan Ini**:
+     - Label kecil abu-abu di atas.
+     - Angka besar: `42` + badge hijau kecil `📈 +8%`.
+     - Ikon kanan: Panah bolak-balik dalam kotak rounded biru muda.
+     - Subteks bawah: `38 unit barang logistik • 4 reservasi ruangan`.
+  2. **Mendekati Jatuh Tempo**:
+     - Angka besar: `3` + badge peach `• Perlu Follow-up`.
+     - Ikon kanan: Jam pasir/waktu dalam kotak rounded oranye muda.
+     - Subteks bawah: `2 unit jatuh tempo hari ini • 1 unit besok`.
+  3. **Total Pemasukan Denda**:
+     - Angka besar: `Rp 485.000`.
+     - Ikon kanan: Dompet uang dalam kotak rounded hijau mint.
+     - Subteks bawah: `Keterlambatan & ganti rugi • ✓ 100% Tercatat`.
+* **Tabel Daftar Jatuh Tempo & Rekap Denda (Priority Table)**:
+  - Header Tabel: Judul `Daftar Jatuh Tempo & Rekap Denda`, badge counter `3 Transaksi Prioritas`, subteks penjelasan.
+  - Filter Tabs Kanan: `Semua`, `Jatuh Tempo`, `Lunas Denda`.
+  - Field Pencarian: `🔍 Cari ID transaksi, nama...`.
+  - Kolom Tabel: `ID TRANSAKSI`, `PEMINJAM`, `ITEM / RUANGAN`, `TENGGAT KEMBALI`, `STATUS`, `TOTAL DENDA`, `AKSI`.
+  - Data Baris:
+    - `PINJAM-004`: `Rina Marlina`, `Proyektor Epson EB-X400`, `🕒 Hari Ini, 17:00 (Sisa waktu 3 jam)`, status `• Dipinjam` (pill biru), Denda `Rp 0`, Aksi `Kirim Pengingat` (teks hijau).
+    - `PINJAM-003`: `Ahmad Fauzi`, `Kursi Lipat (10 Unit)`, kotak merah `⚠️ Terlambat 1 Hari (Tenggat: Kemarin, 16:00)`, status `Jatuh Tempo` (pill pink kemerahan), Denda `Rp 35.000 (Tarif: Rp 3.500/unit/hari)`, Aksi `Lihat Kuitansi` (teks abu-abu/hijau).
+    - `BKG-001`: `Siti Aminah`, `Aula Gedung Utama (200 Orang)`, `25 Nov 2026, 14:00 WIB (Tepat Waktu)`, status `• Selesai` (pill hijau mint), Denda `Rp 0`, Aksi `Arsip Data`.
+  - Pagination Bawah: Teks `Menampilkan 3 dari 42 transaksi perputaran sirkulasi`, tombol navigasi `< Halaman 1 >`.
+* **2 Kartu Integrasi Sistem di Bagian Bawah**:
+  1. **Pengingat Otomatis Aktif**:
+     - Ikon lonceng ungu.
+     - Deskripsi: `Sistem SIPINJAM otomatis mengirim notifikasi WhatsApp & Email H-2 jam sebelum tenggat batas pengembalian barang untuk menekan angka keterlambatan mahasiswa.`
+  2. **Penyelesaian Denda Kasir Kampus**:
+     - Ikon gedung bank/kasir hijau mint.
+     - Deskripsi: `Kompensasi denda tercatat langsung terintegrasi dengan portal keuangan akademik universitas (SIAKAD) dan dapat dilunasi via Virtual Account bank mitra.`
 
 ---
 
-## 4. Langkah-Langkah Pengerjaan
-1. Pasang library chart (misal: `recharts` atau `chart.js` / komponen CSS bar sederhana).
-2. Hubungkan pemanggilan API ke endpoint Backend Java:
-   - `GET /api/laporan/ringkasan`
-   - `GET /api/laporan/kategori`
-   - `GET /api/laporan/utilisasi-ruangan`
-   - `GET /api/laporan/jatuh-tempo`
-3. Terapkan layout kartu metrik yang elegan dan mudah dibaca.
-4. Sediakan tombol cetak laporan (*Print / Export View*).
+## 3. Rincian Pekerjaan Teknis
+
+### A. Pengambilan Data Laporan Statistik
+- Mengambil ringkasan dari Backend Java melalui endpoint:
+  - `GET /api/laporan/ringkasan` $\rightarrow$ Total peminjaman, booking, rasio keterlambatan, dan akumulasi denda.
+  - `GET /api/laporan/jatuh-tempo` $\rightarrow$ Daftar transaksi yang aktif, mendekati batas waktu, atau telah melewati batas pengembalian.
+  - `GET /api/laporan/kategori` $\rightarrow$ Distribusi peminjaman berdasarkan kategori barang.
+
+### B. Tindak Lanjut & Ekspor Laporan
+1. Tombol `Kirim Pengingat`: Menampilkan notifikasi simulasi pengiriman notifikasi pengingat jatuh tempo ke mahasiswa terkait.
+2. Tombol `Unduh Rekap Laporan`: Mengunduh berkas laporan rekapitulasi data format CSV/Excel.
 
 ---
 
-## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [x] Daftar barang yang lewat tenggat tertampil dengan indikator warna merah yang kontras beserta hitungan estimasi denda harian.
-- [x] Diagram grafik statistik kategori barang dan utilisasi ruangan ter-render dengan rapi dan data sinkron dengan database file backend.
-- [x] Halaman dapat diakses oleh Petugas Sarpras dan Dosen Pembina.
-
+## 4. Checklist Penerimaan Tugas (Definition of Done)
+- [ ] Tampilan halaman monitoring laporan persis 100% dengan `monitoring_laporan_sirkulasi_petugas_sarpras.png`.
+- [ ] Tiga kartu metrik analitik menampilkan angka total transaksi, jatuh tempo, dan pemasukan denda secara akurat.
+- [ ] Tabel sirkulasi prioritas membedakan transaksi yang tepat waktu dan terlambat dengan badge visual yang jelas.
+- [ ] Tombol `Unduh Rekap Laporan` dan `Kirim Pengingat` berfungsi normal.
+- [ ] Dua kartu integrasi sistem di bagian bawah ter-render dengan rapi.

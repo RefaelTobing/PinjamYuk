@@ -1,60 +1,70 @@
-# TASK-FE-01: Inisialisasi Proyek Frontend, Styling & Konfigurasi API Client
-
-## 1. Identitas Task
-- **ID Task**: `TASK-FE-01`
-- **Fase**: Fase 1 (Inisialisasi & Pondasi UI)
-- **Komponen**: Project Setup, Tailwind CSS, Axios Client, Environment Variables
-- **Tingkat Kesulitan**: Mudah
-- **Estimasi Waktu**: 0.5 Hari
+# TASK-FE-01: Setup Project, Token Warna Mockup & API Client Service
+## Fondasi Frontend Web Reaktif SIPINJAM
 
 ---
 
-## 2. Deskripsi & Tujuan
-Membuat kerangka awal proyek Frontend terpisah (misalnya di folder `frontend/`), mengonfigurasi Tailwind CSS untuk tata letak modern dan konsisten, serta menyiapkan HTTP Client (Axios) yang telah terhubung ke alamat Backend Java REST API.
+## 1. Ringkasan Tugas
+Menyiapkan struktur proyek Frontend menggunakan **React 19 + Vite** dengan konfigurasi **Tailwind CSS v4**, mengonfigurasi palet warna kustom (*Role-Based Theme System*), tipografi Google Font (`Plus Jakarta Sans`), ikonografi `lucide-react`, serta modul API client terpadu berbasis Axios/Fetch yang terhubung ke Backend Java REST API pada `http://localhost:8080/api`.
 
 ---
 
-## 3. Spesifikasi Teknis
+## 2. Acuan Desain Mockup
+* **Direktori Mockup**: `frontend/MockUpPinjamYuk/`
+* **Elemen Visual Kunci**:
+  - Latar belakang dot-grid pattern (`bg-dot-grid`).
+  - Palet warna peran: Blue-700 (Mahasiswa), Emerald-800 (Petugas), Amber-900 (Pembina).
+  - Radius sudut rounded lembut (`rounded-xl` hingga `rounded-2xl`).
+  - Shadow elevasi halus (`shadow-sm`, `shadow-md`, `shadow-xl shadow-slate-100`).
 
-### 3.1 Perintah Inisialisasi (Contoh React + Vite)
-```bash
-# Di direktori proyek utama
-npm create vite@latest frontend -- --template react
-cd frontend
-npm install
-npm install -D tailwindcss postcss autoprefixer
-npx tailwindcss init -p
-npm install axios react-router-dom lucide-react clsx
+---
+
+## 3. Rincian Pekerjaan Teknis
+
+### A. Konfigurasi CSS & Token Warna (`frontend/src/index.css`)
+Konfigurasikan Tailwind CSS v4 dengan variabel CSS kustom untuk merepresentasikan token warna dari mockup:
+```css
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-mhs-primary: #1d4ed8;
+    --color-mhs-hover: #1e40af;
+    --color-mhs-light: #eff6ff;
+    
+    --color-petugas-primary: #065f46;
+    --color-petugas-hover: #047857;
+    --color-petugas-light: #d1fae5;
+    
+    --color-pembina-primary: #78350f;
+    --color-pembina-hover: #92400e;
+    --color-pembina-light: #fef3c7;
+  }
+}
+
+/* Pola dot-grid untuk latar belakang halaman login */
+.bg-dot-grid {
+  background-image: radial-gradient(#cbd5e1 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
 ```
 
-### 3.2 File Konfigurasi Environment (`frontend/.env`)
-```env
-VITE_API_BASE_URL=http://localhost:8080/api
-VITE_APP_TITLE=SIPINJAM - Sistem Peminjaman Kampus
-```
-
-### 3.3 Konfigurasi Axios Interceptor (`src/services/apiClient.js`)
-- **Base URL**: Mengambil dari `import.meta.env.VITE_API_BASE_URL`.
-- **Request Interceptor**: Menambahkan header `Authorization: Bearer <token>` secara otomatis jika token tersimpan di `localStorage`.
-- **Response Interceptor**: Menangkap error 401 (Sesi Habis) dan mengarahkan pengguna kembali ke halaman `/login`, serta mengekstrak payload respons `response.data`.
-
-### 3.4 Helper Format Lokal (`src/utils/formatters.js`)
-- `formatRupiah(angka)`: Mengubah `50000` $\to$ `"Rp 50.000"`.
-- `formatTanggal(stringTgl)`: Mengubah `"2026-11-20"` $\to$ `"20 Nov 2026"`.
+### B. Konfigurasi API Client (`frontend/src/services/api.js`)
+Buat wrapper pemanggilan HTTP yang terstandarisasi untuk menangani permintaan ke Backend Java:
+1. **Base URL**: Mengarah ke `http://localhost:8080/api` (dapat dikonfigurasi melalui `.env` `VITE_API_BASE_URL`).
+2. **CORS Handling**: Menyertakan header `Content-Type: application/json`.
+3. **Standarisasi Respons & Error Handling**:
+   - Jika respons berstatus `sukses: true`, kembalikan payload data.
+   - Jika menerima HTTP 400 (AturanDilanggarException), HTTP 403 (AksesDitolakException), atau HTTP 404, parse pesan kesalahan `pesan` dan `kodeKesalahan` untuk ditampilkan pada toast UI.
+4. **Fungsi Pembantu Format (Utils)**:
+   - `formatRupiah(number)`: Menghasilkan format mata uang Indonesia (contoh: `Rp10.000`).
+   - `formatTanggal(dateString)`: Menghasilkan format tanggal Indonesia (contoh: `24 Nov 2026`).
+   - `formatRentang(tglMulai, tglSelesai)`: Menghasilkan format rentang tanggal (contoh: `24 Nov 2026 – 26 Nov 2026`).
 
 ---
 
-## 4. Langkah-Langkah Pengerjaan
-1. Eksekusi inisialisasi aplikasi frontend pada folder `frontend/`.
-2. Konfigurasikan `tailwind.config.js` untuk menyertakan path template React.
-3. Buat modul `src/services/apiClient.js`.
-4. Buat script helper di `src/utils/formatters.js`.
-5. Uji koneksi dari frontend ke backend dengan memanggil endpoint `GET /api/health` saat aplikasi dimuat.
-
----
-
-## 5. Kriteria Penerimaan (Acceptance Criteria / DoD)
-- [x] Proyek Frontend berhasil dijalankan dengan `npm run dev` pada port lokal (contoh: `http://localhost:5173`).
-- [x] Styling Tailwind CSS bekerja dengan benar.
-- [x] Axios client berhasil melakukan request uji coba ke Backend Java (`http://localhost:8080/api/health`) dan menerima respons tanpa error CORS.
-
+## 4. Checklist Penerimaan Tugas (Definition of Done)
+- [ ] Server development Vite berjalan lancar via `npm run dev` di port 5173.
+- [ ] Tailwind CSS v4 terpasang dengan plugin `@tailwindcss/vite` tanpa error build.
+- [ ] Class utilitas kustom `.bg-dot-grid` dapat dirender dengan rapi.
+- [ ] Modul `api.js` berhasil melakukan uji *health check* ke `GET http://localhost:8080/api/health`.
+- [ ] Helper pemformatan Rupiah dan Tanggal berfungsi akurat.
