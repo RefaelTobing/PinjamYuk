@@ -21,31 +21,48 @@ Write-Host "============================================================" -Foreg
 Write-Host "  Menyusun (compile) backend Java SIPINJAM..." -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor Cyan
 
-if (-not (Test-Path "out")) {
-    New-Item -ItemType Directory -Path "out" | Out-Null
+$outDir = Join-Path $PSScriptRoot "out"
+if (-not (Test-Path -LiteralPath $outDir)) {
+    New-Item -ItemType Directory -Path $outDir | Out-Null
 }
 
-# PENTING: setiap path WAJIB dibungkus tanda kutip karena javac memecah
-# isi @argfile berdasarkan SPASI. Path proyek ini mengandung spasi
-# ("Semester 3", "Prak PBO", "Final Project"), jadi tanpa kutip akan
-# muncul error "invalid flag".
+# ------------------------------------------------------------------
+# PENTING - ini penyebab error:
+#   error: file not found: D:Kuliah Semester 3PBOFINAL PROJECTPinjamYuksrc...
+#
+# javac membaca isi @argfile dengan '\' sebagai KARAKTER ESCAPE. Jadi path
+# Windows   D:\Kuliah Semester 3\PBO\...\AplikasiServer.java
+# dibaca javac sebagai
+#           D:Kuliah Semester 3PBO...AplikasiServer.java   <- semua '\' hilang
+#
+# Solusinya: tulis path di argfile memakai '/' (javac di Windows menerima
+# '/' sebagai pemisah folder). Tanda kutip tetap wajib karena path proyek
+# ini mengandung spasi ("Semester 3", "Prak PBO", "Final Project").
+# ------------------------------------------------------------------
 $srcDir = Join-Path $PSScriptRoot "src"
-$javaFiles = Get-ChildItem -Path $srcDir -Recurse -Filter "*.java" |
-    ForEach-Object { '"' + $_.FullName + '"' }
+$javaFiles = @(Get-ChildItem -LiteralPath $srcDir -Recurse -Filter "*.java" -File |
+    Sort-Object FullName)
 
 if ($javaFiles.Count -eq 0) {
     Write-Host "[ERROR] Tidak ada berkas .java di folder src!" -ForegroundColor Red
     exit 1
 }
 
-$sourcesFile = Join-Path $PSScriptRoot "sources.txt"
-$javaFiles | Out-File -FilePath $sourcesFile -Encoding ascii
+$sourceLines = $javaFiles | ForEach-Object { '"' + ($_.FullName -replace '\\', '/') + '"' }
 
-javac -encoding UTF-8 -d out ("@" + $sourcesFile)
+# Argfile diletakkan di folder temp supaya path argfile-nya sendiri bebas spasi
+$sourcesFile = Join-Path ([System.IO.Path]::GetTempPath()) ("sipinjam-sources-{0}.txt" -f $PID)
+$sourceLines | Out-File -FilePath $sourcesFile -Encoding ascii
+
+Write-Host ("  {0} berkas .java -> {1}" -f $javaFiles.Count, $outDir) -ForegroundColor Cyan
+
+# Setiap argumen dikirim sebagai elemen terpisah (array), bukan satu string
+# command, supaya spasi di dalam path tidak dipecah.
+& javac "-encoding" "UTF-8" "-d" $outDir "@$sourcesFile"
 $compileExit = $LASTEXITCODE
 
-if (Test-Path $sourcesFile) {
-    Remove-Item -Path $sourcesFile
+if (Test-Path -LiteralPath $sourcesFile) {
+    Remove-Item -LiteralPath $sourcesFile -Force
 }
 
 if ($compileExit -ne 0) {
@@ -63,4 +80,4 @@ Write-Host "  Data Dir : $DataDir" -ForegroundColor Green
 Write-Host "  Tekan Ctrl+C untuk menghentikan server." -ForegroundColor Yellow
 Write-Host "============================================================" -ForegroundColor Green
 
-java "-Dfile.encoding=UTF-8" -cp out sipinjam.AplikasiServer --port $Port --data $DataDir
+& java "-Dfile.encoding=UTF-8" "-cp" $outDir "sipinjam.AplikasiServer" "--port" $Port "--data" $DataDir

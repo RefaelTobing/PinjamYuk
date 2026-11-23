@@ -53,12 +53,20 @@ if !ERRORLEVEL! neq 0 (
 if not exist out mkdir out
 
 REM 2. Kumpulkan semua berkas .java ke argfile.
-REM    PENTING: tiap path diberi tanda kutip ("...") karena javac memecah
-REM    isi @argfile berdasarkan SPASI. Tanpa kutip, path seperti
-REM    "C:\...\Semester 3\Prak PBO\Final Project\PinjamYuk\src\..." akan
-REM    terpotong dan muncul error "invalid flag".
+REM  CATATAN PENTING (jangan diubah):
+REM  1. Tiap path WAJIB diberi tanda kutip ("...") karena javac memecah
+REM     isi @argfile berdasarkan SPASI.
+REM  2. Tiap backslash WAJIB diubah jadi '/' karena di dalam @argfile
+REM     javac memperlakukan '\' sebagai karakter ESCAPE. Kalau tidak,
+REM     path "D:\Kuliah Semester 3\...\AplikasiServer.java" akan dibaca
+REM     sebagai "D:Kuliah Semester 3...AplikasiServer.java" dan muncul
+REM     error: file not found.
 if exist sources.txt del /q sources.txt
-for /r "%~dp0src" %%F in (*.java) do echo "%%F">>sources.txt
+for /r "%~dp0src" %%F in (*.java) do (
+    set "JSRC=%%~fF"
+    set "JSRC=!JSRC:\=/!"
+    echo "!JSRC!">>sources.txt
+)
 
 if not exist sources.txt (
     echo ============================================================

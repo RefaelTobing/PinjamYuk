@@ -6,11 +6,14 @@ cd /d "%~dp0"
 
 REM ============================================================
 REM  SIPINJAM (PinjamYuk) - Build Script (Windows)
-REM  CATATAN PENTING:
-REM  Setiap path di sources.txt WAJIB diberi tanda kutip ("...").
-REM  javac memecah isi @argfile berdasarkan SPASI, sehingga path
-REM  seperti "C:\...\Semester 3\Prak PBO\Final Project\PinjamYuk\..."
-REM  akan terpotong dan memunculkan error "invalid flag".
+REM  CATATAN PENTING (jangan diubah):
+REM  1. Tiap path WAJIB diberi tanda kutip ("...") karena javac memecah
+REM     isi @argfile berdasarkan SPASI.
+REM  2. Tiap backslash WAJIB diubah jadi '/' karena di dalam @argfile
+REM     javac memperlakukan '\' sebagai karakter ESCAPE. Kalau tidak,
+REM     path "D:\Kuliah Semester 3\...\AplikasiServer.java" akan dibaca
+REM     sebagai "D:Kuliah Semester 3...AplikasiServer.java" dan muncul
+REM     error: file not found.
 REM ============================================================
 
 echo ============================================================
@@ -21,7 +24,11 @@ mkdir out
 
 echo Mengompilasi seluruh sumber Java...
 if exist sources.txt del /q sources.txt
-for /r "%~dp0src" %%F in (*.java) do echo "%%F">>sources.txt
+for /r "%~dp0src" %%F in (*.java) do (
+    set "JSRC=%%~fF"
+    set "JSRC=!JSRC:\=/!"
+    echo "!JSRC!">>sources.txt
+)
 
 if not exist sources.txt (
     echo [ERROR] Tidak ada berkas .java di folder src!

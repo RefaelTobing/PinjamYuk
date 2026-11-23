@@ -512,13 +512,23 @@ javac -encoding UTF-8 -d out $(find src -name "*.java")
 java  -Dfile.encoding=UTF-8 -cp out sipinjam.AplikasiSipinjam
 ```
 
-Pada Windows, pengumpulan berkas sumber memakai berkas daftar:
+Pada Windows, pengumpulan berkas sumber memakai berkas daftar (argfile).
+Ada satu jebakan: **di dalam argfile, javac memperlakukan `\` sebagai karakter
+escape**, sehingga path `D:\Kuliah Semester 3\...\AplikasiServer.java` dibaca
+sebagai `D:Kuliah Semester 3...AplikasiServer.java` (muncul
+`error: file not found`). Karena itu setiap path di argfile harus memakai `/`
+dan tetap diberi tanda kutip karena path proyek mengandung spasi:
 
 ```
 dir /s /b src\*.java > sources.txt
+REM  ubah semua backslash di sources.txt menjadi '/', contoh dengan PowerShell:
+REM  (Get-Content sources.txt) -replace '\\','/' | Set-Content sources.txt
 javac -encoding UTF-8 -d out @sources.txt
 java -cp out sipinjam.AplikasiSipinjam
 ```
+
+Skrip `build.bat` dan `run_server.bat` sudah menangani konversi ini otomatis,
+jadi cukup jalankan `build.bat`.
 
 Aplikasi harus dijalankan dari folder proyek karena folder `data/` dibaca relatif terhadap direktori kerja. Untuk lokasi lain, alamat folder data diberikan sebagai argumen: `java -cp out sipinjam.AplikasiSipinjam --data /jalur/data`.
 
