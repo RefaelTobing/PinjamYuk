@@ -33,6 +33,23 @@ echo ============================================================
 echo   Menyusun (compile) backend Java SIPINJAM...
 echo ============================================================
 
+REM 1. Cek apakah javac tersedia di PATH
+where javac >nul 2>&1
+if %ERRORLEVEL% neq 0 (
+    echo ============================================================
+    echo [ERROR] 'javac' (Java Development Kit / JDK) tidak ditemukan!
+    echo Kemungkinan penyebab:
+    echo 1. JDK belum terpasang di komputer Anda.
+    echo 2. JDK sudah terpasang, tetapi folder 'bin' belum masuk ke PATH.
+    echo.
+    echo Solusi:
+    echo - Unduh JDK di: https://adoptium.net/ atau https://www.oracle.com/java/
+    echo - Pastikan mencentang "Set JAVA_HOME" dan "Add to PATH" saat instalasi.
+    echo ============================================================
+    pause
+    exit /b 1
+)
+
 if not exist out mkdir out
 
 REM Kumpulkan semua berkas .java ke file sementara
@@ -42,7 +59,9 @@ set COMPILE_STATUS=%ERRORLEVEL%
 if exist sources.txt del sources.txt
 
 if %COMPILE_STATUS% neq 0 (
-    echo [ERROR] Kompilasi Java gagal! Pastikan JDK sudah terpasang dan ada di PATH.
+    echo ============================================================
+    echo [ERROR] Kompilasi Java gagal! Periksa pesan error di atas.
+    echo ============================================================
     pause
     exit /b %COMPILE_STATUS%
 )
@@ -58,5 +77,9 @@ echo ============================================================
 java -Dfile.encoding=UTF-8 -cp out sipinjam.AplikasiServer --port %PORT% --data %DATA_DIR%
 
 if %ERRORLEVEL% neq 0 (
+    echo.
+    echo [INFO] Server backend telah berhenti.
+    pause
+)
     pause
 )

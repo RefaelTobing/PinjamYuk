@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "backend": "java -jar ../sipinjam-server.jar",
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview"

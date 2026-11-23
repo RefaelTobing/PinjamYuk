@@ -3,6 +3,17 @@ param (
     [string]$DataDir = "data"
 )
 
+# 1. Cek ketersediaan javac di PATH
+if (-not (Get-Command javac -ErrorAction SilentlyContinue)) {
+    Write-Host "============================================================" -ForegroundColor Red
+    Write-Host "[ERROR] 'javac' (Java Development Kit / JDK) tidak ditemukan!" -ForegroundColor Red
+    Write-Host "Penyebab: JDK belum terpasang atau PATH belum disetel." -ForegroundColor Yellow
+    Write-Host "Unduh JDK di: https://adoptium.net/ atau https://www.oracle.com/java/" -ForegroundColor Yellow
+    Write-Host "============================================================" -ForegroundColor Red
+    Read-Host "Tekan Enter untuk keluar..."
+    exit 1
+}
+
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host "  Menyusun (compile) backend Java SIPINJAM..." -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor Cyan
