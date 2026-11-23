@@ -2,6 +2,7 @@
 out/
 *.class
 *.jar
+!sipinjam-server.jar
 *.tmp
 
 ### Node & Frontend ###
