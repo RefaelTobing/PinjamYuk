@@ -35,6 +35,17 @@ public class AplikasiServer {
                     server.stop();
                 }
             }));
+        } catch (java.net.BindException e) {
+            System.err.println("====================================================");
+            System.err.println("[ERROR] Port " + port + " SUDAH DIGUNAKAN!");
+            System.err.println("Kemungkinan server SIPINJAM sudah berjalan di background,");
+            System.err.println("atau port 8080 dipakai aplikasi lain (Oracle/Tomcat/XAMPP).");
+            System.err.println();
+            System.err.println("Solusi:");
+            System.err.println("1. Matikan proses java di Task Manager (End Task 'java.exe'),");
+            System.err.println("   atau ketik di PowerShell: Stop-Process -Name java -Force");
+            System.err.println("2. Atau jalankan di port lain: java -jar sipinjam-server.jar --port 8081");
+            System.err.println("====================================================");
         } catch (Exception e) {
             System.err.println("Gagal memulai server backend: " + e.getMessage());
             e.printStackTrace();

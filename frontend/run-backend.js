@@ -16,9 +16,9 @@ let command = 'java';
 let args = [];
 
 if (fs.existsSync(jarPath)) {
-  args = ['-Dfile.encoding=UTF-8', '-jar', 'sipinjam-server.jar'];
+  args = ['-Dfile.encoding=UTF-8', '-jar', 'sipinjam-server.jar', ...process.argv.slice(2)];
 } else if (fs.existsSync(outDir)) {
-  args = ['-Dfile.encoding=UTF-8', '-cp', 'out', 'sipinjam.AplikasiServer'];
+  args = ['-Dfile.encoding=UTF-8', '-cp', 'out', 'sipinjam.AplikasiServer', ...process.argv.slice(2)];
 } else {
   console.error('[ERROR] Berkas sipinjam-server.jar maupun folder out belum ada!');
   console.error('Silakan jalankan build.bat (Windows) atau ./build.sh (Linux) terlebih dahulu.');
