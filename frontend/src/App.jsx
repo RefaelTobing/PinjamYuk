@@ -7,6 +7,7 @@ import BookingRuangan from './components/mahasiswa/BookingRuangan';
 import CartDrawer from './components/mahasiswa/CartDrawer';
 import RiwayatDenda from './components/mahasiswa/RiwayatDenda';
 import PersetujuanPembina from './components/pembina/PersetujuanPembina';
+import MasterDataFasilitas from './components/petugas/MasterDataFasilitas';
 import { 
   Package, Calendar, Clock, ShieldCheck, AlertTriangle, 
   CheckCircle2, LogOut, Search, Plus, X, 
@@ -673,54 +674,30 @@ export default function App() {
         )}
 
         {/* ========================================================= */}
-        {/* TAB: MASTER DATA INVENTARIS (PETUGAS) */}
+        {/* TAB: MASTER DATA FASILITAS (PETUGAS - MOCKUP COMPLIANT)   */}
         {/* ========================================================= */}
         {activeTab === 'master' && (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-base font-extrabold text-slate-800">Master Data Inventaris Kampus</h2>
-              <button 
-                onClick={() => setTambahBarangModal(true)}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5">
-                <Plus size={16} /> Tambah Barang Baru
-              </button>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase text-[10px]">
-                  <tr>
-                    <th className="p-3">Kode</th>
-                    <th className="p-3">Nama Barang</th>
-                    <th className="p-3">Kategori & Jenis</th>
-                    <th className="p-3">Stok Fisik</th>
-                    <th className="p-3">Harga Satuan</th>
-                    <th className="p-3">Persetujuan</th>
-                    <th className="p-3">Tarif Denda/Hari</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {barangList.map(b => (
-                    <tr key={b.kode} className="hover:bg-slate-50 transition">
-                      <td className="p-3 font-mono font-bold text-slate-800">{b.kode}</td>
-                      <td className="p-3 font-semibold text-slate-900">{b.nama}</td>
-                      <td className="p-3 text-slate-600">{b.kategori} ({b.jenis})</td>
-                      <td className="p-3 font-bold text-slate-800">{b.stok} Unit</td>
-                      <td className="p-3 text-slate-600">{formatRupiah(b.hargaSatuan)}</td>
-                      <td className="p-3">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                          b.perluPersetujuan ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-slate-100 text-slate-600'
-                        }`}>
-                          {b.perluPersetujuan ? 'Wajib Pembina' : 'Reguler'}
-                        </span>
-                      </td>
-                      <td className="p-3 font-bold text-emerald-600">{formatRupiah(b.tarifHarian)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <MasterDataFasilitas
+            barangList={barangList}
+            ruanganList={ruanganList}
+            peminjamanList={peminjamanList}
+            onAddBarang={async (payload) => {
+              await api.tambahBarang(payload);
+              showToast('Barang inventaris baru berhasil ditambahkan');
+              loadBarang();
+            }}
+            onEditBarang={async (payload) => {
+              await api.ubahBarang(payload);
+              showToast('Data barang berhasil diperbarui');
+              loadBarang();
+            }}
+            onAddRuangan={async (payload) => {
+              await api.tambahRuangan(payload);
+              showToast('Ruangan baru berhasil ditambahkan');
+              loadRuangan();
+            }}
+            showToast={showToast}
+          />
         )}
 
         {/* ========================================================= */}

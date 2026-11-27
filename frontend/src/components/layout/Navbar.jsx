@@ -31,7 +31,8 @@ export default function Navbar({
     PETUGAS: {
       badgeText: 'Petugas',
       badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-      activeTabClass: 'bg-emerald-50 text-emerald-800 font-semibold',
+      activeTabClass: 'bg-emerald-100 text-emerald-900 font-semibold',
+      logoBgClass: 'bg-emerald-700 shadow-emerald-500/20',
       tabs: [
         { id: 'verifikasi', label: 'Verifikasi & Sirkulasi' },
         { id: 'master', label: 'Master Data' },

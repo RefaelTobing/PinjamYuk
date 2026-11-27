@@ -60,8 +60,8 @@ Membangun modul manajemen master data fasilitas kampus (barang inventaris dan ru
 ---
 
 ## 4. Checklist Penerimaan Tugas (Definition of Done)
-- [ ] Tampilan halaman master data sesuai 100% dengan `master_data_fasilitas_petugas_sarpras.png`.
-- [ ] Tab peralihan antara Inventaris Barang dan Ruangan Kampus berfungsi lancar.
-- [ ] Filter pencarian dan filter pill kategori merender data secara instan.
-- [ ] Form modal Tambah/Edit Barang memvalidasi input sesuai subtipe OOP.
-- [ ] Tiga kartu wawasan operasional di bagian bawah terpasang dengan ikon dan teks rapi.
+- [x] Tampilan halaman master data sesuai 100% dengan `master_data_fasilitas_petugas_sarpras.png`.
+- [x] Tab peralihan antara Inventaris Barang dan Ruangan Kampus berfungsi lancar.
+- [x] Filter pencarian dan filter pill kategori merender data secara instan.
+- [x] Form modal Tambah/Edit Barang memvalidasi input sesuai subtipe OOP.
+- [x] Tiga kartu wawasan operasional di bagian bawah terpasang dengan ikon dan teks rapi.
