@@ -68,8 +68,8 @@ Menyediakan akun demo 1-klik dan data contoh yang siap dipresentasikan tanpa per
 ---
 
 ## 4. Checklist Penerimaan Tugas (Definition of Done)
-- [ ] Seluruh 10 task Frontend diuji dan terintegrasi tanpa error console / network.
-- [ ] Seluruh visual antarmuka selaras 100% dengan 8 mockup di `frontend/MockUpPinjamYuk/`.
-- [ ] Pengujian alur lengkap (Mahasiswa ajukan $\rightarrow$ Pembina setujui $\rightarrow$ Petugas serah terima & inspeksi kembali $\rightarrow$ Mahasiswa cek denda) sukses 100%.
-- [ ] Build produksi frontend (`npm run build`) berhasil tanpa error linting atau kompilasi.
-- [ ] Aplikasi siap digunakan untuk demonstrasi live ujian praktikum PBO.
+- [x] Seluruh 10 task Frontend diuji dan terintegrasi tanpa error console / network.
+- [x] Seluruh visual antarmuka selaras 100% dengan 8 mockup di `frontend/MockUpPinjamYuk/`.
+- [x] Pengujian alur lengkap (Mahasiswa ajukan $\rightarrow$ Pembina setujui $\rightarrow$ Petugas serah terima & inspeksi kembali $\rightarrow$ Mahasiswa cek denda) sukses 100%.
+- [x] Build produksi frontend (`npm run build`) berhasil tanpa error linting atau kompilasi.
+- [x] Aplikasi siap digunakan untuk demonstrasi live ujian praktikum PBO.

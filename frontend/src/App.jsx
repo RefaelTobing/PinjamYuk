@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { api, formatRupiah, formatTanggal } from './services/api';
+import { api, formatRupiah } from './services/api';
 import AuthPage from './components/auth/AuthPage';
 import Navbar from './components/layout/Navbar';
 import KatalogInventaris from './components/mahasiswa/KatalogInventaris';
@@ -10,11 +10,7 @@ import PersetujuanPembina from './components/pembina/PersetujuanPembina';
 import MasterDataFasilitas from './components/petugas/MasterDataFasilitas';
 import SirkulasiOperasional from './components/petugas/SirkulasiOperasional';
 import MonitoringLaporan from './components/petugas/MonitoringLaporan';
-import { 
-  Package, Calendar, Clock, ShieldCheck, AlertTriangle, 
-  CheckCircle2, LogOut, Search, Plus, X, 
-  Building2, Layers, AlertCircle, RefreshCw
-} from 'lucide-react';
+import { CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function App() {
   // Auth state
@@ -44,8 +40,6 @@ export default function App() {
   const [tglMulai, setTglMulai] = useState(getTomorrow());
   const [tglSelesai, setTglSelesai] = useState(getNextWeek());
   const [barangList, setBarangList] = useState([]);
-  const [kategoriFilter, setKategoriFilter] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState([]); // [{ barang, jumlah }]
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [keperluanPeminjaman, setKeperluanPeminjaman] = useState('');
@@ -61,18 +55,10 @@ export default function App() {
   const [bookingList, setBookingList] = useState([]);
   const [laporanRingkasan, setLaporanRingkasan] = useState(null);
   const [laporanKategori, setLaporanKategori] = useState([]);
-  const [laporanUtilisasi, setLaporanUtilisasi] = useState([]);
   const [jatuhTempoList, setJatuhTempoList] = useState([]);
 
   // Modals
   const [reviewModal, setReviewModal] = useState(null); // for approval/rejection
-  const [pengembalianModal, setPengembalianModal] = useState(null);
-  const [kondisiAkhirMap, setKondisiAkhirMap] = useState({});
-  const [tambahBarangModal, setTambahBarangModal] = useState(false);
-  const [barangBaru, setBarangBaru] = useState({
-    kode: '', nama: '', kategori: 'ELK', jenis: 'ELEKTRONIK',
-    stok: 5, hargaSatuan: 1000000, perluPersetujuan: false
-  });
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
@@ -94,7 +80,7 @@ export default function App() {
   // Load initial data
   const loadBarang = async () => {
     try {
-      const res = await api.getBarang({ mulai: tglMulai, selesai: tglSelesai, kategori: kategoriFilter, cari: searchQuery });
+      const res = await api.getBarang({ mulai: tglMulai, selesai: tglSelesai });
       setBarangList(res.data || []);
     } catch (e) {
       showToast(e.message, 'error');
@@ -133,19 +119,17 @@ export default function App() {
         setPeminjamanList(pRes.data || []);
         setBookingList(bRes.data || []);
       } else {
-        const [pRes, bRes, rRes, kRes, uRes, jRes] = await Promise.all([
+        const [pRes, bRes, rRes, kRes, jRes] = await Promise.all([
           api.getPeminjaman(),
           api.getBooking(),
           api.getLaporanRingkasan(),
           api.getLaporanKategori(),
-          api.getLaporanUtilisasi(),
           api.getLaporanJatuhTempo()
         ]);
         setPeminjamanList(pRes.data || []);
         setBookingList(bRes.data || []);
         setLaporanRingkasan(rRes.data || null);
         setLaporanKategori(kRes.data || []);
-        setLaporanUtilisasi(uRes.data || []);
         setJatuhTempoList(jRes.data || []);
       }
     } catch (e) {
@@ -159,7 +143,7 @@ export default function App() {
       loadRuangan();
       loadRiwayatDanLaporan();
     }
-  }, [user, tglMulai, tglSelesai, kategoriFilter, searchQuery]);
+  }, [user, tglMulai, tglSelesai]);
 
   useEffect(() => {
     if (selectedRuangan) {
@@ -313,57 +297,6 @@ export default function App() {
     }
   };
 
-  // Petugas Pengembalian submit
-  const handlePengembalianSubmit = async () => {
-    if (!pengembalianModal) return;
-    try {
-      const payload = {
-        tanggalKembali: new Date().toISOString().split('T')[0],
-        kondisiAkhir: kondisiAkhirMap,
-        dendaLunas: true
-      };
-      const res = await api.catatPengembalian(pengembalianModal.id, payload);
-      showToast(`Pengembalian dicatat! Total denda: ${formatRupiah(res.data.totalDenda)}`);
-      setPengembalianModal(null);
-      loadRiwayatDanLaporan();
-    } catch (e) {
-      showToast(e.message, 'error');
-    }
-  };
-
-  // Handle Tambah Barang Baru
-  const handleTambahBarang = async (e) => {
-    e.preventDefault();
-    try {
-      await api.tambahBarang(barangBaru);
-      showToast('Barang inventaris baru berhasil ditambahkan');
-      setTambahBarangModal(false);
-      loadBarang();
-    } catch (err) {
-      showToast(err.message, 'error');
-    }
-  };
-
-  // Role Color Helpers
-  const getRoleBadge = (peran) => {
-    if (peran === 'MAHASISWA') return 'bg-blue-100 text-blue-800 border-blue-200';
-    if (peran === 'PETUGAS') return 'bg-emerald-100 text-emerald-800 border-emerald-200';
-    if (peran === 'PEMBINA') return 'bg-amber-100 text-amber-800 border-amber-200';
-    return 'bg-slate-100 text-slate-800';
-  };
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'MENUNGGU_PEMBINA': return 'bg-amber-100 text-amber-800 border-amber-300';
-      case 'DIAJUKAN': return 'bg-sky-100 text-sky-800 border-sky-300';
-      case 'DISETUJUI': return 'bg-indigo-100 text-indigo-800 border-indigo-300';
-      case 'DIPINJAM': case 'TERPAKAI': return 'bg-purple-100 text-purple-800 border-purple-300';
-      case 'DIKEMBALIKAN': case 'SELESAI': return 'bg-emerald-100 text-emerald-800 border-emerald-300';
-      case 'DITOLAK': case 'DIBATALKAN': return 'bg-red-100 text-red-800 border-red-300';
-      default: return 'bg-slate-100 text-slate-700';
-    }
-  };
-
   // ==========================================
   // RENDER: LOGIN & REGISTRATION
   // ==========================================
@@ -392,7 +325,7 @@ export default function App() {
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       {/* GLOBAL TOAST */}
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-xl border text-sm font-semibold flex items-center gap-2 animate-bounce ${
+        <div className={`fixed top-5 right-5 z-50 px-4 py-3 rounded-xl shadow-xl border text-sm font-semibold flex items-center gap-2 transition-all ${
           toast.type === 'error' ? 'bg-red-50 text-red-800 border-red-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'
         }`}>
           {toast.type === 'error' ? <AlertCircle size={18} /> : <CheckCircle2 size={18} />}
@@ -648,154 +581,6 @@ export default function App() {
                   type="submit"
                   className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl">
                   Setujui Pengajuan
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================= */}
-      {/* PENGEMBALIAN & DENDA MODAL (PETUGAS) */}
-      {/* ========================================================= */}
-      {pengembalianModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl p-6 border border-slate-100">
-            <h3 className="font-extrabold text-sm text-slate-900 mb-1">Catat Pengembalian & Kondisi Akhir Barang</h3>
-            <p className="text-xs text-slate-500 mb-4">Nomor: <b>{pengembalianModal.id}</b> | Peminjam: <b>{pengembalianModal.namaMahasiswa}</b></p>
-
-            <div className="space-y-3 mb-6">
-              {pengembalianModal.items?.map(it => (
-                <div key={it.kodeBarang} className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center text-xs">
-                  <div>
-                    <h4 className="font-bold text-slate-900">{it.namaBarang}</h4>
-                    <span className="text-[10px] text-slate-500">Jumlah: {it.jumlah} Unit</span>
-                  </div>
-                  <select 
-                    value={kondisiAkhirMap[it.kodeBarang] || 'BAIK'}
-                    onChange={e => setKondisiAkhirMap({ ...kondisiAkhirMap, [it.kodeBarang]: e.target.value })}
-                    className="px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 outline-none">
-                    <option value="BAIK">Kondisi: Baik (Tanpa Denda)</option>
-                    <option value="RUSAK_RINGAN">Kondisi: Rusak Ringan</option>
-                    <option value="RUSAK_BERAT">Kondisi: Rusak Berat</option>
-                    <option value="HILANG">Kondisi: Hilang</option>
-                  </select>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <button 
-                onClick={() => setPengembalianModal(null)}
-                className="px-4 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl">
-                Batal
-              </button>
-              <button 
-                onClick={handlePengembalianSubmit}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl">
-                Simpan & Selesaikan Peminjaman
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================= */}
-      {/* MODAL TAMBAH BARANG (PETUGAS) */}
-      {/* ========================================================= */}
-      {tambahBarangModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 border border-slate-100">
-            <h3 className="font-extrabold text-sm text-slate-900 mb-3">Tambah Barang Inventaris Baru</h3>
-            <form onSubmit={handleTambahBarang} className="space-y-3">
-              <div>
-                <label className="block text-[11px] font-bold text-slate-600 mb-1">Kode Barang</label>
-                <input 
-                  type="text" 
-                  value={barangBaru.kode}
-                  onChange={e => setBarangBaru({...barangBaru, kode: e.target.value})}
-                  placeholder="Contoh: PROY-02" 
-                  className="w-full px-3 py-1.5 border rounded-lg text-xs outline-none" required 
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] font-bold text-slate-600 mb-1">Nama Barang</label>
-                <input 
-                  type="text" 
-                  value={barangBaru.nama}
-                  onChange={e => setBarangBaru({...barangBaru, nama: e.target.value})}
-                  placeholder="Nama inventaris" 
-                  className="w-full px-3 py-1.5 border rounded-lg text-xs outline-none" required 
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Kategori</label>
-                  <select 
-                    value={barangBaru.kategori}
-                    onChange={e => setBarangBaru({...barangBaru, kategori: e.target.value})}
-                    className="w-full px-2 py-1.5 border rounded-lg text-xs outline-none">
-                    <option value="ELK">Elektronik</option>
-                    <option value="LAB">Alat Laboratorium</option>
-                    <option value="FUR">Furnitur</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Subtipe OOP</label>
-                  <select 
-                    value={barangBaru.jenis}
-                    onChange={e => setBarangBaru({...barangBaru, jenis: e.target.value})}
-                    className="w-full px-2 py-1.5 border rounded-lg text-xs outline-none">
-                    <option value="ELEKTRONIK">BarangElektronik</option>
-                    <option value="ALAT_LAB">AlatLaboratorium</option>
-                    <option value="FURNITUR">BarangFurnitur</option>
-                  </select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Stok Fisik</label>
-                  <input 
-                    type="number" 
-                    value={barangBaru.stok}
-                    onChange={e => setBarangBaru({...barangBaru, stok: Number(e.target.value)})}
-                    className="w-full px-3 py-1.5 border rounded-lg text-xs outline-none" required 
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-600 mb-1">Harga Satuan (Rp)</label>
-                  <input 
-                    type="number" 
-                    value={barangBaru.hargaSatuan}
-                    onChange={e => setBarangBaru({...barangBaru, hargaSatuan: Number(e.target.value)})}
-                    className="w-full px-3 py-1.5 border rounded-lg text-xs outline-none" required 
-                  />
-                </div>
-              </div>
-              <div className="flex items-center gap-2 pt-2">
-                <input 
-                  type="checkbox" 
-                  id="perluPersetujuan"
-                  checked={barangBaru.perluPersetujuan}
-                  onChange={e => setBarangBaru({...barangBaru, perluPersetujuan: e.target.checked})}
-                  className="rounded" 
-                />
-                <label htmlFor="perluPersetujuan" className="text-xs text-slate-700 font-semibold">
-                  Wajib Persetujuan Dosen Pembina
-                </label>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-4">
-                <button 
-                  type="button" 
-                  onClick={() => setTambahBarangModal(false)}
-                  className="px-3 py-1.5 bg-slate-100 text-slate-700 font-bold text-xs rounded-lg">
-                  Batal
-                </button>
-                <button 
-                  type="submit"
-                  className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg">
-                  Simpan Barang
                 </button>
               </div>
             </form>
