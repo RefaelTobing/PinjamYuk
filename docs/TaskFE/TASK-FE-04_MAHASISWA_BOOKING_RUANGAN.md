@@ -54,8 +54,8 @@ Membangun antarmuka pemesanan fasilitas ruangan kampus bagi mahasiswa, mencakup 
 ---
 
 ## 4. Checklist Penerimaan Tugas (Definition of Done)
-- [ ] Grid 14 slot jam (07.00 - 21.00) ter-render rapi dengan kode warna status yang jelas.
-- [ ] Deteksi bentrok jadwal berfungsi otomatis saat tanggal atau ruangan diganti.
-- [ ] Validasi kapasitas ruangan mencegah pengajuan peserta yang berlebihan.
-- [ ] Alert denda pembatalan Rp50.000 terpasang jelas di form pemesanan.
-- [ ] Pengajuan booking berhasil terkirim dan tercatat di database file backend.
+- [x] Grid 14 slot jam (07.00 - 21.00) ter-render rapi dengan kode warna status yang jelas.
+- [x] Deteksi bentrok jadwal berfungsi otomatis saat tanggal atau ruangan diganti.
+- [x] Validasi kapasitas ruangan mencegah pengajuan peserta yang berlebihan.
+- [x] Alert denda pembatalan Rp50.000 terpasang jelas di form pemesanan.
+- [x] Pengajuan booking berhasil terkirim dan tercatat di database file backend.

@@ -158,6 +158,17 @@ public class BookingHandler implements HttpHandler {
         int jumlahPeserta = req.get("jumlahPeserta") instanceof Number ? ((Number) req.get("jumlahPeserta")).intValue() : 1;
         String keperluan = req.get("keperluan") != null ? req.get("keperluan").toString().trim() : "";
 
+        if (jamMulaiStr.isEmpty() && req.get("slotMulai") instanceof Number) {
+            int sm = ((Number) req.get("slotMulai")).intValue();
+            int jam = sm < 7 ? sm + 6 : sm;
+            jamMulaiStr = String.format("%02d:00", jam);
+        }
+        if (jamSelesaiStr.isEmpty() && req.get("slotSelesai") instanceof Number) {
+            int ss = ((Number) req.get("slotSelesai")).intValue();
+            int jam = ss < 7 ? ss + 7 : ss + 1;
+            jamSelesaiStr = String.format("%02d:00", jam);
+        }
+
         if (nim.isEmpty() || kodeRuangan.isEmpty() || tglStr.isEmpty() || jamMulaiStr.isEmpty() || jamSelesaiStr.isEmpty() || keperluan.isEmpty()) {
             HttpHelper.kirimError(exchange, 400, "Semua field booking wajib diisi", "BAD_REQUEST");
             return;

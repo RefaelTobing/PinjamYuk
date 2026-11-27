@@ -3,6 +3,7 @@ import { api, formatRupiah, formatTanggal } from './services/api';
 import AuthPage from './components/auth/AuthPage';
 import Navbar from './components/layout/Navbar';
 import KatalogInventaris from './components/mahasiswa/KatalogInventaris';
+import BookingRuangan from './components/mahasiswa/BookingRuangan';
 import { 
   Package, Calendar, Clock, ShieldCheck, AlertTriangle, 
   CheckCircle2, Trash2, LogOut, Search, Plus, X, 
@@ -48,9 +49,6 @@ export default function App() {
   const [selectedRuangan, setSelectedRuangan] = useState(null);
   const [tglBooking, setTglBooking] = useState(getNextWeek());
   const [jadwalSlots, setJadwalSlots] = useState([]);
-  const [selectedSlots, setSelectedSlots] = useState([]); // [slotObj, ...]
-  const [bookingPeserta, setBookingPeserta] = useState(15);
-  const [bookingKeperluan, setBookingKeperluan] = useState('');
 
   // Riwayat & Admin lists
   const [peminjamanList, setPeminjamanList] = useState([]);
@@ -114,7 +112,6 @@ export default function App() {
     try {
       const res = await api.getJadwalRuangan(selectedRuangan.kode, tglBooking);
       setJadwalSlots(res.data?.slots || []);
-      setSelectedSlots([]);
     } catch (e) {
       showToast(e.message, 'error');
     }
@@ -234,40 +231,6 @@ export default function App() {
     }
   };
 
-  // Handle Submit Booking
-  const submitBooking = async () => {
-    if (!selectedRuangan || selectedSlots.length === 0) {
-      showToast('Pilih ruangan dan minimal satu slot jam', 'error');
-      return;
-    }
-    if (!bookingKeperluan.trim()) {
-      showToast('Harap isi keperluan kegiatan booking ruangan', 'error');
-      return;
-    }
-    const jamMulai = selectedSlots[0].jamMulai;
-    const jamSelesai = selectedSlots[selectedSlots.length - 1].jamSelesai;
-
-    try {
-      const payload = {
-        nim: user.nim,
-        kodeRuangan: selectedRuangan.kode,
-        tanggal: tglBooking,
-        jamMulai,
-        jamSelesai,
-        jumlahPeserta: bookingPeserta,
-        keperluan: bookingKeperluan
-      };
-      await api.ajukanBooking(payload);
-      showToast('Pengajuan booking ruangan berhasil dikirim!');
-      setBookingKeperluan('');
-      setSelectedSlots([]);
-      loadJadwal();
-      loadRiwayatDanLaporan();
-      setActiveTab('riwayat');
-    } catch (e) {
-      showToast(e.message, 'error');
-    }
-  };
 
   // Handle Cancel Peminjaman
   const handleBatalPeminjaman = async (id) => {
@@ -448,126 +411,25 @@ export default function App() {
         )}
 
         {/* ========================================================= */}
-        {/* TAB: JADWAL & BOOKING RUANGAN (MAHASISWA) */}
+        {/* TAB: JADWAL & BOOKING RUANGAN (MAHASISWA - MOCKUP COMPLIANT) */}
         {/* ========================================================= */}
         {activeTab === 'booking' && (
-          <div className="space-y-6">
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap gap-4 items-center justify-between">
-              <div>
-                <h2 className="text-sm font-extrabold text-slate-800">Visualisasi Papan Jadwal Slot Ruangan</h2>
-                <p className="text-xs text-slate-500">Slot operasional 07.00 - 21.00. Slot terkunci bila berstatus Diajukan, Disetujui, atau Terpakai.</p>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <select 
-                  value={selectedRuangan?.kode || ''}
-                  onChange={e => {
-                    const r = ruanganList.find(x => x.kode === e.target.value);
-                    setSelectedRuangan(r);
-                  }}
-                  className="px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-bold text-slate-700 outline-none">
-                  {ruanganList.map(r => (
-                    <option key={r.kode} value={r.kode}>{r.nama} (Kapasitas: {r.kapasitas})</option>
-                  ))}
-                </select>
-
-                <input 
-                  type="date" 
-                  value={tglBooking}
-                  min={getNextWeek()}
-                  onChange={e => setTglBooking(e.target.value)}
-                  className="px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-medium outline-none focus:ring-2 focus:ring-blue-500" 
-                />
-              </div>
-            </div>
-
-            {/* Room Info Card */}
-            {selectedRuangan && (
-              <div className="bg-slate-900 text-white p-4 rounded-2xl flex justify-between items-center">
-                <div>
-                  <h3 className="font-bold text-base">{selectedRuangan.nama} ({selectedRuangan.kode})</h3>
-                  <p className="text-xs text-slate-300 mt-0.5">Fasilitas: {selectedRuangan.fasilitas}</p>
-                </div>
-                <div className="text-right">
-                  <span className="text-xs text-slate-400">Kapasitas Maksimal</span>
-                  <p className="text-lg font-black text-blue-400">{selectedRuangan.kapasitas} Orang</p>
-                </div>
-              </div>
-            )}
-
-            {/* Grid Slot Jam (07.00 - 21.00) */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200">
-              <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Pilih Slot Waktu (07.00 s.d 21.00):</h4>
-              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2.5">
-                {jadwalSlots.map((s, idx) => {
-                  const isBusy = s.status === 'TERISI';
-                  const isSelected = selectedSlots.some(x => x.jamMulai === s.jamMulai);
-
-                  return (
-                    <button 
-                      key={idx}
-                      disabled={isBusy}
-                      onClick={() => {
-                        if (isSelected) {
-                          setSelectedSlots(selectedSlots.filter(x => x.jamMulai !== s.jamMulai));
-                        } else {
-                          if (selectedSlots.length >= 4) {
-                            showToast('Batas maksimal booking adalah 4 jam per pengajuan', 'error');
-                            return;
-                          }
-                          setSelectedSlots([...selectedSlots, s].sort((a,b) => a.jamMulai.localeCompare(b.jamMulai)));
-                        }
-                      }}
-                      className={`p-3 rounded-xl border text-center transition flex flex-col items-center justify-center ${
-                        isBusy 
-                          ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed opacity-60' 
-                          : isSelected 
-                            ? 'bg-amber-100 border-amber-400 text-amber-900 shadow-sm ring-2 ring-amber-400' 
-                            : 'bg-emerald-50 border-emerald-200 text-emerald-800 hover:bg-emerald-100 cursor-pointer'
-                      }`}>
-                      <span className="text-xs font-black">{s.jamMulai} - {s.jamSelesai}</span>
-                      <span className="text-[10px] font-semibold mt-1">
-                        {isBusy ? 'Terisi' : isSelected ? 'Dipilih' : 'Kosong'}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Booking Submission Form */}
-              {selectedSlots.length > 0 && (
-                <div className="mt-6 pt-6 border-t border-slate-100 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Jumlah Peserta</label>
-                    <input 
-                      type="number" 
-                      value={bookingPeserta}
-                      onChange={e => setBookingPeserta(Number(e.target.value))}
-                      max={selectedRuangan?.kapasitas}
-                      className="w-full px-3 py-2 border rounded-xl text-xs outline-none focus:ring-2 focus:ring-blue-500" 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Keperluan Kegiatan</label>
-                    <input 
-                      type="text" 
-                      value={bookingKeperluan}
-                      onChange={e => setBookingKeperluan(e.target.value)}
-                      placeholder="Contoh: Rapat Kerja Himpunan Mahasiswa"
-                      className="w-full px-3 py-2 border rounded-xl text-xs outline-none focus:ring-2 focus:ring-blue-500" 
-                    />
-                  </div>
-                  <div>
-                    <button 
-                      onClick={submitBooking}
-                      className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition">
-                      Kirim Pengajuan Booking ({selectedSlots.length} Jam)
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+          <BookingRuangan
+            user={user}
+            ruanganList={ruanganList}
+            selectedRuangan={selectedRuangan}
+            setSelectedRuangan={setSelectedRuangan}
+            tglBooking={tglBooking}
+            setTglBooking={setTglBooking}
+            jadwalSlots={jadwalSlots}
+            onSubmitBooking={async (payload) => {
+              await api.ajukanBooking(payload);
+              loadJadwal();
+              loadRiwayatDanLaporan();
+            }}
+            showToast={showToast}
+            setActiveTab={setActiveTab}
+          />
         )}
 
         {/* ========================================================= */}
