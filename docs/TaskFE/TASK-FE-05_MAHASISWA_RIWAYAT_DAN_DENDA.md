@@ -88,8 +88,8 @@ Membangun dua komponen vital pengalaman pengguna mahasiswa:
 ---
 
 ## 4. Checklist Penerimaan Tugas (Definition of Done)
-- [ ] Tampilan drawer keranjang persis 100% dengan `katalog_inventaris_keranjang_pengajuan.png`.
-- [ ] Checklist hijau otomatis memverifikasi status mahasiswa aktif dan batas kuota.
-- [ ] Tampilan halaman riwayat persis 100% dengan `riwayat_denda_mahasiswa.png`.
-- [ ] Tiga kartu metrik menampilkan data kuota dan status bebas denda secara akurat.
-- [ ] Aksi batalkan transaksi berfungsi baik untuk peminjaman barang maupun booking ruangan.
+- [x] Tampilan drawer keranjang persis 100% dengan `katalog_inventaris_keranjang_pengajuan.png`.
+- [x] Checklist hijau otomatis memverifikasi status mahasiswa aktif dan batas kuota.
+- [x] Tampilan halaman riwayat persis 100% dengan `riwayat_denda_mahasiswa.png`.
+- [x] Tiga kartu metrik menampilkan data kuota dan status bebas denda secara akurat.
+- [x] Aksi batalkan transaksi berfungsi baik untuk peminjaman barang maupun booking ruangan.

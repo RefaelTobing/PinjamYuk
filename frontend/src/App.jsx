@@ -4,10 +4,12 @@ import AuthPage from './components/auth/AuthPage';
 import Navbar from './components/layout/Navbar';
 import KatalogInventaris from './components/mahasiswa/KatalogInventaris';
 import BookingRuangan from './components/mahasiswa/BookingRuangan';
+import CartDrawer from './components/mahasiswa/CartDrawer';
+import RiwayatDenda from './components/mahasiswa/RiwayatDenda';
 import { 
   Package, Calendar, Clock, ShieldCheck, AlertTriangle, 
-  CheckCircle2, Trash2, LogOut, Search, Plus, X, 
-  Building2, Layers, AlertCircle, ShoppingCart, RefreshCw
+  CheckCircle2, LogOut, Search, Plus, X, 
+  Building2, Layers, AlertCircle, RefreshCw
 } from 'lucide-react';
 
 export default function App() {
@@ -234,25 +236,20 @@ export default function App() {
 
   // Handle Cancel Peminjaman
   const handleBatalPeminjaman = async (id) => {
-    if (!window.confirm('Yakin ingin membatalkan pengajuan peminjaman ini?')) return;
     try {
       await api.batalkanPeminjaman(id);
       showToast('Pengajuan peminjaman berhasil dibatalkan');
       loadRiwayatDanLaporan();
+      loadBarang();
     } catch (e) {
       showToast(e.message, 'error');
     }
   };
 
   // Handle Cancel Booking
-  const handleBatalBooking = async (b) => {
-    const isLate = new Date(b.tanggal) - new Date() < 86400000;
-    const pesan = isLate 
-      ? 'PERHATIAN: Pembatalan kurang dari H-1 dikenakan denda Rp50.000. Lanjutkan pembatalan?' 
-      : 'Yakin ingin membatalkan booking ruangan ini?';
-    if (!window.confirm(pesan)) return;
+  const handleBatalBooking = async (id) => {
     try {
-      const res = await api.batalkanBooking(b.id);
+      const res = await api.batalkanBooking(id);
       showToast(res.pesan || 'Booking berhasil dibatalkan');
       loadRiwayatDanLaporan();
       loadJadwal();
@@ -260,6 +257,25 @@ export default function App() {
       showToast(e.message, 'error');
     }
   };
+
+  // Hitung kuota aktif & tunggakan denda mahasiswa
+  const activeLoanCount = peminjamanList.filter((p) =>
+    ['DIAJUKAN', 'DISETUJUI', 'DIPINJAM'].includes(p.status)
+  ).length;
+
+  const totalUnpaidFines =
+    peminjamanList.reduce((sum, p) => {
+      if (p.pengembalian && p.pengembalian.denda > 0 && !p.pengembalian.lunas) {
+        return sum + p.pengembalian.denda;
+      }
+      return sum;
+    }, 0) +
+    bookingList.reduce((sum, b) => {
+      if (b.dendaPembatalan > 0 && !b.dendaLunas) {
+        return sum + b.dendaPembatalan;
+      }
+      return sum;
+    }, 0);
 
   // Petugas & Pembina review action
   const handleReviewAction = async (setuju, catatan) => {
@@ -433,115 +449,16 @@ export default function App() {
         )}
 
         {/* ========================================================= */}
-        {/* TAB: RIWAYAT SAYA (MAHASISWA) */}
+        {/* TAB: RIWAYAT & DENDA (MAHASISWA - MOCKUP COMPLIANT)       */}
         {/* ========================================================= */}
         {activeTab === 'riwayat' && (
-          <div className="space-y-6">
-            <h2 className="text-base font-extrabold text-slate-800">Riwayat Pengajuan Peminjaman & Booking</h2>
-
-            {/* Peminjaman Barang */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-              <div className="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
-                <span className="font-extrabold text-xs text-slate-700 uppercase">Peminjaman Barang Inventaris</span>
-                <span className="text-xs text-slate-500 font-semibold">{peminjamanList.length} Pengajuan</span>
-              </div>
-
-              <div className="divide-y divide-slate-100">
-                {peminjamanList.length === 0 ? (
-                  <p className="p-6 text-center text-xs text-slate-400">Belum ada riwayat peminjaman barang.</p>
-                ) : (
-                  peminjamanList.map(p => (
-                    <div key={p.id} className="p-4 hover:bg-slate-50 transition flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs font-bold text-slate-700">{p.id}</span>
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${getStatusBadge(p.status)}`}>
-                            {p.labelStatus || p.status}
-                          </span>
-                        </div>
-                        <p className="text-xs font-bold text-slate-800 mt-1">{p.keperluan}</p>
-                        <p className="text-[11px] text-slate-500">
-                          Rentang: {formatTanggal(p.tanggalMulai)} &rarr; {formatTanggal(p.tanggalSelesai)}
-                        </p>
-                        <div className="mt-2 flex flex-wrap gap-1.5">
-                          {p.items?.map((it, idx) => (
-                            <span key={idx} className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-medium">
-                              {it.namaBarang} ({it.jumlah} unit)
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        {p.pengembalian && (
-                          <div className="text-right">
-                            <span className="text-[10px] text-slate-400">Total Denda</span>
-                            <p className="text-xs font-bold text-red-600">{formatRupiah(p.pengembalian.denda)}</p>
-                          </div>
-                        )}
-
-                        {(p.status === 'DIAJUKAN' || p.status === 'DISETUJUI') && (
-                          <button 
-                            onClick={() => handleBatalPeminjaman(p.id)}
-                            className="px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50 rounded-lg border border-red-200 transition">
-                            Batalkan
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* Booking Ruangan */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-              <div className="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
-                <span className="font-extrabold text-xs text-slate-700 uppercase">Booking Ruangan</span>
-                <span className="text-xs text-slate-500 font-semibold">{bookingList.length} Booking</span>
-              </div>
-
-              <div className="divide-y divide-slate-100">
-                {bookingList.length === 0 ? (
-                  <p className="p-6 text-center text-xs text-slate-400">Belum ada riwayat booking ruangan.</p>
-                ) : (
-                  bookingList.map(b => (
-                    <div key={b.id} className="p-4 hover:bg-slate-50 transition flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs font-bold text-slate-700">{b.id}</span>
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${getStatusBadge(b.status)}`}>
-                            {b.labelStatus || b.status}
-                          </span>
-                        </div>
-                        <h4 className="text-xs font-bold text-slate-800 mt-1">{b.namaRuangan} &bull; {b.keperluan}</h4>
-                        <p className="text-[11px] text-slate-500">
-                          Tanggal: {formatTanggal(b.tanggal)} | Jam: {b.jamMulai} - {b.jamSelesai} ({b.durasiJam} Jam)
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        {b.dendaPembatalan > 0 && (
-                          <div className="text-right">
-                            <span className="text-[10px] text-slate-400">Denda Pembatalan</span>
-                            <p className="text-xs font-bold text-red-600">{formatRupiah(b.dendaPembatalan)}</p>
-                          </div>
-                        )}
-
-                        {(b.status === 'DIAJUKAN' || b.status === 'DISETUJUI') && (
-                          <button 
-                            onClick={() => handleBatalBooking(b)}
-                            className="px-3 py-1.5 text-xs font-bold text-red-600 hover:bg-red-50 rounded-lg border border-red-200 transition">
-                            Batalkan Booking
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
+          <RiwayatDenda
+            user={user}
+            peminjamanList={peminjamanList}
+            bookingList={bookingList}
+            onCancelPeminjaman={handleBatalPeminjaman}
+            onCancelBooking={handleBatalBooking}
+          />
         )}
 
         {/* ========================================================= */}
@@ -843,96 +760,26 @@ export default function App() {
       </main>
 
       {/* ========================================================= */}
-      {/* CART DRAWER / MODAL (MAHASISWA) */}
+      {/* SLIDE-OVER CART DRAWER (MAHASISWA - MOCKUP COMPLIANT)     */}
       {/* ========================================================= */}
-      {isCartOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex justify-end">
-          <div className="w-full max-w-md bg-white h-full shadow-2xl flex flex-col justify-between p-6 overflow-y-auto">
-            <div>
-              <div className="flex justify-between items-center pb-4 border-b border-slate-200 mb-4">
-                <h3 className="font-extrabold text-base text-slate-800 flex items-center gap-2">
-                  <ShoppingCart size={18} /> Keranjang Peminjaman Multi-Item
-                </h3>
-                <button onClick={() => setIsCartOpen(false)} className="p-1 text-slate-400 hover:text-slate-600">
-                  <X size={20} />
-                </button>
-              </div>
-
-              <div className="mb-4 bg-blue-50 p-3 rounded-xl border border-blue-200 text-xs text-blue-800">
-                <p><b>Rentang:</b> {formatTanggal(tglMulai)} &rarr; {formatTanggal(tglSelesai)}</p>
-              </div>
-
-              {cart.length === 0 ? (
-                <p className="text-center text-xs text-slate-400 py-10">Keranjang masih kosong.</p>
-              ) : (
-                <div className="space-y-3">
-                  {cart.map((item, idx) => (
-                    <div key={idx} className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center">
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-900">{item.barang.nama}</h4>
-                        <p className="text-[10px] text-slate-500">Kode: {item.barang.kode}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button 
-                          onClick={() => {
-                            if (item.jumlah > 1) {
-                              setCart(cart.map(c => c.barang.kode === item.barang.kode ? { ...c, jumlah: c.jumlah - 1 } : c));
-                            } else {
-                              setCart(cart.filter(c => c.barang.kode !== item.barang.kode));
-                            }
-                          }}
-                          className="w-6 h-6 rounded bg-white border border-slate-300 font-bold text-xs flex items-center justify-center">
-                          -
-                        </button>
-                        <span className="text-xs font-bold">{item.jumlah}</span>
-                        <button 
-                          onClick={() => {
-                            const sisa = item.barang.stokTersedia !== undefined ? item.barang.stokTersedia : item.barang.stok;
-                            if (item.jumlah < sisa) {
-                              setCart(cart.map(c => c.barang.kode === item.barang.kode ? { ...c, jumlah: c.jumlah + 1 } : c));
-                            } else {
-                              showToast(`Stok maksimal ${sisa} unit`, 'error');
-                            }
-                          }}
-                          className="w-6 h-6 rounded bg-white border border-slate-300 font-bold text-xs flex items-center justify-center">
-                          +
-                        </button>
-                        <button 
-                          onClick={() => setCart(cart.filter(c => c.barang.kode !== item.barang.kode))}
-                          className="p-1 text-red-500 hover:text-red-700 ml-1">
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-
-                  <div className="mt-4">
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Keperluan Peminjaman (Wajib)</label>
-                    <textarea 
-                      rows={3}
-                      value={keperluanPeminjaman}
-                      onChange={e => setKeperluanPeminjaman(e.target.value)}
-                      placeholder="Jelaskan tujuan kegiatan dan organisasi peminjam..."
-                      className="w-full px-3 py-2 border rounded-xl text-xs outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="pt-4 border-t border-slate-200">
-              <button 
-                onClick={submitPeminjaman}
-                disabled={cart.length === 0}
-                className={`w-full py-2.5 rounded-xl font-bold text-xs shadow transition ${
-                  cart.length > 0 ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                }`}>
-                Kirim Pengajuan ({cart.reduce((s, i) => s + i.jumlah, 0)} Unit)
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cart={cart}
+        tglMulai={tglMulai}
+        tglSelesai={tglSelesai}
+        onUpdateQuantity={updateCartQuantity}
+        onRemoveItem={(kode) => {
+          setCart((prev) => prev.filter((item) => item.barang.kode !== kode));
+          showToast('Item dihapus dari keranjang');
+        }}
+        keperluan={keperluanPeminjaman}
+        setKeperluan={setKeperluanPeminjaman}
+        onSubmit={submitPeminjaman}
+        user={user}
+        activeLoanCount={activeLoanCount}
+        totalUnpaidFines={totalUnpaidFines}
+      />
 
       {/* ========================================================= */}
       {/* REVIEW & APPROVAL MODAL (PETUGAS / PEMBINA) */}

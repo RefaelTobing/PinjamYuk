@@ -251,8 +251,8 @@ public class PeminjamanHandler implements HttpHandler {
             it.put("namaBarang", d.getBarang().getNama());
             it.put("jenis", d.getBarang().getJenisBarang());
             it.put("jumlah", d.getJumlah());
-            it.put("kondisiAwal", d.getKondisiAwal().name());
-            it.put("kondisiAkhir", d.getKondisiAkhir().name());
+            it.put("kondisiAwal", d.getKondisiAwal() != null ? d.getKondisiAwal().name() : "BAIK");
+            it.put("kondisiAkhir", d.getKondisiAkhir() != null ? d.getKondisiAkhir().name() : "");
             items.add(it);
         }
         map.put("items", items);
