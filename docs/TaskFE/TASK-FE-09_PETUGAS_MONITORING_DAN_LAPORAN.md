@@ -68,8 +68,8 @@ Membangun modul pengawasan dan analitik operasional kampus untuk Petugas Sarana 
 ---
 
 ## 4. Checklist Penerimaan Tugas (Definition of Done)
-- [ ] Tampilan halaman monitoring laporan persis 100% dengan `monitoring_laporan_sirkulasi_petugas_sarpras.png`.
-- [ ] Tiga kartu metrik analitik menampilkan angka total transaksi, jatuh tempo, dan pemasukan denda secara akurat.
-- [ ] Tabel sirkulasi prioritas membedakan transaksi yang tepat waktu dan terlambat dengan badge visual yang jelas.
-- [ ] Tombol `Unduh Rekap Laporan` dan `Kirim Pengingat` berfungsi normal.
-- [ ] Dua kartu integrasi sistem di bagian bawah ter-render dengan rapi.
+- [x] Tampilan halaman monitoring laporan persis 100% dengan `monitoring_laporan_sirkulasi_petugas_sarpras.png`.
+- [x] Tiga kartu metrik analitik menampilkan angka total transaksi, jatuh tempo, dan pemasukan denda secara akurat.
+- [x] Tabel sirkulasi prioritas membedakan transaksi yang tepat waktu dan terlambat dengan badge visual yang jelas.
+- [x] Tombol `Unduh Rekap Laporan` dan `Kirim Pengingat` berfungsi normal.
+- [x] Dua kartu integrasi sistem di bagian bawah ter-render dengan rapi.

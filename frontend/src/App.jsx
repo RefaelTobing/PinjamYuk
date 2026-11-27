@@ -9,6 +9,7 @@ import RiwayatDenda from './components/mahasiswa/RiwayatDenda';
 import PersetujuanPembina from './components/pembina/PersetujuanPembina';
 import MasterDataFasilitas from './components/petugas/MasterDataFasilitas';
 import SirkulasiOperasional from './components/petugas/SirkulasiOperasional';
+import MonitoringLaporan from './components/petugas/MonitoringLaporan';
 import { 
   Package, Calendar, Clock, ShieldCheck, AlertTriangle, 
   CheckCircle2, LogOut, Search, Plus, X, 
@@ -559,76 +560,17 @@ export default function App() {
         )}
 
         {/* ========================================================= */}
-        {/* TAB: LAPORAN & OVERDUE (PETUGAS / PEMBINA) */}
+        {/* TAB: MONITORING & LAPORAN (PETUGAS - MOCKUP COMPLIANT)    */}
         {/* ========================================================= */}
         {activeTab === 'laporan' && (
-          <div className="space-y-6">
-            <h2 className="text-base font-extrabold text-slate-800">Laporan Statistik & Pemantauan Jatuh Tempo</h2>
-
-            {/* Metric Cards */}
-            {laporanRingkasan && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Peminjaman Aktif</span>
-                  <h3 className="text-2xl font-black text-blue-600 mt-1">{laporanRingkasan.totalPeminjamanAktif}</h3>
-                </div>
-                <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Booking Ruang Aktif</span>
-                  <h3 className="text-2xl font-black text-indigo-600 mt-1">{laporanRingkasan.totalBookingAktif}</h3>
-                </div>
-                <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Kasus Jatuh Tempo</span>
-                  <h3 className="text-2xl font-black text-red-600 mt-1">{laporanRingkasan.kasusJatuhTempo}</h3>
-                </div>
-                <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Total Denda Terkumpul</span>
-                  <h3 className="text-xl font-black text-emerald-600 mt-1">{formatRupiah(laporanRingkasan.totalDenda)}</h3>
-                </div>
-              </div>
-            )}
-
-            {/* Overdue Alerts (Red warning cards) */}
-            <div className="bg-red-50 border border-red-200 rounded-2xl p-5">
-              <h3 className="text-xs font-black text-red-800 uppercase tracking-wider flex items-center gap-2 mb-3">
-                <AlertTriangle size={16} /> Peringatan Transaksi Jatuh Tempo / Lewat Batas Waktu
-              </h3>
-              {jatuhTempoList.length === 0 ? (
-                <p className="text-xs text-red-600">Tidak ada peminjaman yang melewati jatuh tempo saat ini. Semua tertib.</p>
-              ) : (
-                <div className="space-y-3">
-                  {jatuhTempoList.map(j => (
-                    <div key={j.id} className="bg-white p-3 rounded-xl border border-red-200 flex justify-between items-center text-xs">
-                      <div>
-                        <span className="font-mono font-bold text-red-800">{j.id}</span> &bull; <b>{j.namaMahasiswa} ({j.nim})</b>
-                        <p className="text-[11px] text-slate-600">Tenggat Selesai: {formatTanggal(j.tanggalSelesai)}</p>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-[10px] text-red-500 font-bold">Terlambat {j.hariTerlambat || 0} Hari</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Rekapitulasi Kategori */}
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-              <h3 className="text-xs font-black text-slate-700 uppercase tracking-wider mb-4">Rekapitulasi Frekuensi Peminjaman per Kategori</h3>
-              <div className="space-y-3">
-                {laporanKategori.map((k, idx) => (
-                  <div key={idx}>
-                    <div className="flex justify-between text-xs font-bold mb-1">
-                      <span>{k.kategori}</span>
-                      <span>{k.jumlahPeminjaman} Unit ({k.persentase}%)</span>
-                    </div>
-                    <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                      <div className="bg-blue-600 h-full rounded-full" style={{ width: `${k.persentase}%` }}></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <MonitoringLaporan
+            peminjamanList={peminjamanList}
+            bookingList={bookingList}
+            laporanRingkasan={laporanRingkasan}
+            laporanKategori={laporanKategori}
+            jatuhTempoList={jatuhTempoList}
+            showToast={showToast}
+          />
         )}
       </main>
 
