@@ -6,6 +6,7 @@ import KatalogInventaris from './components/mahasiswa/KatalogInventaris';
 import BookingRuangan from './components/mahasiswa/BookingRuangan';
 import CartDrawer from './components/mahasiswa/CartDrawer';
 import RiwayatDenda from './components/mahasiswa/RiwayatDenda';
+import PersetujuanPembina from './components/pembina/PersetujuanPembina';
 import { 
   Package, Calendar, Clock, ShieldCheck, AlertTriangle, 
   CheckCircle2, LogOut, Search, Plus, X, 
@@ -449,9 +450,17 @@ export default function App() {
         )}
 
         {/* ========================================================= */}
-        {/* TAB: RIWAYAT & DENDA (MAHASISWA - MOCKUP COMPLIANT)       */}
+        {/* TAB: RIWAYAT (MAHASISWA / DOSEN PEMBINA)                  */}
         {/* ========================================================= */}
-        {activeTab === 'riwayat' && (
+        {activeTab === 'riwayat' && user.peran === 'PEMBINA' && (
+          <PersetujuanPembina
+            mode="riwayat"
+            peminjamanList={peminjamanList}
+            barangList={barangList}
+          />
+        )}
+
+        {activeTab === 'riwayat' && user.peran !== 'PEMBINA' && (
           <RiwayatDenda
             user={user}
             peminjamanList={peminjamanList}
@@ -462,9 +471,38 @@ export default function App() {
         )}
 
         {/* ========================================================= */}
-        {/* TAB: VERIFIKASI (PETUGAS / PEMBINA) */}
+        {/* TAB: VERIFIKASI (DOSEN PEMBINA - MOCKUP COMPLIANT)        */}
         {/* ========================================================= */}
-        {activeTab === 'verifikasi' && (
+        {activeTab === 'verifikasi' && user.peran === 'PEMBINA' && (
+          <PersetujuanPembina
+            mode="antrean"
+            peminjamanList={peminjamanList}
+            barangList={barangList}
+            onApprove={async (id, catatan) => {
+              try {
+                await api.persetujuanPembina(id, true, catatan || '');
+                showToast('Pengajuan berhasil disetujui dan diteruskan ke Petugas Sarpras');
+                loadRiwayatDanLaporan();
+              } catch (e) {
+                showToast(e.message, 'error');
+              }
+            }}
+            onReject={async (id, alasan) => {
+              try {
+                await api.persetujuanPembina(id, false, alasan);
+                showToast('Pengajuan telah ditolak oleh Dosen Pembina');
+                loadRiwayatDanLaporan();
+              } catch (e) {
+                showToast(e.message, 'error');
+              }
+            }}
+          />
+        )}
+
+        {/* ========================================================= */}
+        {/* TAB: VERIFIKASI (PETUGAS) */}
+        {/* ========================================================= */}
+        {activeTab === 'verifikasi' && user.peran === 'PETUGAS' && (
           <div className="space-y-6">
             <h2 className="text-base font-extrabold text-slate-800">Antrean Verifikasi Pengajuan</h2>
 

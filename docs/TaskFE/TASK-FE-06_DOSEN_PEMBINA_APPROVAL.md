@@ -63,8 +63,8 @@ Membangun antarmuka khusus **Dosen Pembina** untuk meninjau, menyetujui, atau me
 ---
 
 ## 4. Checklist Penerimaan Tugas (Definition of Done)
-- [ ] Tampilan antrean persetujuan pembina sesuai persis dengan `persetujuan_dosen_pembina_minimalist.png`.
-- [ ] Indikator `• Aset Bernilai Tinggi` dan estimasi nilai aset tampil dengan jelas.
-- [ ] Tombol `Setujui Pengajuan` berhasil memperbarui status transaksi di Backend Java.
-- [ ] Tombol `Tolak` menampilkan dialog input alasan sebelum mengirimkan pembatalan.
-- [ ] Notifikasi informatif bawah ("diteruskan ke Petugas Loket Sarpras") terpasang rapi.
+- [x] Tampilan antrean persetujuan pembina sesuai persis dengan `persetujuan_dosen_pembina_minimalist.png`.
+- [x] Indikator `• Aset Bernilai Tinggi` dan estimasi nilai aset tampil dengan jelas.
+- [x] Tombol `Setujui Pengajuan` berhasil memperbarui status transaksi di Backend Java.
+- [x] Tombol `Tolak` menampilkan dialog input alasan sebelum mengirimkan pembatalan.
+- [x] Notifikasi informatif bawah ("diteruskan ke Petugas Loket Sarpras") terpasang rapi.

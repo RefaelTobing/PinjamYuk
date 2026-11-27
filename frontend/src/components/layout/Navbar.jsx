@@ -41,7 +41,8 @@ export default function Navbar({
     PEMBINA: {
       badgeText: 'Dosen Pembina',
       badgeClass: 'bg-amber-50 text-amber-900 border-amber-200',
-      activeTabClass: 'bg-amber-50 text-amber-900 font-semibold',
+      activeTabClass: 'bg-amber-100 text-amber-900 font-semibold',
+      logoBgClass: 'bg-amber-700 shadow-amber-500/20',
       tabs: [
         { id: 'verifikasi', label: 'Antrean Persetujuan' },
         { id: 'riwayat', label: 'Riwayat' }
@@ -62,7 +63,7 @@ export default function Navbar({
         {/* KIRI: Logo 3D Box + SIPINJAM + Role Badge                 */}
         {/* ========================================================= */}
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-xs shadow-blue-500/20">
+          <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-white shadow-xs ${currentTheme.logoBgClass || 'bg-blue-600 shadow-blue-500/20'}`}>
             <Box size={19} strokeWidth={2.2} />
           </div>
           <span className="text-lg font-black tracking-tight text-slate-900">
