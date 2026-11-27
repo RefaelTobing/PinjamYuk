@@ -72,8 +72,8 @@ Membangun modul operasional sirkulasi harian Petugas Sarana Prasarana (verifikas
 ---
 
 ## 4. Checklist Penerimaan Tugas (Definition of Done)
-- [ ] Tampilan modal inspeksi pengembalian fisik identik 100% dengan `sirkulasi_inspeksi_pengembalian_petugas_sarpras.png`.
-- [ ] Dropdown kondisi barang merender opsi Baik, Rusak Ringan, Rusak Berat, dan Hilang.
-- [ ] Angka denda keterlambatan dan denda kerusakan terhitung otomatis secara live.
-- [ ] Total denda merah mencerminkan hasil akumulasi secara presisi.
-- [ ] Eksekusi `Simpan Pengembalian` berhasil memperbarui database dan menutup modal.
+- [x] Tampilan modal inspeksi pengembalian fisik identik 100% dengan `sirkulasi_inspeksi_pengembalian_petugas_sarpras.png`.
+- [x] Dropdown kondisi barang merender opsi Baik, Rusak Ringan, Rusak Berat, dan Hilang.
+- [x] Angka denda keterlambatan dan denda kerusakan terhitung otomatis secara live.
+- [x] Total denda merah mencerminkan hasil akumulasi secara presisi.
+- [x] Eksekusi `Simpan Pengembalian` berhasil memperbarui database dan menutup modal.
