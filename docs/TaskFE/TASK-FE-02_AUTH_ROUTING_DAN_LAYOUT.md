@@ -56,8 +56,8 @@ Membangun antarmuka autentikasi pengguna (Login dan Registrasi Mahasiswa) yang p
 ---
 
 ## 4. Checklist Penerimaan Tugas (Definition of Done)
-- [ ] Tampilan halaman login identik 100% dengan `halaman_login_sipinjam.png`.
-- [ ] Efek background dot-grid terlihat rapi di berbagai resolusi layar.
-- [ ] Tombol toggle tab `Masuk` dan `Daftar Mahasiswa` bertransisi mulus.
-- [ ] Fitur intip password (toggle eye icon) berfungsi normal.
-- [ ] Ketiga tombol akun demo berfungsi langsung mengautentikasi pengguna ke dashboard perannya masing-masing.
+- [x] Tampilan halaman login identik 100% dengan `halaman_login_sipinjam.png`.
+- [x] Efek background dot-grid terlihat rapi di berbagai resolusi layar.
+- [x] Tombol toggle tab `Masuk` dan `Daftar Mahasiswa` bertransisi mulus.
+- [x] Fitur intip password (toggle eye icon) berfungsi normal.
+- [x] Ketiga tombol akun demo berfungsi langsung mengautentikasi pengguna ke dashboard perannya masing-masing.

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { api, formatRupiah, formatTanggal } from './services/api';
+import AuthPage from './components/auth/AuthPage';
 import { 
-  Package, Calendar, Clock, User, ShieldCheck, AlertTriangle, 
-  CheckCircle2, Filter, Trash2, LogOut, Search, Plus, X, 
-  ChevronRight, Building2, Layers, AlertCircle, ShoppingCart, RefreshCw
+  Package, Calendar, Clock, ShieldCheck, AlertTriangle, 
+  CheckCircle2, Trash2, LogOut, Search, Plus, X, 
+  Building2, Layers, AlertCircle, ShoppingCart, RefreshCw
 } from 'lucide-react';
 
 export default function App() {
@@ -13,17 +14,8 @@ export default function App() {
     return saved ? JSON.parse(saved) : null;
   });
 
-  // Login form state
-  const [loginUsername, setLoginUsername] = useState('mahasiswa');
-  const [loginPassword, setLoginPassword] = useState('mahasiswa123');
-  const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
-  const [regData, setRegData] = useState({
-    nim: '', nama: '', programStudi: 'D3 Teknik Informatika',
-    noTelepon: '', username: '', password: ''
-  });
-
   // Global feedback notification
-  const [toast, setToast] = useState(null); // { message, type: 'success' | 'error' }
+  const [toast, setToast] = useState(null); // { message, type: 'success' | 'error' | 'info' }
 
   // Active navigation tab
   const [activeTab, setActiveTab] = useState('katalog'); // 'katalog' | 'booking' | 'riwayat' | 'verifikasi' | 'sirkulasi' | 'master' | 'laporan'
@@ -170,30 +162,6 @@ export default function App() {
     }
   }, [selectedRuangan, tglBooking]);
 
-  // Handle Login
-  const handleLogin = async (u, p) => {
-    try {
-      const res = await api.login(u || loginUsername, p || loginPassword);
-      setUser(res.data);
-      showToast(`Selamat datang, ${res.data.nama}!`);
-    } catch (e) {
-      showToast(e.message, 'error');
-    }
-  };
-
-  // Handle Register
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    try {
-      await api.register(regData);
-      showToast('Registrasi berhasil! Silakan masuk.');
-      setAuthMode('login');
-      setLoginUsername(regData.username);
-      setLoginPassword(regData.password);
-    } catch (err) {
-      showToast(err.message, 'error');
-    }
-  };
 
   // Handle Add to Cart
   const addToCart = (b) => {
@@ -396,147 +364,19 @@ export default function App() {
   // ==========================================
   if (!user) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+      <>
         {toast && (
           <div className={`fixed top-5 right-5 z-50 px-4 py-3 rounded-xl shadow-lg border text-sm font-semibold flex items-center gap-2 ${
-            toast.type === 'error' ? 'bg-red-50 text-red-800 border-red-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+            toast.type === 'error' ? 'bg-red-50 text-red-800 border-red-200' : 
+            toast.type === 'info' ? 'bg-blue-50 text-blue-800 border-blue-200' :
+            'bg-emerald-50 text-emerald-800 border-emerald-200'
           }`}>
             {toast.type === 'error' ? <AlertCircle size={18} /> : <CheckCircle2 size={18} />}
             {toast.message}
           </div>
         )}
-
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100">
-          <div className="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-700 p-8 text-white text-center">
-            <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-white/20">
-              <Package size={28} className="text-blue-300" />
-            </div>
-            <h1 className="text-2xl font-black tracking-tight">SIPINJAM</h1>
-            <p className="text-blue-200 text-xs mt-1">Platform Peminjaman Inventaris & Booking Ruangan Kampus</p>
-          </div>
-
-          <div className="p-6">
-            <div className="flex border-b border-slate-200 mb-6">
-              <button 
-                onClick={() => setAuthMode('login')} 
-                className={`flex-1 py-2 text-sm font-bold border-b-2 transition ${authMode === 'login' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-400'}`}>
-                Masuk Akun
-              </button>
-              <button 
-                onClick={() => setAuthMode('register')} 
-                className={`flex-1 py-2 text-sm font-bold border-b-2 transition ${authMode === 'register' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-400'}`}>
-                Daftar Mahasiswa
-              </button>
-            </div>
-
-            {authMode === 'login' ? (
-              <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Username</label>
-                  <input 
-                    type="text" 
-                    value={loginUsername} 
-                    onChange={e => setLoginUsername(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" 
-                    placeholder="Contoh: mahasiswa, petugas, pembina"
-                    required 
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Kata Sandi</label>
-                  <input 
-                    type="password" 
-                    value={loginPassword} 
-                    onChange={e => setLoginPassword(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" 
-                    placeholder="••••••••"
-                    required 
-                  />
-                </div>
-
-                <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm shadow transition">
-                  Masuk Sekarang
-                </button>
-
-                {/* Quick-Fill Demo Accounts */}
-                <div className="pt-4 border-t border-slate-100">
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Akun Demo Praktikum:</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    <button 
-                      type="button" 
-                      onClick={() => handleLogin('mahasiswa', 'mahasiswa123')}
-                      className="text-[11px] font-bold py-1.5 px-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg border border-blue-200 transition">
-                      Mahasiswa
-                    </button>
-                    <button 
-                      type="button" 
-                      onClick={() => handleLogin('petugas', 'petugas123')}
-                      className="text-[11px] font-bold py-1.5 px-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg border border-emerald-200 transition">
-                      Petugas
-                    </button>
-                    <button 
-                      type="button" 
-                      onClick={() => handleLogin('pembina', 'pembina123')}
-                      className="text-[11px] font-bold py-1.5 px-2 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg border border-amber-200 transition">
-                      Pembina
-                    </button>
-                  </div>
-                </div>
-              </form>
-            ) : (
-              <form onSubmit={handleRegister} className="space-y-3">
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">NIM</label>
-                  <input 
-                    type="text" 
-                    value={regData.nim} 
-                    onChange={e => setRegData({...regData, nim: e.target.value})}
-                    className="w-full px-3 py-1.5 border rounded-lg text-sm outline-none" 
-                    placeholder="220411100055" 
-                    required 
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap</label>
-                  <input 
-                    type="text" 
-                    value={regData.nama} 
-                    onChange={e => setRegData({...regData, nama: e.target.value})}
-                    className="w-full px-3 py-1.5 border rounded-lg text-sm outline-none" 
-                    placeholder="Nama Mahasiswa" 
-                    required 
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Username</label>
-                  <input 
-                    type="text" 
-                    value={regData.username} 
-                    onChange={e => setRegData({...regData, username: e.target.value})}
-                    className="w-full px-3 py-1.5 border rounded-lg text-sm outline-none" 
-                    placeholder="username_mhs" 
-                    required 
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Kata Sandi</label>
-                  <input 
-                    type="password" 
-                    value={regData.password} 
-                    onChange={e => setRegData({...regData, password: e.target.value})}
-                    className="w-full px-3 py-1.5 border rounded-lg text-sm outline-none" 
-                    placeholder="••••••••" 
-                    required 
-                  />
-                </div>
-                <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-sm shadow transition mt-2">
-                  Daftarkan Akun
-                </button>
-              </form>
-            )}
-          </div>
-        </div>
-      </div>
+        <AuthPage onLoginSuccess={(userData) => setUser(userData)} showToast={showToast} />
+      </>
     );
   }
 

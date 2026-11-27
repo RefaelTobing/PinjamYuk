@@ -1,13 +1,9 @@
-<<<<<<< HEAD
-const BASE_URL = 
+// Base URL backend. Bisa dioverride lewat frontend/.env -> VITE_API_BASE_URL.
+const RAW_URL = 
   (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL) ||
   (typeof process !== 'undefined' && process.env && process.env.VITE_API_BASE_URL) ||
   'http://localhost:8080/api';
-=======
-// Base URL backend. Bisa dioverride lewat frontend/.env -> VITE_API_BASE_URL.
-// Default 8080 harus SAMA dengan port yang dipakai run_server (./run_server.ps1 -Port 8080).
-const BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api').replace(/\/+$/, '');
->>>>>>> 7ccfc22fa3b15da1039d6178b7d4a701d2466b27
+const BASE_URL = RAW_URL.replace(/\/+$/, '');
 
 async function request(endpoint, options = {}) {
   const url = `${BASE_URL}${endpoint}`;
@@ -32,21 +28,15 @@ async function request(endpoint, options = {}) {
     }
     return data;
   } catch (err) {
-<<<<<<< HEAD
-    if (err.name === 'TypeError' && err.message.includes('fetch')) {
-      const connError = new Error('Tidak dapat terhubung ke Backend Server Java (Port 8080). Pastikan server backend telah aktif (./run_server.sh atau npm run backend).');
+    if (err.name === 'TypeError') {
+      const connError = new Error(
+        `Tidak dapat terhubung ke Backend Server Java di ${BASE_URL}. ` +
+        'Pastikan server sudah jalan (./run_server.ps1 atau npm run backend) dan port-nya sama dengan VITE_API_BASE_URL.'
+      );
       connError.status = 503;
       connError.pesan = connError.message;
       connError.kodeKesalahan = 'KONEKSI_GAGAL';
       throw connError;
-=======
-    if (err.name === 'TypeError') {
-      throw new Error(
-        `Tidak dapat terhubung ke Backend Server Java di ${BASE_URL}. ` +
-        'Pastikan server sudah jalan (./run_server.ps1) dan port-nya sama dengan VITE_API_BASE_URL ' +
-        '(mis. backend di 8081 -> set VITE_API_BASE_URL=http://localhost:8081/api di frontend/.env).'
-      );
->>>>>>> 7ccfc22fa3b15da1039d6178b7d4a701d2466b27
     }
     throw err;
   }
@@ -183,10 +173,9 @@ export const formatTanggal = (str) => {
     const d = new Date(str);
     if (isNaN(d.getTime())) return String(str);
     return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).format(d);
-  } catch (e) {
+  } catch (_e) {
     return String(str);
   }
-<<<<<<< HEAD
 };
 
 /**
@@ -198,6 +187,3 @@ export const formatRentang = (tglMulai, tglSelesai) => {
   if (!tglMulai && tglSelesai) return formatTanggal(tglSelesai);
   return `${formatTanggal(tglMulai)} \u2013 ${formatTanggal(tglSelesai)}`;
 };
-=======
-};
->>>>>>> 7ccfc22fa3b15da1039d6178b7d4a701d2466b27
