@@ -63,8 +63,8 @@ Mengimplementasikan komponen Header Navbar Universal yang beradaptasi dengan per
 ---
 
 ## 4. Checklist Penerimaan Tugas (Definition of Done)
-- [ ] Tampilan katalog inventaris sesuai persis dengan `katalog_inventaris_mahasiswa.png`.
-- [ ] Header navbar floating universal menampilkan pill tabs, counter keranjang, dan profil pengguna dengan rapi.
-- [ ] Grid 3-kolom responsif menyesuaikan layar mobile, tablet, dan desktop.
-- [ ] Pengecekan sisa stok dinamis terhubung ke REST API saat rentang tanggal berubah.
-- [ ] Tombol `+ Tambah` berhasil bertransisi menjadi stepper `[- X Unit +]` saat item masuk ke keranjang.
+- [x] Tampilan katalog inventaris sesuai persis dengan `katalog_inventaris_mahasiswa.png`.
+- [x] Header navbar floating universal menampilkan pill tabs, counter keranjang, dan profil pengguna dengan rapi.
+- [x] Grid 3-kolom responsif menyesuaikan layar mobile, tablet, dan desktop.
+- [x] Pengecekan sisa stok dinamis terhubung ke REST API saat rentang tanggal berubah.
+- [x] Tombol `+ Tambah` berhasil bertransisi menjadi stepper `[- X Unit +]` saat item masuk ke keranjang.

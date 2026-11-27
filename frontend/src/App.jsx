@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { api, formatRupiah, formatTanggal } from './services/api';
 import AuthPage from './components/auth/AuthPage';
+import Navbar from './components/layout/Navbar';
+import KatalogInventaris from './components/mahasiswa/KatalogInventaris';
 import { 
   Package, Calendar, Clock, ShieldCheck, AlertTriangle, 
   CheckCircle2, Trash2, LogOut, Search, Plus, X, 
@@ -182,6 +184,26 @@ export default function App() {
       return [...prev, { barang: b, jumlah: 1 }];
     });
     showToast(`${b.nama} ditambahkan ke keranjang`);
+  };
+
+  // Handle Update Cart Quantity (Stepper +/-)
+  const updateCartQuantity = (kode, newQty) => {
+    if (newQty <= 0) {
+      setCart(prev => prev.filter(item => item.barang.kode !== kode));
+      showToast('Item dihapus dari keranjang');
+    } else {
+      setCart(prev => prev.map(item => {
+        if (item.barang.kode === kode) {
+          const sisa = item.barang.stokTersedia !== undefined ? item.barang.stokTersedia : item.barang.stok;
+          if (newQty > sisa) {
+            showToast(`Kuantitas maksimal (${sisa} unit) telah tercapai`, 'error');
+            return item;
+          }
+          return { ...item, jumlah: newQty };
+        }
+        return item;
+      }));
+    }
   };
 
   // Handle Submit Peminjaman
@@ -395,250 +417,34 @@ export default function App() {
         </div>
       )}
 
-      {/* TOP NAVBAR */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-sm">
-              <Package size={22} />
-            </div>
-            <div>
-              <span className="font-extrabold text-lg text-slate-900 tracking-tight flex items-center gap-2">
-                SIPINJAM <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200">v2.0 Decoupled</span>
-              </span>
-              <p className="text-[10px] text-slate-500 font-medium">Sistem Peminjaman Inventaris & Ruangan Kampus</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* User profile pill */}
-            <div className="flex items-center gap-2.5 px-3 py-1.5 bg-slate-50 rounded-xl border border-slate-200">
-              <div className="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center font-bold text-xs text-slate-700">
-                {user.nama.charAt(0)}
-              </div>
-              <div className="text-left">
-                <p className="text-xs font-bold text-slate-800 leading-tight">{user.nama}</p>
-                <span className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded border ${getRoleBadge(user.peran)}`}>
-                  {user.labelPeran || user.peran}
-                </span>
-              </div>
-            </div>
-
-            {/* Cart Button (for Mahasiswa) */}
-            {user.peran === 'MAHASISWA' && (
-              <button 
-                onClick={() => setIsCartOpen(true)}
-                className="relative p-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl border border-blue-200 transition">
-                <ShoppingCart size={18} />
-                {cart.length > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-600 text-white rounded-full text-[10px] font-bold flex items-center justify-center">
-                    {cart.reduce((sum, i) => sum + i.jumlah, 0)}
-                  </span>
-                )}
-              </button>
-            )}
-
-            {/* Logout */}
-            <button 
-              onClick={() => setUser(null)}
-              className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition"
-              title="Keluar">
-              <LogOut size={18} />
-            </button>
-          </div>
-        </div>
-
-        {/* NAVIGATION TABS */}
-        <div className="max-w-7xl mx-auto px-4 flex gap-2 overflow-x-auto py-1">
-          {user.peran === 'MAHASISWA' && (
-            <>
-              <button 
-                onClick={() => setActiveTab('katalog')} 
-                className={`px-4 py-2 text-xs font-bold rounded-lg transition flex items-center gap-1.5 ${
-                  activeTab === 'katalog' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
-                }`}>
-                <Package size={15} /> Katalog Barang
-              </button>
-              <button 
-                onClick={() => setActiveTab('booking')} 
-                className={`px-4 py-2 text-xs font-bold rounded-lg transition flex items-center gap-1.5 ${
-                  activeTab === 'booking' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
-                }`}>
-                <Calendar size={15} /> Jadwal & Booking Ruangan
-              </button>
-              <button 
-                onClick={() => setActiveTab('riwayat')} 
-                className={`px-4 py-2 text-xs font-bold rounded-lg transition flex items-center gap-1.5 ${
-                  activeTab === 'riwayat' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
-                }`}>
-                <Clock size={15} /> Riwayat Saya & Denda
-              </button>
-            </>
-          )}
-
-          {user.peran === 'PETUGAS' && (
-            <>
-              <button 
-                onClick={() => setActiveTab('verifikasi')} 
-                className={`px-4 py-2 text-xs font-bold rounded-lg transition flex items-center gap-1.5 ${
-                  activeTab === 'verifikasi' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
-                }`}>
-                <ShieldCheck size={15} /> Verifikasi Pengajuan
-              </button>
-              <button 
-                onClick={() => setActiveTab('sirkulasi')} 
-                className={`px-4 py-2 text-xs font-bold rounded-lg transition flex items-center gap-1.5 ${
-                  activeTab === 'sirkulasi' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
-                }`}>
-                <RefreshCw size={15} /> Sirkulasi & Denda
-              </button>
-              <button 
-                onClick={() => setActiveTab('master')} 
-                className={`px-4 py-2 text-xs font-bold rounded-lg transition flex items-center gap-1.5 ${
-                  activeTab === 'master' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
-                }`}>
-                <Layers size={15} /> Master Data Inventaris
-              </button>
-              <button 
-                onClick={() => setActiveTab('laporan')} 
-                className={`px-4 py-2 text-xs font-bold rounded-lg transition flex items-center gap-1.5 ${
-                  activeTab === 'laporan' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
-                }`}>
-                <Building2 size={15} /> Laporan & Overdue
-              </button>
-            </>
-          )}
-
-          {user.peran === 'PEMBINA' && (
-            <>
-              <button 
-                onClick={() => setActiveTab('verifikasi')} 
-                className={`px-4 py-2 text-xs font-bold rounded-lg transition flex items-center gap-1.5 ${
-                  activeTab === 'verifikasi' ? 'bg-amber-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
-                }`}>
-                <ShieldCheck size={15} /> Antrean Persetujuan Khusus
-              </button>
-              <button 
-                onClick={() => setActiveTab('laporan')} 
-                className={`px-4 py-2 text-xs font-bold rounded-lg transition flex items-center gap-1.5 ${
-                  activeTab === 'laporan' ? 'bg-amber-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'
-                }`}>
-                <Building2 size={15} /> Pantau Jatuh Tempo & Statistik
-              </button>
-            </>
-          )}
-        </div>
-      </header>
+      {/* TOP NAVBAR UNIVERSAL (ROLE-BASED & MOCKUP COMPLIANT) */}
+      <Navbar
+        user={user}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        cartCount={cart.reduce((sum, i) => sum + i.jumlah, 0)}
+        onCartClick={() => setIsCartOpen(true)}
+        onLogout={() => setUser(null)}
+      />
 
       {/* MAIN CONTENT AREA */}
       <main className="max-w-7xl mx-auto px-4 py-6 flex-1 w-full">
         {/* ========================================================= */}
-        {/* TAB: KATALOG BARANG (MAHASISWA) */}
+        {/* TAB: KATALOG BARANG (MAHASISWA - MOCKUP COMPLIANT)        */}
         {/* ========================================================= */}
         {activeTab === 'katalog' && (
-          <div className="space-y-6">
-            {/* Filter Date Range & Dynamic Stock Calculator */}
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap gap-4 items-center justify-between">
-              <div>
-                <h2 className="text-sm font-extrabold text-slate-800">Rentang Tanggal Peminjaman</h2>
-                <p className="text-xs text-slate-500">Sisa stok dihitung otomatis berdasarkan tumpang tindih tanggal peminjaman aktif.</p>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase">Mulai</label>
-                  <input 
-                    type="date" 
-                    value={tglMulai}
-                    min={getTomorrow()}
-                    onChange={e => setTglMulai(e.target.value)}
-                    className="px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-medium outline-none focus:ring-2 focus:ring-blue-500" 
-                  />
-                </div>
-                <span className="text-slate-400 font-bold">&rarr;</span>
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase">Selesai (Maks 7 Hari)</label>
-                  <input 
-                    type="date" 
-                    value={tglSelesai}
-                    min={tglMulai}
-                    onChange={e => setTglSelesai(e.target.value)}
-                    className="px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-medium outline-none focus:ring-2 focus:ring-blue-500" 
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Search & Filter */}
-            <div className="flex gap-3">
-              <div className="relative flex-1">
-                <Search size={16} className="absolute left-3 top-2.5 text-slate-400" />
-                <input 
-                  type="text" 
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  placeholder="Cari nama barang atau kode inventaris..." 
-                  className="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <select 
-                value={kategoriFilter}
-                onChange={e => setKategoriFilter(e.target.value)}
-                className="px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none">
-                <option value="">Semua Kategori</option>
-                <option value="ELK">Elektronik</option>
-                <option value="LAB">Alat Laboratorium</option>
-                <option value="FUR">Furnitur</option>
-              </select>
-            </div>
-
-            {/* Catalog Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {barangList.map(b => {
-                const sisa = b.stokTersedia !== undefined ? b.stokTersedia : b.stok;
-                return (
-                  <div key={b.kode} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between">
-                    <div className="p-4 border-b border-slate-100 flex items-start justify-between">
-                      <div>
-                        <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">{b.kategori || b.jenis}</span>
-                        <h3 className="font-bold text-sm text-slate-900 mt-0.5">{b.nama}</h3>
-                        <p className="text-[11px] text-slate-400">Kode: {b.kode}</p>
-                      </div>
-                      {b.perluPersetujuan && (
-                        <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                          Perlu Pembina
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="p-4 space-y-3">
-                      <div className="flex justify-between items-center text-xs">
-                        <span className="text-slate-500">Stok Tersedia:</span>
-                        <span className={`font-black ${sisa > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
-                          {sisa} Unit (Total: {b.stok})
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center text-xs">
-                        <span className="text-slate-500">Tarif Denda Telat:</span>
-                        <span className="font-semibold text-slate-700">{formatRupiah(b.tarifHarian)}/hari</span>
-                      </div>
-
-                      <button 
-                        onClick={() => addToCart(b)}
-                        disabled={sisa <= 0}
-                        className={`w-full py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition ${
-                          sisa > 0 
-                            ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm' 
-                            : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                        }`}>
-                        <Plus size={14} /> Tambah ke Keranjang
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          <KatalogInventaris
+            barangList={barangList}
+            tglMulai={tglMulai}
+            tglSelesai={tglSelesai}
+            onDateChange={(mulai, selesai) => {
+              setTglMulai(mulai);
+              setTglSelesai(selesai);
+            }}
+            cart={cart}
+            onAddToCart={addToCart}
+            onUpdateCartQuantity={updateCartQuantity}
+          />
         )}
 
         {/* ========================================================= */}

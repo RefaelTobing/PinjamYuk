@@ -61,8 +61,16 @@ export const api = {
   // Inventaris & Ruangan
   getBarang: (params = {}) => {
     const q = new URLSearchParams();
-    if (params.mulai) q.set('mulai', params.mulai);
-    if (params.selesai) q.set('selesai', params.selesai);
+    const mulai = params.mulai || params.tglMulai;
+    const selesai = params.selesai || params.tglSelesai;
+    if (mulai) {
+      q.set('mulai', mulai);
+      q.set('tglMulai', mulai);
+    }
+    if (selesai) {
+      q.set('selesai', selesai);
+      q.set('tglSelesai', selesai);
+    }
     if (params.kategori) q.set('kategori', params.kategori);
     if (params.cari) q.set('cari', params.cari);
     const qs = q.toString() ? `?${q.toString()}` : '';
